@@ -10,7 +10,7 @@ Capture OFF. Corrections OFF. No live ingest, secrets, merge, deploy, or upstrea
 | Repo | Ref | SHA |
 |---|---|---|
 | Engine wire (read-only) | [SelfLearning PR #13](https://github.com/liddar12/SelfLearning/pull/13) head | **`37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2`** |
-| NFL fork draft branch | `cursor/selflearning-shadow-wiring-a401` | *(see `git rev-parse HEAD` after commit)* |
+| NFL fork draft branch | `cursor/selflearning-shadow-wiring-a401` | **`2e94c6e04ba898a9136323a37d7e85bfdbd6c850`** |
 
 Engine CI: owner reports green; this agent observed SUCCESS on PR #13 check rollup via `gh` — **not** independently re-run. Beta pending.
 
