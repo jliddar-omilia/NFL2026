@@ -130,5 +130,8 @@ test('propagation caveat lock: SWR120 is not a global revoke upper bound', () =>
   assert.match(src, /NOT globally bounded|offline|open-tab|stale-while-revalidate/i);
   const dataSrc = readFileSync(join(ROOT, 'app/data.js'), 'utf8');
   assert.match(dataSrc, /loadServedParlays/);
+  assert.match(dataSrc, /import\('\.\/parlay-serving\.js'\)/);
   assert.match(dataSrc, /NOT a global revoke bound|open-tab/i);
+  // Keep corrections resolve off the static boot graph.
+  assert.doesNotMatch(dataSrc, /^import \{[^}]*loadServedParlays/m);
 });

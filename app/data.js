@@ -23,7 +23,8 @@
  */
 
 import { RUNTIME_CONFIG } from './runtime-config.js';
-import { loadServedParlays } from './parlay-serving.js';
+// R1 parlay-serving is LAZY inside getParlays — keep it off the static boot
+// graph (slate/players/etc. must not pay for corrections resolve).
 
 // Absolute paths from the site root so getters work under any hash route.
 const PATHS = Object.freeze({
@@ -116,6 +117,7 @@ export const getGamePredictions = (opts) => loadJson(PATHS.gamePredictions, opts
  */
 export async function getParlays(opts = {}) {
   const { nowIso = null, ...loadOpts } = opts;
+  const { loadServedParlays } = await import('./parlay-serving.js');
   const result = await loadServedParlays(
     (path) => loadJson(path, loadOpts),
     { nowIso },
