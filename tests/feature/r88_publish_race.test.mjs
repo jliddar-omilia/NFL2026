@@ -268,6 +268,8 @@ test('the DEFAULT contract gate is the real validate_data.py', () => {
   assert.match(PUBLISH_SRC, /PUBLISH_VALIDATE_CMD:-python3 scripts\/validate_data\.py/);
   assert.match(PUBLISH_SRC, /PUBLISH_BACKOFF_S:-5/, 'the production backoff is 5s');
   assert.match(PUBLISH_SRC, /PUBLISH_ATTEMPTS:-5/, 'the production bound is 5 attempts');
+  assert.match(PUBLISH_SRC, /retry budget: attempts=\$\{ATTEMPTS\} backoff_s=\$\{BACKOFF_S\}/,
+    'resolved retry budget is logged for the test seam');
 });
 
 test('merge_ledgers --selftest passes', () => {
@@ -706,7 +708,6 @@ test('(f) a remote that always rejects: exactly 5 attempts, then one ::error:: a
     writeFileSync(hook, '#!/bin/sh\necho "rejected by policy" >&2\nexit 1\n', { mode: 0o755 });
 
     generate(world.b, { asOf: TB, legSel: 'B ML', cardId: 'bbb', pHome: 0.77 });
-    const started = Date.now();
     const r = publish(world.b, 'data: daily pipeline refresh [skip actions]');
     assert.equal(r.status, 1, r.out);
 
@@ -714,8 +715,10 @@ test('(f) a remote that always rejects: exactly 5 attempts, then one ::error:: a
     assert.deepEqual(attempts, ['1', '2', '3', '4', '5'], 'bounded at exactly 5');
     assert.equal((r.out.match(/::error::/g) || []).length, 1, 'one explicit failure line');
     assert.match(r.out, /could not publish data after 5 attempts/);
-    // PUBLISH_BACKOFF_S=0 is honoured, so the bound costs no wall time.
-    assert.ok(Date.now() - started < 20000, 'the test must not sit through the real backoff');
+    // Lock the test seam directly. Wall-clock is not a reliable detector of the
+    // production 5s backoff on shared disks once other feature tests have run.
+    assert.match(r.out, /retry budget: attempts=5 backoff_s=0/,
+      'PUBLISH_BACKOFF_S=0 must be the resolved retry budget');
 
     // The generation is still committed locally: nothing was lost, it was just
     // not published.
