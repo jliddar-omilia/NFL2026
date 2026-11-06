@@ -22,6 +22,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { scopedBuckets, setLegs } from './_legstep.mjs';
+import { routeOffParlayServing } from './_parlay_serving.mjs';
 
 const PARLAYS = JSON.parse(readFileSync(new URL('../../data/parlays.json', import.meta.url), 'utf8'));
 const INDEX_FX = JSON.parse(readFileSync(new URL('../fixtures/r73/index.json', import.meta.url), 'utf8'));
@@ -145,7 +146,8 @@ const notFound = (route) => route.fulfill({ status: 404, contentType: 'text/plai
 
 /** Route every R73 contract; `opts` drops the index or the archive (404). */
 async function routeAll(page, { index = true, archive = true, review = reviewDoc() } = {}) {
-  await page.route('**/data/parlays.json', (r) => json(r, JSON.stringify(currentDoc())));
+  // R1: getParlays reads flag+baseline; stub the OFF triad with the fixture week.
+  await routeOffParlayServing(page, currentDoc(), { fulfill: json });
   await page.route('**/data/parlays/index.json', (r) => (index ? json(r, JSON.stringify(indexDoc())) : notFound(r)));
   await page.route(`**/${ARCHIVE_PATH}`, (r) => (archive ? json(r, JSON.stringify(archiveDoc())) : notFound(r)));
   await page.route('**/data/review.json', (r) => json(r, JSON.stringify(review)));

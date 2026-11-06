@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { setLegs } from './_legstep.mjs';
+import { routeOffParlayServing } from './_parlay_serving.mjs';
 
 const doc = JSON.parse(readFileSync(new URL('../../data/parlays.json', import.meta.url), 'utf8'));
 const week = doc.parlays.filter((c) => c.scope === 'week');
@@ -47,7 +48,7 @@ test('a thin game explains its smaller offer set and the message follows scope c
     game_shortfalls: [{ game_id: String(target.game_id), target: 3, candidate_prop_count: 0,
       raw_cards: 3, distinct_cards: 1, duplicates_removed: 2, shortfall: 2,
       reason: 'no_eligible_prop_candidates' }], week_shortfall: null };
-  await page.route('**/data/parlays.json*', (route) => route.fulfill({ json: fixture }));
+  await routeOffParlayServing(page, fixture);
   await page.goto('/#/parlays');
   const notice = page.locator('#parlays-list .state').filter({ hasText: 'LIMITED PICKS' });
   await expect(notice).toContainText('1 of the usual 3 distinct picks available');
