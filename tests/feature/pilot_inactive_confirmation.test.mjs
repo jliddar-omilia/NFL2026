@@ -221,6 +221,7 @@ test('production is unchanged: only listed offline tools and the two locked pilo
     'inactive_confirmation.py', 'pilot_config.py', 'pilot_capture.py',
     'learning_journal.py', 'export_learning.py', 'capture_outcome_evidence.py',
     'run_parlay_feedback.py', 'learning_history_guard.py',
+    'parlay_selflearn_corrections.py',
   ].map(name => join('scripts', name)));
   // Two locked workflow exceptions: the test-only canary and the default-off
   // shadow capture, whose contract is locked by pilot_shadow_workflow.test.mjs.

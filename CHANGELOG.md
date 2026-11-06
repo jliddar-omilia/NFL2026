@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Default-off SelfLearning shadow-capture workflow (`.github/workflows/selflearning-shadow-capture.yml`) gated on pilot `enabled`, with offline served-forecast invariance tests and wiring report under `docs/pilot/`.
+- Default-off NFL parlay corrections boundary (`config/parlay_selflearn_corrections.json`, `scripts/parlay_selflearn_corrections.py`) validated read-only against SelfLearning PR #13 head `37629ecc…`, with conformance tests, capture-contract inventory, and switch/redeploy facts (engine Vercel env ≠ instant; NFL OFF bypasses network and clears pairs without engine). Caps pending Jimmy; no live calls.
 
 ### Changed
 

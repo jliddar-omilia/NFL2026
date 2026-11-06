@@ -160,6 +160,10 @@ def _json(raw):
             elif isinstance(node, list):
                 pending.extend((child, depth + 1) for child in node)
         return value
+    except ExportError:
+        # ExportError subclasses ValueError; keep machine codes (duplicate_json_key,
+        # nonfinite_json) rather than collapsing them into invalid_json.
+        raise
     except (ValueError, TypeError, UnicodeError, RecursionError):
         raise ExportError("invalid_json") from None
 

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "corrections_mode": "off",
+  "consumer_timeout_s": 4,
+  "endpoint_path": "/api/v1/nfl/corrections",
+  "base_url": null,
+  "schema_version": 1,
+  "proposed_leg_cap_pp_max": 0.03,
+  "proposed_parlay_cap_pp_max": 0.03,
+  "proposed_parlay_cap_relative": 0.15,
+  "proposed_applied_prob_min": 0.01,
+  "proposed_applied_prob_max": 0.99,
+  "proposed_min_graded_legs_overall": 200,
+  "proposed_min_graded_legs_per_market": 50,
+  "engine_method": "market_bias_shrinkage_v1",
+  "engine_contract_pr": "https://github.com/liddar12/SelfLearning/pull/13",
+  "engine_contract_head": "37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2",
+  "caps_status": "pending_jimmy_decision",
+  "contract_status": "draft_pr13_head_37629ecc_readonly"
+}

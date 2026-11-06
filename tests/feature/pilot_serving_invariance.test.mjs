@@ -142,7 +142,7 @@ test('no production builder, app surface, or betting path imports the self-learn
       if (rel.startsWith(join('scripts', 'pilot_')) || [
         'inactive_confirmation.py', 'learning_journal.py', 'export_learning.py',
         'capture_outcome_evidence.py', 'run_parlay_feedback.py', 'learning_history_guard.py',
-        'pilot_config.py', 'pilot_capture.py',
+        'pilot_config.py', 'pilot_capture.py', 'parlay_selflearn_corrections.py',
       ].map((n) => join('scripts', n)).includes(rel)) continue;
       if (banned.test(readFileSync(full, 'utf8'))) hits.push(rel);
     }

@@ -1586,11 +1586,23 @@ def main():
         weekly_doc,
         {"season": SEASON, "updated_utc": now, "players": projected[:300]},
     )
-    _write(os.path.join(DATA, "parlays.json"),
-           parlay_builder.build_parlays_document(
-               week_games, SEASON, wk, now,
-               markets_by_game=markets_by_game,
-               props_by_game=props_by_game))
+    parlays_doc = parlay_builder.build_parlays_document(
+        week_games, SEASON, wk, now,
+        markets_by_game=markets_by_game,
+        props_by_game=props_by_game)
+    # SelfLearning parlay corrections — default OFF (config/parlay_selflearn_corrections.json).
+    # Distinct from capture pilot. Always invoke the helper so OFF deletes any
+    # stale pairs sidecar and never depends on engine reachability.
+    from scripts import parlay_selflearn_corrections as _parlay_corr  # noqa: E402
+    parlays_doc, _corr_prov = _parlay_corr.maybe_correct_and_write(
+        parlays_doc,
+        pairs_path=os.path.join(DATA, "parlay_corrections_pairs.json"),
+    )
+    if _corr_prov.get("corrections_mode") != "off" or _corr_prov.get("fallback_reason") != "corrections_mode_off":
+        print("[parlay_corrections] mode=%s reason=%s served_adjusted=%s" % (
+            _corr_prov.get("corrections_mode"), _corr_prov.get("fallback_reason"),
+            _corr_prov.get("served_adjusted")), file=sys.stderr)
+    _write(os.path.join(DATA, "parlays.json"), parlays_doc)
 
     # Overall health mirrors the WORST CONFIGURED feed — never rosier than
     # reality; 'unconfigured' feeds are excluded (not turned on ≠ broken) and
