@@ -58,6 +58,9 @@ Regression: `tests/feature/parlay_selflearn_corrections.test.mjs:239` —
 | Capture fingerprint / gaps | `tests/feature/export_learning_fingerprint.test.mjs`, `docs/pilot/capture-contract-inventory-20261106.md` |
 | Switch / redeploy facts | `docs/pilot/nfl-corrections-switch-redeploy-20261106.md` |
 | Producer / Eleanor inventory | `docs/pilot/selflearning-parlay-corrections-20261106.md` |
+| Provenance eligibility (no 600 certify) | `docs/pilot/provenance-chain-eligibility-20261106.md` |
+| Rapid-disable design (no infra activation) | `docs/pilot/rapid-disable-baseline-restore-design-20261106.md` |
+| Offline disable sim tests (not deployed) | `tests/feature/rapid_disable_design_sim.test.mjs` |
 
 ---
 
