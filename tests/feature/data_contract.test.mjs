@@ -122,6 +122,8 @@ test('no view can reach a pipeline artifact: every /data/ path in app/ is on the
   const allowed = new Set([
     // app/data.js PATHS
     '/data/player_projections.json', '/data/game_predictions.json', '/data/parlays.json',
+    // R1 corrections serving triad (fail-closed; default flag mode=off).
+    '/data/parlays.baseline.json', '/data/corrections_serving.json',
     '/data/meta.json', '/data/pipeline_status.json', '/data/schedule_full.json',
     '/data/player_weekly.json', '/data/ai_insights.json', '/data/player_history.json',
     '/data/team_strength.json', '/data/market_prices.json', '/data/playoff_odds.json',
@@ -321,17 +323,35 @@ test('clearCache() mid-flight: the post-clear request survives the pre-clear fai
 });
 
 test('getAll degrades per-contract (allSettled, never all) and is off the boot path', async () => {
+  const baseline = { season: 2026, week: 1, updated_utc: '2026-11-06T10:15:24Z', parlays: [] };
+  const { contentId, expectedRunId } = await import('../../app/parlay-serving.js');
+  const flag = {
+    version: 1, mode: 'off', updated_utc: baseline.updated_utc,
+    generation_id: baseline.updated_utc,
+    baseline_path: '/data/parlays.baseline.json',
+    active_path: '/data/parlays.json',
+    baseline_content_id: await contentId(baseline),
+    active_content_id: null,
+    run_id: null,
+  };
+  flag.active_content_id = flag.baseline_content_id;
+  flag.run_id = await expectedRunId(flag);
+
   await withStubbedFetch(async (data, { pending }) => {
     const p = data.getAll();
     await tick();
     pending.get('/data/player_projections.json')[0].resolve(ok([{ id: 'a' }]));
     pending.get('/data/game_predictions.json')[0].resolve(http(500));
-    pending.get('/data/parlays.json')[0].resolve(ok([]));
+    // R1 getParlays: OFF flag → baseline only (never unapproved active).
+    pending.get('/data/corrections_serving.json')[0].resolve(ok(flag));
+    await tick();
+    pending.get('/data/parlays.baseline.json')[0].resolve(ok(baseline));
     pending.get('/data/meta.json')[0].resolve(ok({ v: 1 }));
     pending.get('/data/pipeline_status.json')[0].resolve(ok({ feeds: [] }));
     const out = await p;
     assert.deepEqual(out.playerProjections, [{ id: 'a' }]);
     assert.deepEqual(out.meta, { v: 1 });
+    assert.deepEqual(out.parlays, baseline);
     assert.match(out.gamePredictions.__error, /HTTP 500/, 'one bad feed must not blank the others');
   });
 

@@ -15,6 +15,7 @@ import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { routeOffParlayServing } from './_parlay_serving.mjs';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const PARLAYS = JSON.parse(readFileSync(new URL('../../data/parlays.json', import.meta.url), 'utf8'));
@@ -59,7 +60,7 @@ const reviewDoc = (excluded) => ({
 
 const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body });
 async function routeAll(page, excluded = true) {
-  await page.route('**/data/parlays.json', (r) => json(r, JSON.stringify(currentDoc())));
+  await routeOffParlayServing(page, currentDoc(), { fulfill: json });
   await page.route('**/data/parlays/index.json', (r) => json(r, JSON.stringify(indexDoc())));
   await page.route(`**/${ARCHIVE_PATH}`, (r) => json(r, JSON.stringify(archiveDoc())));
   await page.route('**/data/review.json', (r) => json(r, JSON.stringify(reviewDoc(excluded))));

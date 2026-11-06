@@ -203,6 +203,10 @@ const CONTRACT_ALLOWLIST = new Set([
   'meta.json',
   'model_tuning.json',
   'parlays.json',
+  // R1 — fail-closed corrections serving triad (default OFF). Flag is tiny;
+  // baseline mirrors parlays.json (~75 KB). Fetched only by getParlays.
+  'corrections_serving.json',
+  'parlays.baseline.json',
   'pipeline_status.json',
   'player_history.json',
   'player_projections.json',
@@ -313,7 +317,10 @@ const ROUTES = [
   // the cards; a 404 is still one request. The per-week archive files are
   // NOT in this count: they are fetched only when a past week's chip is
   // tapped, so a cold load never requests one (asserted below).
-  { hash: '#/parlays', name: 'parlays', contracts: 6 },
+  // R1 — 6 -> 7: getParlays fail-closed OFF loads corrections_serving.json +
+  // parlays.baseline.json instead of a single parlays.json (active is not
+  // fetched while mode=off). Net +1 on the cold mount; archives still chip-tap.
+  { hash: '#/parlays', name: 'parlays', contracts: 7 },
   { hash: '#/team', name: 'team', contracts: 9 },
   // R47 — the DEFAULT league now fields K and DEF (owner's pick: first-class
   // everywhere), so LINEUP's conditional second-wave kdst fetch is live on a

@@ -291,6 +291,9 @@ main() {
   fi
   git commit -q -m "$message"
   log "committed $(git rev-parse --short HEAD): $message"
+  # Emit the resolved retry budget so tests can lock PUBLISH_BACKOFF_S without
+  # relying on wall-clock (shared runners can spend >20s in git alone).
+  log "retry budget: attempts=${ATTEMPTS} backoff_s=${BACKOFF_S}"
 
   for ((attempt = 1; attempt <= ATTEMPTS; attempt++)); do
     if ! git fetch --quiet origin "$target_branch"; then

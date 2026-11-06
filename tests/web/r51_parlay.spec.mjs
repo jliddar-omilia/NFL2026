@@ -21,6 +21,7 @@
 
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import { routeOffParlayServing } from './_parlay_serving.mjs';
 
 const COMMITTED = JSON.parse(
   readFileSync(new URL('../../data/parlays.json', import.meta.url), 'utf8'),
@@ -70,9 +71,7 @@ test.describe('R51 — parlay leg pricing honesty on the card', () => {
     test.skip(spreadLegs === 0 || propLegs === 0,
       'committed parlays.json carries no spread or prop legs to annotate');
 
-    await page.route('**/data/parlays.json', (route) => route.fulfill({
-      status: 200, contentType: 'application/json', body: JSON.stringify(doc),
-    }));
+    await routeOffParlayServing(page, doc);
     await page.goto('/#/parlays');
     await waitForCards(page);
 

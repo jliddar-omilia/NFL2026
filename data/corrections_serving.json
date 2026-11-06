@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "mode": "off",
+  "updated_utc": "2026-11-06T10:15:24Z",
+  "generation_id": "2026-11-06T10:15:24Z",
+  "baseline_path": "/data/parlays.baseline.json",
+  "active_path": "/data/parlays.json",
+  "baseline_content_id": "sha256:212ff68853f9ca7674c6f3be6ef11736fbdbaf92e3c44a121ceba199cc32ec2a",
+  "active_content_id": "sha256:212ff68853f9ca7674c6f3be6ef11736fbdbaf92e3c44a121ceba199cc32ec2a",
+  "expires_at": null,
+  "engine_contract_head": "5941214178254df38a1c67b5935e591bfb052e33",
+  "note": "fail_closed_default_off_not_an_activation",
+  "run_id": "sha256:881c0163c9833adbd954c21c308d17d62277f130fcc307bb6c0eb80987d25203"
+}

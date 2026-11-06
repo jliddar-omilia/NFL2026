@@ -1586,11 +1586,37 @@ def main():
         weekly_doc,
         {"season": SEASON, "updated_utc": now, "players": projected[:300]},
     )
-    _write(os.path.join(DATA, "parlays.json"),
-           parlay_builder.build_parlays_document(
-               week_games, SEASON, wk, now,
-               markets_by_game=markets_by_game,
-               props_by_game=props_by_game))
+    parlays_doc = parlay_builder.build_parlays_document(
+        week_games, SEASON, wk, now,
+        markets_by_game=markets_by_game,
+        props_by_game=props_by_game)
+    # SelfLearning parlay corrections — default OFF (R1 dual artifact + flag).
+    # Baseline is always the pre-corrections builder output. Active may diverge
+    # only when mode=on AND served_adjusted; otherwise active bytes == baseline.
+    # Serving flag binds run_id/content ids. Pairs audit lineage is retained.
+    from scripts import parlay_selflearn_corrections as _parlay_corr  # noqa: E402
+    _baseline_parlays = parlays_doc
+    _active_parlays, _corr_prov = _parlay_corr.maybe_correct_and_write(
+        _baseline_parlays,
+        pairs_path=os.path.join(DATA, "parlay_corrections_pairs.json"),
+    )
+    if (_corr_prov.get("corrections_mode") == "on"
+            and _corr_prov.get("served_adjusted")):
+        _serve_mode, parlays_doc = "on", _active_parlays
+    elif _corr_prov.get("corrections_mode") == "shadow":
+        _serve_mode, parlays_doc = "shadow", _baseline_parlays
+    else:
+        _serve_mode, parlays_doc = "off", _baseline_parlays
+    _parlay_corr.publish_parlay_artifacts(
+        _baseline_parlays, parlays_doc,
+        data_dir=DATA, mode=_serve_mode, updated_utc=now, write_json=_write,
+        pairs_path=os.path.join(DATA, "parlay_corrections_pairs.json"),
+    )
+    if _corr_prov.get("corrections_mode") != "off" or _corr_prov.get("fallback_reason") != "corrections_mode_off":
+        print("[parlay_corrections] mode=%s serve=%s reason=%s served_adjusted=%s" % (
+            _corr_prov.get("corrections_mode"), _serve_mode,
+            _corr_prov.get("fallback_reason"), _corr_prov.get("served_adjusted")),
+            file=sys.stderr)
 
     # Overall health mirrors the WORST CONFIGURED feed — never rosier than
     # reality; 'unconfigured' feeds are excluded (not turned on ≠ broken) and
