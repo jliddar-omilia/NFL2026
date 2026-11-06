@@ -1,6 +1,6 @@
 // SelfLearning parlay corrections consumer — default OFF, fail-closed.
 // Fixtures are LABELED FAKES only; they are not learned production corrections.
-// Wire shape pinned to SelfLearning PR #13 head 37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2.
+// Wire shape pinned to SelfLearning PR #13 head 5941214178254df38a1c67b5935e591bfb052e33.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -10,7 +10,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const ENGINE_HEAD = '37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2';
+const ENGINE_HEAD = '5941214178254df38a1c67b5935e591bfb052e33';
 
 function runPy(code) {
   const result = spawnSync('python3', ['-B', '-'], {
@@ -55,6 +55,59 @@ def request_from(doc, **kw):
     return C.build_request(doc, baseline_model_version="sha256:" + "a"*64,
                            generated_at=NOW, **kw)
 
+def legacy_incomplete_public_artifact(expire="2026-11-07T00:00:00Z", n_graded=250):
+    """Pre-5941214 HTTP public_artifact key set — OMITS apply evidence."""
+    return {"artifact_id": "sha256:" + "b"*64, "model_version": C.ENGINE_MODEL_VERSION,
+            "method": C.ENGINE_METHOD,
+            "trained_through": "2026-11-01T00:00:00Z",
+            "fitted_at": "2026-11-05T12:00:00Z",
+            "expires_at": expire, "n_graded": n_graded, "source": "graded_journal_receipts"}
+
+# Alias retained for older test names.
+pr13_public_artifact = legacy_incomplete_public_artifact
+
+def strict_apply_artifact(req, expire="2026-11-07T00:00:00Z", n_per_seg=None):
+    """FAKE full provenance for pin 5941214… (not a real fit)."""
+    n_legs = max(1, len(req["legs"]))
+    # Floors: overall >=200 and per-segment >=50; n_graded == sum(n_eligible).
+    if n_per_seg is None:
+        n_per_seg = max(50, (199 + n_legs) // n_legs)
+    segs = {}
+    for leg in req["legs"]:
+        key = C.segment_key(leg["market"], leg["selection"])
+        segs[key] = {"n_eligible": n_per_seg, "raw_bias": -0.01, "delta": -0.008,
+                     "eligible_for_application": True}
+    n_graded = n_per_seg * len(segs)
+    return {
+        "artifact_id": "sha256:" + "b"*64,
+        "model_version": C.ENGINE_MODEL_VERSION,
+        "method": C.ENGINE_METHOD,
+        "trained_through": "2026-11-01T00:00:00Z",
+        "fitted_at": "2026-11-05T12:00:00Z",
+        "expires_at": expire,
+        "n_graded": n_graded,
+        "source": "graded_journal_receipts",
+        "eligibility_rules": list(C.ELIGIBILITY_RULES),
+        "fit_inputs_hash": "sha256:" + "c"*64,
+        "prior_strength": 50.0,
+        "min_graded_total": 200,
+        "min_graded_per_market": 50,
+        "leg_cap_pp": 0.03,
+        "parlay_cap_pp": 0.03,
+        "parlay_cap_rel": 0.15,
+        "clamp": [0.01, 0.99],
+        "segments": segs,
+        "sufficient_total": True,
+    }
+
+def all_leg_adjust(req, deltas=None):
+    """Apply every request leg (required for parlay consistency)."""
+    out = {}
+    for i, leg in enumerate(req["legs"]):
+        d = (deltas or {}).get(leg["leg_id"], 0.02 if i == 0 else 0.01)
+        out[leg["leg_id"]] = round(leg["baseline_prob"] + d, 6)
+    return out
+
 def echo_transport(mode="on", adjust_legs=None, adjust_parlays=None, mutate=None,
                    expire="2026-11-07T00:00:00Z", artifact_shape="strict"):
     """FAKE engine: shadow/off always echo baseline applied=false."""
@@ -68,37 +121,11 @@ def echo_transport(mode="on", adjust_legs=None, adjust_parlays=None, mutate=None
         return 200, json.dumps(fake).encode()
     return transport
 
-def pr13_public_artifact(expire="2026-11-07T00:00:00Z", n_graded=250):
-    """Exact HTTP public_artifact key set from engine PR#13 — OMITS apply evidence."""
-    return {"artifact_id": "sha256:" + "b"*64, "model_version": C.ENGINE_MODEL_VERSION,
-            "method": C.ENGINE_METHOD,
-            "trained_through": "2026-11-01T00:00:00Z",
-            "fitted_at": "2026-11-05T12:00:00Z",
-            "expires_at": expire, "n_graded": n_graded, "source": "graded_journal_receipts"}
-
-def strict_apply_artifact(req, expire="2026-11-07T00:00:00Z", n_graded=250):
-    """FAKE full provenance satisfying NFL strict apply gate (not a real fit)."""
-    art = pr13_public_artifact(expire=expire, n_graded=n_graded)
-    markets = sorted({leg["market"] for leg in req["legs"]})
-    art.update({
-        "fit_inputs_hash": "sha256:" + "c"*64,
-        "sufficient_total": True,
-        "min_graded_total": 200,
-        "min_graded_per_market": 50,
-        "eligibility_rules": ["served_at_before_kickoff", "exclude_push_void",
-                              "binary_outcome_only"],
-        "leg_cap_pp": 0.03,
-        "segments": {m: {"n_eligible": 80, "raw_bias": -0.01, "delta": -0.008,
-                         "eligible_for_application": True} for m in markets},
-    })
-    return art
-
 def valid_response(req, *, mode="on", expire="2026-11-07T00:00:00Z",
                    adjust_legs=None, adjust_parlays=None, artifact=True,
                    artifact_shape="strict"):
     legs=[]
     for leg in req["legs"]:
-        # Engine shadow/off: never apply; would-be adjustments stay in engine logs only.
         if mode in ("off", "shadow") or adjust_legs is None or leg["leg_id"] not in (adjust_legs or {}):
             legs.append({**leg, "adjusted_prob": leg["baseline_prob"], "delta": 0.0,
                          "applied": False, "reason": "FAKE_fixture_echo", "cap_pp": 0.03})
@@ -120,7 +147,7 @@ def valid_response(req, *, mode="on", expire="2026-11-07T00:00:00Z",
     art = None
     if artifact and mode != "off":
         if artifact_shape == "pr13_public":
-            art = pr13_public_artifact(expire=expire)
+            art = legacy_incomplete_public_artifact(expire=expire)
         else:
             art = strict_apply_artifact(req, expire=expire)
     return {"schema_version": 1, "request_id": req["request_id"],
@@ -137,6 +164,7 @@ test('committed NFL corrections_mode is off; caps/method pinned to engine PR#13 
   assert.equal(corr.proposed_parlay_cap_pp_max, 0.03);
   assert.equal(corr.proposed_min_graded_legs_overall, 200);
   assert.equal(corr.proposed_min_graded_legs_per_market, 50);
+  assert.equal(corr.env_override_policy, 'off_only_never_elevates');
   assert.equal(pilot.enabled, false);
   assert.equal(corr.consumer_timeout_s, 4);
 });
@@ -187,12 +215,33 @@ print(json.dumps({"exists": os.path.exists(pairs), "reason": prov["fallback_reas
   }
 });
 
+test('ENV override cannot elevate committed OFF to on/shadow', () => {
+  const r = runPy(`${PRELUDE}
+cfg_on = C.read_config(environment={"NFL_PARLAY_CORRECTIONS_MODE": "on"})
+cfg_shadow = C.read_config(environment={"NFL_PARLAY_CORRECTIONS_MODE": "shadow"})
+cfg_off = C.read_config(environment={"NFL_PARLAY_CORRECTIONS_MODE": "off"})
+doc, prov = C.maybe_correct_and_write(BASELINE,
+    environment={"NFL_PARLAY_CORRECTIONS_MODE": "on", "SELFLEARN_NFL_CORRECTIONS_TOKEN": "t"*32})
+print(json.dumps({
+  "on_attempt": cfg_on["corrections_mode"],
+  "shadow_attempt": cfg_shadow["corrections_mode"],
+  "off_force": cfg_off["corrections_mode"],
+  "maybe_mode": prov["corrections_mode"],
+  "maybe_reason": prov["fallback_reason"],
+}))
+`);
+  assert.equal(r.on_attempt, 'off');
+  assert.equal(r.shadow_attempt, 'off');
+  assert.equal(r.off_force, 'off');
+  assert.equal(r.maybe_mode, 'off');
+  assert.equal(r.maybe_reason, 'corrections_mode_off');
+});
+
 test('shadow (engine-faithful): applied=false echoes; NFL serves baseline', () => {
   const r = runPy(`${PRELUDE}
 cfg = {**C.read_config(), "corrections_mode": "shadow", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
 lid = req["legs"][0]["leg_id"]
-# adjust_legs ignored by FAKE when mode=shadow (engine contract)
 out = C.correct_parlays_document(BASELINE, config=cfg,
     transport=echo_transport(mode="shadow", adjust_legs={lid: 0.69}),
     now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
@@ -202,7 +251,8 @@ print(json.dumps({"served_baseline": served == 0.667,
   "pair_applied": out["pairs"]["legs"][0]["applied"],
   "pair_echo": out["pairs"]["legs"][0]["adjusted_prob"] == 0.667,
   "engine_mode": out["provenance"]["engine_corrections_mode"],
-  "method": out["pairs"]["artifact"]["method"]}))
+  "method": out["pairs"]["artifact"]["method"],
+  "seg_key": next(iter(out["pairs"]["artifact"]["segments"]))}))
 `);
   assert.equal(r.served_baseline, true);
   assert.equal(r.served_adjusted_flag, false);
@@ -210,6 +260,7 @@ print(json.dumps({"served_baseline": served == 0.667,
   assert.equal(r.pair_echo, true);
   assert.equal(r.engine_mode, 'shadow');
   assert.equal(r.method, 'market_bias_shrinkage_v1');
+  assert.match(r.seg_key, /\|/);
 });
 
 test('on + strict FAKE provenance: applies capped adjustment with provenance linkage', () => {
@@ -217,43 +268,55 @@ test('on + strict FAKE provenance: applies capped adjustment with provenance lin
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
 pid = req["parlays"][0]["parlay_id"]
-lid = req["legs"][0]["leg_id"]
+legs = all_leg_adjust(req)
 out = C.correct_parlays_document(BASELINE, config=cfg,
-    transport=echo_transport(mode="on", adjust_legs={lid: 0.69}, adjust_parlays={pid: 0.28}),
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28}),
     now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
 print(json.dumps({"served_adj": out["parlays"][0]["legs"][0]["model_prob"],
   "pair_request_id": out["pairs"]["request_id"] == req["request_id"],
   "artifact": out["pairs"]["artifact"]["method"],
   "has_segments": "segments" in out["pairs"]["artifact"],
+  "seg_keys": sorted(out["pairs"]["artifact"]["segments"]),
+  "rules": out["pairs"]["artifact"]["eligibility_rules"],
   "served_adjusted": out["provenance"]["served_adjusted"],
   "head": out["pairs"]["engine_contract_head"]}))
 `);
-  assert.equal(r.served_adj, 0.69);
+  assert.equal(r.served_adj, 0.687);
   assert.equal(r.pair_request_id, true);
   assert.equal(r.artifact, 'market_bias_shrinkage_v1');
   assert.equal(r.has_segments, true);
+  assert.ok(r.seg_keys.every((k) => k.includes('|')));
+  assert.deepEqual(r.rules, [
+    'served_at_before_kickoff',
+    'exclude_push_void',
+    'exclude_after_trained_through',
+    'baseline_prob_as_served_in_(0,1)',
+    'binary_outcome_only',
+    'segment_market_and_selection',
+  ]);
   assert.equal(r.served_adjusted, true);
   assert.equal(r.head, ENGINE_HEAD);
 });
 
-test('REGRESSION: PR#13 public_artifact (no segments/fit_inputs_hash) cannot apply', () => {
+test('REGRESSION: legacy incomplete public_artifact cannot apply', () => {
   const r = runPy(`${PRELUDE}
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
-lid = req["legs"][0]["leg_id"]
+legs = all_leg_adjust(req)
 pid = req["parlays"][0]["parlay_id"]
-public = pr13_public_artifact()
+public = legacy_incomplete_public_artifact()
 assert C.pr13_public_artifact_shape(public) is True
+assert C.legacy_incomplete_artifact_shape(public) is True
 assert "segments" not in public and "fit_inputs_hash" not in public
 out = C.correct_parlays_document(BASELINE, config=cfg,
-    transport=echo_transport(mode="on", adjust_legs={lid: 0.69}, adjust_parlays={pid: 0.28},
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
                              artifact_shape="pr13_public"),
     now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
-# Direct validator must also refuse apply on the incomplete shape.
 direct = None
 try:
     C.validate_response(
-        valid_response(req, mode="on", adjust_legs={lid: 0.69}, artifact_shape="pr13_public"),
+        valid_response(req, mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
+                       artifact_shape="pr13_public"),
         req, cfg, now=NOW)
 except C.CorrectionsError as e:
     direct = e.args[0]
@@ -274,10 +337,150 @@ print(json.dumps({"reason": out["provenance"]["fallback_reason"],
   ]);
 });
 
+test('MB1 REGRESSION: missing required leg hard-fails (not soft any_applied)', () => {
+  const r = runPy(`${PRELUDE}
+cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
+req = request_from(BASELINE)
+legs = all_leg_adjust(req)
+pid = req["parlays"][0]["parlay_id"]
+def drop_leg(fake, req):
+    # Otherwise-valid applied response, but omit one required leg id.
+    fake["legs"] = [fake["legs"][0]]
+direct = None
+try:
+    C.validate_response(
+        valid_response(req, mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28}),
+        req, cfg, now=NOW)
+    # mutate after build
+except C.CorrectionsError:
+    pass
+fake = valid_response(req, mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28})
+drop_leg(fake, req)
+try:
+    C.validate_response(fake, req, cfg, now=NOW)
+except C.CorrectionsError as e:
+    direct = e.args[0]
+out = C.correct_parlays_document(BASELINE, config=cfg,
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
+                             mutate=drop_leg),
+    now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
+print(json.dumps({"direct": direct,
+  "reason": out["provenance"]["fallback_reason"],
+  "served": out["parlays"][0]["legs"][0]["model_prob"],
+  "served_adjusted": out["provenance"]["served_adjusted"],
+  "pairs": out["pairs"]}))
+`);
+  assert.equal(r.direct, 'missing_leg_ids');
+  assert.match(r.reason, /missing_leg/);
+  assert.equal(r.served, 0.667);
+  assert.equal(r.served_adjusted, false);
+  assert.equal(r.pairs, null);
+});
+
+test('REGRESSION: partial leg apply / parlay EV inconsistency hard-fails', () => {
+  const r = runPy(`${PRELUDE}
+cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
+req = request_from(BASELINE)
+lid0 = req["legs"][0]["leg_id"]
+pid = req["parlays"][0]["parlay_id"]
+# Only one leg applied; parlay left unapplied — would rewrite one model_prob while EV stale.
+partial = None
+try:
+    C.validate_response(
+        valid_response(req, mode="on", adjust_legs={lid0: 0.69}),
+        req, cfg, now=NOW)
+except C.CorrectionsError as e:
+    partial = e.args[0]
+# All legs applied but parlay not — inconsistent card.
+legs = all_leg_adjust(req)
+inconsist = None
+try:
+    C.validate_response(
+        valid_response(req, mode="on", adjust_legs=legs),
+        req, cfg, now=NOW)
+except C.CorrectionsError as e:
+    inconsist = e.args[0]
+# Parlay applied without all legs.
+parlay_only = None
+try:
+    C.validate_response(
+        valid_response(req, mode="on", adjust_legs={lid0: 0.69}, adjust_parlays={pid: 0.28}),
+        req, cfg, now=NOW)
+except C.CorrectionsError as e:
+    parlay_only = e.args[0]
+print(json.dumps({"partial": partial, "inconsist": inconsist, "parlay_only": parlay_only}))
+`);
+  assert.equal(r.partial, 'partial_leg_apply_in_parlay');
+  assert.equal(r.inconsist, 'parlay_leg_apply_inconsistency');
+  assert.match(r.parlay_only, /partial_leg_apply_in_parlay|parlay_applied_without_all_legs/);
+});
+
+test('I1: market-only segment keys cannot bind; selection must match', () => {
+  const r = runPy(`${PRELUDE}
+cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
+req = request_from(BASELINE)
+legs = all_leg_adjust(req)
+pid = req["parlays"][0]["parlay_id"]
+def market_only(fake, req):
+    remapped = {}
+    for leg in req["legs"]:
+        remapped[leg["market"]] = {
+          "n_eligible": 100, "raw_bias": -0.01, "delta": -0.008,
+          "eligible_for_application": True}
+    fake["artifact"]["segments"] = remapped
+    fake["artifact"]["n_graded"] = 100 * len(remapped)
+def wrong_sel(fake, req):
+    segs = {}
+    for leg in req["legs"]:
+        segs[leg["market"] + "|WRONG SEL"] = {
+          "n_eligible": 100, "raw_bias": -0.01, "delta": -0.008,
+          "eligible_for_application": True}
+    fake["artifact"]["segments"] = segs
+    fake["artifact"]["n_graded"] = 100 * len(segs)
+out_m = C.correct_parlays_document(BASELINE, config=cfg,
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
+                             mutate=market_only),
+    now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
+out_s = C.correct_parlays_document(BASELINE, config=cfg,
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
+                             mutate=wrong_sel),
+    now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
+print(json.dumps({"market": out_m["provenance"]["fallback_reason"],
+  "wrong_sel": out_s["provenance"]["fallback_reason"],
+  "served_m": out_m["parlays"][0]["legs"][0]["model_prob"],
+  "served_s": out_s["parlays"][0]["legs"][0]["model_prob"]}))
+`);
+  assert.match(r.market, /insufficient_segment|segment/i);
+  assert.match(r.wrong_sel, /insufficient_segment|segment/i);
+  assert.equal(r.served_m, 0.667);
+  assert.equal(r.served_s, 0.667);
+});
+
+test('I2: noncanonical eligibility_rules rejected (exact engine canon required)', () => {
+  const r = runPy(`${PRELUDE}
+cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
+req = request_from(BASELINE)
+legs = all_leg_adjust(req)
+pid = req["parlays"][0]["parlay_id"]
+def bad_rules(fake, req):
+    fake["artifact"]["eligibility_rules"] = ["served_at_before_kickoff", "binary_outcome_only"]
+out = C.correct_parlays_document(BASELINE, config=cfg,
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28},
+                             mutate=bad_rules),
+    now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
+print(json.dumps({"reason": out["provenance"]["fallback_reason"],
+  "served": out["parlays"][0]["legs"][0]["model_prob"]}))
+`);
+  assert.match(r.reason, /eligibility_rules/i);
+  assert.equal(r.served, 0.667);
+});
+
 test('fallback on timeout, HTTP error, schema failure, bad request_id, stale artifact', () => {
   const r = runPy(`${PRELUDE}
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 ver = "sha256:"+"a"*64
+req = request_from(BASELINE)
+legs = all_leg_adjust(req)
 cases = {}
 cases["timeout"] = C.correct_parlays_document(BASELINE, config=cfg,
     transport=lambda *a, **k: (_ for _ in ()).throw(TimeoutError("slow")),
@@ -292,7 +495,8 @@ cases["request_id"] = C.correct_parlays_document(BASELINE, config=cfg,
     transport=echo_transport(mutate=lambda fake, req: fake.__setitem__("request_id", "nope")),
     now=NOW, baseline_model_version=ver, token="t"*32)["provenance"]["fallback_reason"]
 cases["stale"] = C.correct_parlays_document(BASELINE, config=cfg,
-    transport=echo_transport(mode="on", adjust_legs={request_from(BASELINE)["legs"][0]["leg_id"]: 0.69},
+    transport=echo_transport(mode="on", adjust_legs=legs,
+                             adjust_parlays={req["parlays"][0]["parlay_id"]: 0.28},
                              expire="2026-11-06T09:00:00Z"),
     now=NOW, baseline_model_version=ver, token="t"*32)["provenance"]["fallback_reason"]
 cases["token"] = C.correct_parlays_document(BASELINE, config=cfg,
@@ -308,7 +512,7 @@ print(json.dumps(cases))
   assert.match(r.http, /http|transport|status/);
   assert.match(r.schema, /schema/);
   assert.match(r.request_id, /request_id/);
-  assert.match(r.stale, /expir|stale|fresh/);
+  assert.match(r.stale, /expir|stale|fresh|artifact/);
   assert.match(r.token, /token/);
 });
 
@@ -317,7 +521,7 @@ test('cap enforcement: rejects oversize delta even if engine advertises higher c
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
 lid = req["legs"][0]["leg_id"]
-# baseline 0.667; +0.05 exceeds HARD 0.03
+# baseline 0.667; +0.05 exceeds HARD 0.03 — fail before consistency if single-leg applied
 out = C.correct_parlays_document(BASELINE, config=cfg,
     transport=echo_transport(mode="on", adjust_legs={lid: 0.717},
         mutate=lambda fake, req: fake["legs"][0].__setitem__("cap_pp", 0.03)),
@@ -326,7 +530,7 @@ print(json.dumps({"reason": out["provenance"]["fallback_reason"],
   "served": out["parlays"][0]["legs"][0]["model_prob"],
   "served_adjusted": out["provenance"]["served_adjusted"]}))
 `);
-  assert.match(r.reason, /cap/i);
+  assert.match(r.reason, /cap|partial_leg/i);
   assert.equal(r.served, 0.667);
   assert.equal(r.served_adjusted, false);
 });
@@ -394,6 +598,7 @@ print(json.dumps({
   "expected_parlay": sorted(C.PARLAY_KEYS),
   "n_legs": len(req["legs"]), "path": C.CORRECTIONS_PATH,
   "head": C.ENGINE_CONTRACT_HEAD, "method": C.ENGINE_METHOD,
+  "rules": list(C.ELIGIBILITY_RULES),
 }))
 `);
   assert.deepEqual(r.req_keys, r.expected_req);
@@ -402,6 +607,7 @@ print(json.dumps({
   assert.equal(r.path, '/api/v1/nfl/corrections');
   assert.equal(r.head, ENGINE_HEAD);
   assert.equal(r.method, 'market_bias_shrinkage_v1');
+  assert.ok(r.rules.includes('segment_market_and_selection'));
 });
 
 test('restore_parlays_from_pairs rewrites adjusted model_prob offline without engine', () => {
@@ -424,15 +630,16 @@ test('no-data / insufficient artifact floor refuses applied serving', () => {
   const r = runPy(`${PRELUDE}
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
-lid = req["legs"][0]["leg_id"]
+legs = all_leg_adjust(req)
+pid = req["parlays"][0]["parlay_id"]
 def low_n(fake, req):
     fake["artifact"]["n_graded"] = 40
     fake["artifact"]["sufficient_total"] = False
-    fake["legs"][0]["applied"] = True
-    fake["legs"][0]["adjusted_prob"] = 0.69
-    fake["legs"][0]["delta"] = 0.023
+    for row in fake["artifact"]["segments"].values():
+        row["n_eligible"] = 20
+        row["eligible_for_application"] = False
 out = C.correct_parlays_document(BASELINE, config=cfg,
-    transport=echo_transport(mode="on", adjust_legs={lid: 0.69}, mutate=low_n),
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28}, mutate=low_n),
     now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
 print(json.dumps({"reason": out["provenance"]["fallback_reason"],
   "served": out["parlays"][0]["legs"][0]["model_prob"]}))
@@ -445,14 +652,16 @@ test('segment below 50 eligible refuses applied leg (no global inheritance)', ()
   const r = runPy(`${PRELUDE}
 cfg = {**C.read_config(), "corrections_mode": "on", "base_url": "https://example.invalid"}
 req = request_from(BASELINE)
-lid = req["legs"][0]["leg_id"]
-market = req["legs"][0]["market"]
+legs = all_leg_adjust(req)
+pid = req["parlays"][0]["parlay_id"]
+key = C.segment_key(req["legs"][0]["market"], req["legs"][0]["selection"])
 def thin(fake, req):
-    fake["artifact"]["segments"][market] = {
+    fake["artifact"]["segments"][key] = {
       "n_eligible": 12, "raw_bias": 0.1, "delta": 0.02,
       "eligible_for_application": False}
+    fake["artifact"]["n_graded"] = sum(s["n_eligible"] for s in fake["artifact"]["segments"].values())
 out = C.correct_parlays_document(BASELINE, config=cfg,
-    transport=echo_transport(mode="on", adjust_legs={lid: 0.69}, mutate=thin),
+    transport=echo_transport(mode="on", adjust_legs=legs, adjust_parlays={pid: 0.28}, mutate=thin),
     now=NOW, baseline_model_version="sha256:"+"a"*64, token="t"*32)
 print(json.dumps({"reason": out["provenance"]["fallback_reason"],
   "served": out["parlays"][0]["legs"][0]["model_prob"]}))
@@ -461,10 +670,60 @@ print(json.dumps({"reason": out["provenance"]["fallback_reason"],
   assert.equal(r.served, 0.667);
 });
 
+test('R1 publish: baseline/active/flag bound; emergency restore forces OFF', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'corr-r1-'));
+  try {
+    const r = runPy(`${PRELUDE}
+from pathlib import Path
+dir_path = Path(${JSON.stringify(dir)})
+def write_json(path, obj):
+    Path(path).write_text(json.dumps(obj, ensure_ascii=True, indent=2) + "\\n", encoding="utf-8")
+baseline = copy.deepcopy(BASELINE)
+active_on = copy.deepcopy(BASELINE)
+active_on["parlays"][0]["legs"][0]["model_prob"] = 0.69
+# OFF publish requires active == baseline
+flag_off = C.publish_parlay_artifacts(baseline, baseline, data_dir=dir_path, mode="off",
+    updated_utc=NOW, write_json=write_json)
+ok_off, reason_off, served_off = C.validate_serving_bundle(flag_off, baseline, baseline, now=NOW)
+# tamper active while claiming on
+flag_bad = C.build_serving_flag(mode="on", baseline_doc=baseline, active_doc=active_on,
+                                updated_utc=NOW)
+ok_bad, reason_bad, served_bad = C.validate_serving_bundle(flag_bad, baseline, active_on, now=NOW)
+# write active on disk then emergency restore
+write_json(str(dir_path / C.ACTIVE_NAME), active_on)
+write_json(str(dir_path / C.BASELINE_NAME), baseline)
+restored = C.emergency_restore_active_from_baseline(data_dir=dir_path, write_json=write_json, now=NOW)
+active_after = json.loads((dir_path / C.ACTIVE_NAME).read_text())
+flag_after = json.loads((dir_path / C.SERVING_FLAG_NAME).read_text())
+print(json.dumps({
+  "flag_mode": flag_off["mode"], "ok_off": ok_off, "reason_off": reason_off,
+  "served_is_baseline": served_off == baseline,
+  "ok_on": ok_bad, "reason_on": reason_bad,
+  "restored_mode": restored["mode"],
+  "active_eq_baseline": active_after == baseline,
+  "flag_after_mode": flag_after["mode"],
+  "run_id": bool(flag_off.get("run_id")),
+}))
+`);
+    assert.equal(r.flag_mode, 'off');
+    assert.equal(r.ok_off, true);
+    assert.equal(r.served_is_baseline, true);
+    assert.equal(r.ok_on, true);
+    assert.equal(r.reason_on, 'flag_on');
+    assert.equal(r.restored_mode, 'off');
+    assert.equal(r.active_eq_baseline, true);
+    assert.equal(r.flag_after_mode, 'off');
+    assert.equal(r.run_id, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('production builders always call helper; committed mode remains off', () => {
   const src = readFileSync(join(ROOT, 'scripts/build_predictions.py'), 'utf8');
   assert.match(src, /parlay_selflearn_corrections/);
   assert.match(src, /maybe_correct_and_write/);
+  assert.match(src, /publish_parlay_artifacts/);
   assert.doesNotMatch(src, /if _corr_cfg\["corrections_mode"\] != "off"/);
   const pilot = JSON.parse(readFileSync(join(ROOT, 'config/selflearning_pilot.json'), 'utf8'));
   assert.equal(pilot.enabled, false);

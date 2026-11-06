@@ -3,24 +3,30 @@
 
 Validated read-only against engine draft:
   PR https://github.com/liddar12/SelfLearning/pull/13
-  head 37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2
-  docs/nfl-corrections-v1.md
+  head 5941214178254df38a1c67b5935e591bfb052e33
+  (segments keyed market|selection; full public_artifact provenance keys)
 
 Server-side only: POST /api/v1/nfl/corrections with Bearer
 SELFLEARN_NFL_CORRECTIONS_TOKEN. NEVER reads that token when
 corrections_mode=off, NEVER places secrets in logs, NEVER invents a fitted
 artifact. No genuine fitted artifact is verified in this repo — no-data stays
-baseline.
+baseline. Digests are content-address, not authenticity.
 
 NFL kill switch (distinct from engine Vercel SELFLEARN_CORRECTIONS_MODE):
   config/parlay_selflearn_corrections.json → corrections_mode: off|shadow|on
-  optional env NFL_PARLAY_CORRECTIONS_MODE
+  env NFL_PARLAY_CORRECTIONS_MODE may force OFF only (never elevate).
 
 Modes (NFL consumer):
-  off    — no network; serve/build baseline; delete pairs sidecar.
+  off    — no network; active serving = baseline; retain pairs audit lineage.
   shadow — may POST; engine contract echoes baselines (applied=false); NFL
            never serves adjusted model_prob.
-  on     — serve applied adjustments only after full validation (Jimmy TBD).
+  on     — serve applied adjustments only after full validation + separate
+           activation approval (not this draft).
+
+R1 same-stack publish (draft): parlays.baseline.json + parlays.json (active) +
+corrections_serving.json bound by run_id / content ids. Default flag mode=off.
+Fail-closed client never serves adjusted active when flag/baseline invalid.
+SWR120 is NOT a global restoration upper bound; offline/open tabs are unbounded.
 
 Engine mode is a Vercel env var and requires redeploy — NOT an instant kill.
 NFL OFF must not depend on engine reachability.
@@ -44,10 +50,17 @@ CONFIG_PATH = ROOT / "config" / "parlay_selflearn_corrections.json"
 CORRECTIONS_PATH = "/api/v1/nfl/corrections"
 TOKEN_ENV = "SELFLEARN_NFL_CORRECTIONS_TOKEN"
 MODE_ENV = "NFL_PARLAY_CORRECTIONS_MODE"
+BASELINE_NAME = "parlays.baseline.json"
+ACTIVE_NAME = "parlays.json"
+SERVING_FLAG_NAME = "corrections_serving.json"
+PAIRS_AUDIT_NAME = "parlay_corrections_pairs.audit.json"
+BASELINE_URL = "/data/parlays.baseline.json"
+ACTIVE_URL = "/data/parlays.json"
+SERVING_FLAG_URL = "/data/corrections_serving.json"
 
 # Pinned from SelfLearning PR #13 head (read-only verify; not a live deploy pin).
 ENGINE_CONTRACT_PR = "https://github.com/liddar12/SelfLearning/pull/13"
-ENGINE_CONTRACT_HEAD = "37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2"
+ENGINE_CONTRACT_HEAD = "5941214178254df38a1c67b5935e591bfb052e33"
 ENGINE_METHOD = "market_bias_shrinkage_v1"
 ENGINE_MODEL_VERSION = "corrections_v1"
 
@@ -65,21 +78,29 @@ REQUEST_KEYS = frozenset({
 })
 LEG_KEYS = frozenset({"leg_id", "game_id", "market", "selection", "baseline_prob"})
 PARLAY_KEYS = frozenset({"parlay_id", "leg_ids", "baseline_prob"})
-# PR #13 HTTP public_artifact returns ONLY these keys — insufficient to apply.
-ARTIFACT_PUBLIC_KEYS = (
+# Exact canon from engine pin 5941214… — reject empty/fake rule lists.
+ELIGIBILITY_RULES = (
+    "served_at_before_kickoff",
+    "exclude_push_void",
+    "exclude_after_trained_through",
+    "baseline_prob_as_served_in_(0,1)",
+    "binary_outcome_only",
+    "segment_market_and_selection",
+)
+# Legacy incomplete HTTP public shape (pre-5941214) — retain reject regression.
+LEGACY_INCOMPLETE_PUBLIC_KEYS = (
     "artifact_id", "model_version", "method", "trained_through", "fitted_at",
     "expires_at", "n_graded", "source",
 )
-# Strict consumer apply gate (intended contract). Missing any ⇒ reject applied.
-ARTIFACT_APPLY_EVIDENCE_KEYS = ARTIFACT_PUBLIC_KEYS + (
-    "fit_inputs_hash",
-    "segments",
-    "sufficient_total",
-    "min_graded_total",
-    "min_graded_per_market",
-    "eligibility_rules",
-    "leg_cap_pp",
+# Current engine public_artifact (pin 5941214…) — still NOT authenticity proof.
+ARTIFACT_PUBLIC_KEYS = (
+    "artifact_id", "model_version", "method", "trained_through", "fitted_at",
+    "expires_at", "n_graded", "source", "eligibility_rules", "fit_inputs_hash",
+    "prior_strength", "min_graded_total", "min_graded_per_market", "leg_cap_pp",
+    "parlay_cap_pp", "parlay_cap_rel", "clamp", "segments", "sufficient_total",
 )
+# Apply requires the full public provenance set (floors not weakened).
+ARTIFACT_APPLY_EVIDENCE_KEYS = ARTIFACT_PUBLIC_KEYS
 
 MODES = frozenset({"off", "shadow", "on"})
 HASH_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -124,8 +145,10 @@ def read_config(path=None, environment=None):
     _need(isinstance(raw, dict) and raw.get("version") == 1, "config_refused")
     mode = raw.get("corrections_mode")
     override = environment.get(MODE_ENV)
-    if override not in (None, ""):
-        mode = override
+    # Emergency override is OFF-only. Env must never elevate to on/shadow.
+    # Activation requires committed config corrections_mode=on (+ separate approval).
+    if override == "off":
+        mode = "off"
     _need(mode in MODES, "config_mode_refused")
     timeout = raw.get("consumer_timeout_s", 4)
     _need(_finite(timeout) and 0 < float(timeout) <= 8, "config_timeout_refused")
@@ -260,9 +283,20 @@ def _same_prob(a, b, eps=1e-12):
     return _finite(a) and _finite(b) and abs(float(a) - float(b)) <= eps
 
 
+def segment_key(market, selection):
+    """Engine pin 5941214… segment identity: market|selection (case-sensitive text)."""
+    _need(isinstance(market, str) and market, "segment_market_invalid")
+    _need(isinstance(selection, str) and selection, "segment_selection_invalid")
+    return "%s|%s" % (market, selection)
+
+
 def pr13_public_artifact_shape(artifact):
-    """True when artifact matches PR#13 HTTP public_artifact key set (apply-insufficient)."""
-    return isinstance(artifact, dict) and set(artifact.keys()) == set(ARTIFACT_PUBLIC_KEYS)
+    """True for LEGACY incomplete public shape (pre-5941214) — apply-insufficient."""
+    return isinstance(artifact, dict) and set(artifact.keys()) == set(LEGACY_INCOMPLETE_PUBLIC_KEYS)
+
+
+def legacy_incomplete_artifact_shape(artifact):
+    return pr13_public_artifact_shape(artifact)
 
 
 def _validate_artifact_public(artifact, *, now, generated_at):
@@ -291,25 +325,27 @@ def _validate_artifact_public(artifact, *, now, generated_at):
 
 
 def _validate_artifact_for_apply(artifact, *, now, generated_at, request_legs, applied_leg_rows, config):
-    """Strict apply gate: eligibility/provenance evidence required. Do not relax.
+    """Strict apply gate against engine pin 5941214…. Do not relax floors.
 
-    PR #13 public_artifact omits segments + fit_inputs_hash; those responses MUST
-    fail this gate so applied corrections cannot ship on incomplete evidence.
+    Digests/fit_inputs_hash are content-address only — NOT authenticity or journal
+    integrity. Legacy incomplete public shapes must still fail here.
     """
+    if legacy_incomplete_artifact_shape(artifact):
+        raise CorrectionsError("artifact_missing_apply_evidence")
     _validate_artifact_public(artifact, now=now, generated_at=generated_at)
     missing = [key for key in ARTIFACT_APPLY_EVIDENCE_KEYS if key not in artifact]
     _need(not missing, "artifact_missing_apply_evidence")
     _need(isinstance(artifact.get("fit_inputs_hash"), str)
           and HASH_RE.match(artifact["fit_inputs_hash"]), "artifact_fit_inputs_hash_invalid")
-    # artifact_id / fit_inputs_hash are content-address digests, NOT signatures.
     _need(isinstance(artifact["sufficient_total"], bool), "artifact_sufficient_total_invalid")
     _need(isinstance(artifact["min_graded_total"], int)
           and artifact["min_graded_total"] >= MIN_GRADED_TOTAL, "artifact_min_total_invalid")
     _need(isinstance(artifact["min_graded_per_market"], int)
           and artifact["min_graded_per_market"] >= MIN_GRADED_PER_MARKET,
           "artifact_min_market_invalid")
-    _need(isinstance(artifact["eligibility_rules"], list)
-          and len(artifact["eligibility_rules"]) >= 1, "artifact_eligibility_rules_missing")
+    rules = artifact.get("eligibility_rules")
+    _need(isinstance(rules, list) and tuple(rules) == ELIGIBILITY_RULES,
+          "artifact_eligibility_rules_mismatch")
     _need(artifact["sufficient_total"] is True, "insufficient_graded_data")
     _need(artifact["n_graded"] >= max(config["proposed_min_graded_legs_overall"],
                                       artifact["min_graded_total"]),
@@ -317,22 +353,44 @@ def _validate_artifact_for_apply(artifact, *, now, generated_at, request_legs, a
     _need(_finite(artifact.get("leg_cap_pp"))
           and 0 < float(artifact["leg_cap_pp"]) <= HARD_LEG_CAP_PP + 1e-15,
           "artifact_leg_cap_invalid")
+    _need(_finite(artifact.get("parlay_cap_pp"))
+          and 0 < float(artifact["parlay_cap_pp"]) <= HARD_PARLAY_CAP_PP + 1e-15,
+          "artifact_parlay_cap_invalid")
+    _need(_finite(artifact.get("parlay_cap_rel"))
+          and 0 < float(artifact["parlay_cap_rel"]) <= HARD_PARLAY_CAP_REL + 1e-15,
+          "artifact_parlay_cap_rel_invalid")
+    _need(_finite(artifact.get("prior_strength")) and float(artifact["prior_strength"]) > 0,
+          "artifact_prior_strength_invalid")
+    clamp = artifact.get("clamp")
+    _need(isinstance(clamp, list) and clamp == list(HARD_CLAMP), "artifact_clamp_mismatch")
+    _need(artifact.get("model_version") == ENGINE_MODEL_VERSION, "artifact_model_version_mismatch")
     segments = artifact["segments"]
     _need(isinstance(segments, dict) and segments, "artifact_segments_missing")
+    # Optional integrity: n_graded should equal sum of segment n_eligible when present.
+    try:
+        seg_sum = sum(int(row.get("n_eligible") or 0) for row in segments.values()
+                      if isinstance(row, dict))
+        _need(seg_sum == artifact["n_graded"], "artifact_n_graded_segment_sum_mismatch")
+    except (TypeError, ValueError):
+        raise CorrectionsError("artifact_segments_missing") from None
     req_by_id = {row["leg_id"]: row for row in request_legs}
     for row in applied_leg_rows:
         if not row["applied"]:
             continue
-        market = req_by_id[row["leg_id"]]["market"]
-        seg = segments.get(market)
+        req = req_by_id[row["leg_id"]]
+        key = segment_key(req["market"], req["selection"])
+        seg = segments.get(key)
+        # Wrong-selection / market-only key must not inherit another segment.
         _need(isinstance(seg, dict), "insufficient_segment_evidence")
-        _need(isinstance(seg.get("n_eligible"), int)
-              and seg["n_eligible"] >= max(config["proposed_min_graded_legs_per_market"],
-                                           artifact["min_graded_per_market"]),
+        _need("|" in key and key.split("|", 1)[1] == req["selection"], "segment_selection_mismatch")
+        floor = max(config["proposed_min_graded_legs_per_market"], artifact["min_graded_per_market"])
+        _need(isinstance(seg.get("n_eligible"), int) and seg["n_eligible"] >= floor,
               "insufficient_segment_data")
         _need(seg.get("eligible_for_application") is True, "segment_not_eligible")
+        _need(bool(seg.get("eligible_for_application"))
+              == (seg["n_eligible"] >= artifact["min_graded_per_market"]),
+              "segment_eligibility_flag_inconsistent")
         _need(_finite(seg.get("delta")), "segment_delta_invalid")
-        # No global inheritance: refuse applied legs whose market segment is absent.
     return artifact
 
 
@@ -423,6 +481,8 @@ def validate_response(response, request, config, *, now):
                          "applied": bool(applied), "delta": float(delta)})
 
     missing_legs = set(req_legs) - seen_legs
+    # MB1: partial required leg sets are hard-fail, not soft-missing.
+    _need(not missing_legs, "missing_leg_ids")
     adjusted_by_leg = {row["leg_id"]: row for row in leg_rows}
 
     for row in parlays:
@@ -481,6 +541,20 @@ def validate_response(response, request, config, *, now):
 
     missing_parlays = set(req_parlays) - seen_parlays
     _need(not missing_parlays, "missing_parlay_ids")
+
+    # Parlay/leg consistency: no partial applied legs inside a card, and no
+    # applied legs while the parent parlay stays unapplied (or the reverse).
+    by_parlay = {row["parlay_id"]: row for row in parlay_rows}
+    for pid, req_p in req_parlays.items():
+        prow = by_parlay[pid]
+        deps = [adjusted_by_leg[lid] for lid in req_p["leg_ids"]]
+        flags = [d["applied"] for d in deps]
+        if any(flags) and not all(flags):
+            raise CorrectionsError("partial_leg_apply_in_parlay")
+        if any(flags) and not prow["applied"]:
+            raise CorrectionsError("parlay_leg_apply_inconsistency")
+        if prow["applied"] and not all(flags):
+            raise CorrectionsError("parlay_applied_without_all_legs")
 
     any_applied = any(row["applied"] for row in leg_rows + parlay_rows)
     artifact = None
@@ -678,14 +752,164 @@ def correct_parlays_document(parlays_doc, *, config=None, transport=None, now=No
     }
 
 
+def content_id(value):
+    """Content-address for a JSON document. Not a signature."""
+    raw = json.dumps(value, sort_keys=True, separators=(",", ":"),
+                     ensure_ascii=True, allow_nan=False).encode("utf-8")
+    return "sha256:" + hashlib.sha256(raw).hexdigest()
+
+
+def _archive_pairs_for_audit(pairs_path):
+    """Retain grading lineage when leaving active serving; clear live sidecar.
+
+    Copies bytes to the audit path then unlinks the live pairs file so OFF/restore
+    never leaves an active pairs sidecar that could be mistaken for live apply
+    state. Audit retention is intentional — do not destroy lineage silently.
+    """
+    path = Path(pairs_path)
+    if not path.exists():
+        return False
+    audit = path.with_name(PAIRS_AUDIT_NAME)
+    audit.write_bytes(path.read_bytes())
+    path.unlink()
+    return True
+
+
+def build_serving_flag(*, mode, baseline_doc, active_doc, updated_utc,
+                       generation_id=None, expires_at=None):
+    """Bind baseline/active/flag for one publish run. Default-deny mode=off."""
+    _need(mode in MODES, "serving_mode_invalid")
+    baseline_id = content_id(baseline_doc)
+    active_id = content_id(active_doc)
+    if mode == "off":
+        _need(baseline_id == active_id, "off_requires_active_equals_baseline")
+    generation = generation_id or baseline_doc.get("updated_utc") or updated_utc
+    _need(isinstance(generation, str) and generation, "generation_id_required")
+    body = {
+        "version": 1,
+        "mode": mode,
+        "updated_utc": updated_utc,
+        "generation_id": generation,
+        "baseline_path": BASELINE_URL,
+        "active_path": ACTIVE_URL,
+        "baseline_content_id": baseline_id,
+        "active_content_id": active_id,
+        "expires_at": expires_at,
+        "engine_contract_head": ENGINE_CONTRACT_HEAD,
+        "note": "fail_closed_default_off_not_an_activation",
+    }
+    body["run_id"] = content_id({
+        "generation_id": generation,
+        "mode": mode,
+        "baseline_content_id": baseline_id,
+        "active_content_id": active_id,
+    })
+    return body
+
+
+def validate_serving_bundle(flag, baseline_doc, active_doc, *, now=None):
+    """Server/client shared rules. Returns (ok, reason, serve_doc_or_none).
+
+    Never returns the active document when it may be adjusted under a bad flag.
+    Baseline unavailable ⇒ safe unavailable (None), not active fallback.
+    """
+    if not isinstance(flag, dict) or flag.get("version") != 1:
+        return False, "flag_missing_or_malformed", None
+    mode = flag.get("mode")
+    if mode not in MODES:
+        return False, "flag_mode_invalid", None
+    if not isinstance(baseline_doc, dict):
+        return False, "baseline_unavailable", None
+    baseline_id = content_id(baseline_doc)
+    if flag.get("baseline_content_id") != baseline_id:
+        return False, "baseline_content_mismatch", None
+    expires = flag.get("expires_at")
+    if expires is not None:
+        exp = _parse_utc(expires)
+        now_dt = _parse_utc(now) if now else datetime.now(timezone.utc)
+        if exp is None or now_dt is None or not (now_dt < exp):
+            return False, "flag_expired", None
+    expected_run = content_id({
+        "generation_id": flag.get("generation_id"),
+        "mode": mode,
+        "baseline_content_id": flag.get("baseline_content_id"),
+        "active_content_id": flag.get("active_content_id"),
+    })
+    if flag.get("run_id") != expected_run:
+        return False, "run_id_mismatch", None
+    gen = flag.get("generation_id")
+    if not isinstance(gen, str) or not gen:
+        return False, "generation_mismatch", None
+    if gen not in (baseline_doc.get("updated_utc"), baseline_doc.get("generation_id")):
+        return False, "generation_mismatch", None
+    if mode == "off":
+        return True, "flag_off", baseline_doc
+    if mode == "shadow":
+        return True, "flag_shadow_serve_baseline", baseline_doc
+    # mode == on — only then may active differ; still require identity binding.
+    if not isinstance(active_doc, dict):
+        return False, "active_unavailable_while_on", None
+    active_id = content_id(active_doc)
+    if flag.get("active_content_id") != active_id:
+        return False, "active_content_mismatch", None
+    if active_doc.get("updated_utc") != baseline_doc.get("updated_utc"):
+        return False, "mixed_generation_active_baseline", None
+    if gen not in (active_doc.get("updated_utc"), active_doc.get("generation_id")):
+        return False, "generation_mismatch", None
+    return True, "flag_on", active_doc
+
+
+def publish_parlay_artifacts(baseline_doc, active_doc, *, data_dir, mode, updated_utc,
+                             write_json, pairs_path=None):
+    """Write baseline, active, and serving flag with run_id binding.
+
+    write_json(path, obj) must match repo on-disk encoding. Returns flag dict.
+    """
+    data_dir = Path(data_dir)
+    flag = build_serving_flag(mode=mode, baseline_doc=baseline_doc, active_doc=active_doc,
+                              updated_utc=updated_utc)
+    ok, reason, _served = validate_serving_bundle(flag, baseline_doc, active_doc,
+                                                  now=updated_utc)
+    _need(ok, reason)
+    write_json(str(data_dir / BASELINE_NAME), baseline_doc)
+    write_json(str(data_dir / ACTIVE_NAME), active_doc)
+    write_json(str(data_dir / SERVING_FLAG_NAME), flag)
+    if pairs_path is not None and mode == "off":
+        _archive_pairs_for_audit(pairs_path)
+    return flag
+
+
+def emergency_restore_active_from_baseline(*, data_dir, write_json, now=None):
+    """Least-privilege restore: active := baseline, flag mode=off. No engine/forecast.
+
+    Does not delete pairs audit. Caller (Actions) must not invoke build_predictions.
+    """
+    data_dir = Path(data_dir)
+    baseline_path = data_dir / BASELINE_NAME
+    _need(baseline_path.is_file(), "baseline_unavailable")
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    _need(isinstance(baseline, dict), "baseline_unavailable")
+    stamp = now or baseline.get("updated_utc") or datetime.now(timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ")
+    active = deepcopy(baseline)
+    flag = build_serving_flag(mode="off", baseline_doc=baseline, active_doc=active,
+                              updated_utc=stamp, generation_id=baseline.get("updated_utc"))
+    write_json(str(data_dir / ACTIVE_NAME), active)
+    write_json(str(data_dir / SERVING_FLAG_NAME), flag)
+    pairs = data_dir / "parlay_corrections_pairs.json"
+    if pairs.exists():
+        _archive_pairs_for_audit(pairs)
+    return flag
+
+
 def maybe_correct_and_write(parlays_doc, *, pairs_path=None, environment=None):
-    """Build-time helper. OFF: no network, delete pairs sidecar, keep baseline."""
+    """Build-time helper. OFF: no network; retain pairs audit lineage."""
     env = os.environ if environment is None else environment
     config = read_config(environment=env)
     path = Path(pairs_path) if pairs_path is not None else None
     if config["corrections_mode"] == "off":
-        if path is not None and path.exists():
-            path.unlink()
+        if path is not None:
+            _archive_pairs_for_audit(path)
         return parlays_doc, _provenance("off", "corrections_mode_off")
     token = env.get(TOKEN_ENV)
     result = correct_parlays_document(
@@ -697,9 +921,11 @@ def maybe_correct_and_write(parlays_doc, *, pairs_path=None, environment=None):
     doc["parlays"] = result["parlays"]
     if path is not None:
         if result["pairs"] is None:
-            if path.exists():
-                path.unlink()
+            # Keep prior pairs for audit; do not destroy grading lineage on fallback.
+            _archive_pairs_for_audit(path)
         else:
+            if path.exists():
+                _archive_pairs_for_audit(path)
             path.write_text(json.dumps(result["pairs"], indent=2, sort_keys=True) + "\n",
                             encoding="utf-8")
     return doc, result["provenance"]

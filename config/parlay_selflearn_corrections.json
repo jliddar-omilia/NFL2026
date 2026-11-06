@@ -14,7 +14,9 @@
   "proposed_min_graded_legs_per_market": 50,
   "engine_method": "market_bias_shrinkage_v1",
   "engine_contract_pr": "https://github.com/liddar12/SelfLearning/pull/13",
-  "engine_contract_head": "37629ecc63c2dc6b92e5cd1b1c5fd5d58398bcb2",
+  "engine_contract_head": "5941214178254df38a1c67b5935e591bfb052e33",
   "caps_status": "pending_jimmy_decision",
-  "contract_status": "draft_pr13_head_37629ecc_readonly"
+  "contract_status": "draft_pr13_head_5941214_readonly_default_off",
+  "activation_status": "blocked_separate_approval_required",
+  "env_override_policy": "off_only_never_elevates"
 }

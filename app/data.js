@@ -23,6 +23,7 @@
  */
 
 import { RUNTIME_CONFIG } from './runtime-config.js';
+import { loadServedParlays } from './parlay-serving.js';
 
 // Absolute paths from the site root so getters work under any hash route.
 const PATHS = Object.freeze({
@@ -107,7 +108,23 @@ export async function loadJson(path, { force = false, ttlMs = DATA_TTL_MS,
 // path and so the getter names document the available contracts.
 export const getPlayerProjections = (opts) => loadJson(PATHS.playerProjections, opts);
 export const getGamePredictions = (opts) => loadJson(PATHS.gamePredictions, opts);
-export const getParlays = (opts) => loadJson(PATHS.parlays, opts);
+/**
+ * R1 fail-closed serving: resolves corrections_serving.json + baseline/active.
+ * Default-OFF publishes keep active == baseline. Missing/malformed flag or
+ * baseline ⇒ reject (safe unavailable) — never silently serve unapproved
+ * adjusted active. Client TTL/SWR/open-tab lag is NOT a global revoke bound.
+ */
+export async function getParlays(opts = {}) {
+  const { nowIso = null, ...loadOpts } = opts;
+  const result = await loadServedParlays(
+    (path) => loadJson(path, loadOpts),
+    { nowIso },
+  );
+  if (!result.ok || !result.doc) {
+    throw new Error(`[data] parlays serving unavailable: ${result.reason || 'unknown'}`);
+  }
+  return result.doc;
+}
 export const getMeta = (opts) => loadJson(PATHS.meta, opts);
 export const getPipelineStatus = (opts) => loadJson(PATHS.pipelineStatus, opts);
 export const getScheduleFull = (opts) => loadJson(PATHS.scheduleFull, opts);
