@@ -323,7 +323,10 @@ test.describe('R73 — PARLAYS week chips + history', () => {
     await page.waitForSelector('.card.parlay[data-parlay-id$="-a"]', { timeout: 15000 });
     await page.waitForTimeout(300);
     expect(got.filter((f) => f === ARCHIVE_PATH.replace(/^data\//, '')).length).toBe(1);
-    expect(got.filter((f) => f === 'parlays.json').length).toBe(1);
+    // R1 OFF: getParlays loads flag + baseline only — never active parlays.json.
+    expect(got.filter((f) => f === 'corrections_serving.json').length).toBe(1);
+    expect(got.filter((f) => f === 'parlays.baseline.json').length).toBe(1);
+    expect(got.filter((f) => f === 'parlays.json').length).toBe(0);
     expect(got.filter((f) => f === 'parlays/index.json').length).toBe(1);
     expect(errors).toEqual([]);
   });
