@@ -311,9 +311,45 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
     cwd: ROOT, encoding: 'utf8',
   }).trim();
 
-  if (!gitOk(['cat-file', '-t', UPSTREAM_PIN])) {
-    assert.fail(`upstream pin ${UPSTREAM_PIN} unavailable — fetch read-only before claiming lock equality`);
-  }
+  // CI PR checkouts are often depth=1. Fetch the audited pin read-only (no
+  // push, no history rewrite) until it is a reachable ancestor of HEAD, or fail
+  // visibly — never invent HEAD~N success.
+  const ensureUpstreamPin = () => {
+    const pinReady = () => {
+      if (!gitOk(['cat-file', '-t', UPSTREAM_PIN])) return false;
+      try {
+        execFileSync('git', ['merge-base', '--is-ancestor', UPSTREAM_PIN, 'HEAD'], {
+          cwd: ROOT, stdio: 'ignore',
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    if (pinReady()) return;
+    const fetches = [
+      ['fetch', '--no-tags', '--depth=1', 'origin', UPSTREAM_PIN],
+      ['fetch', '--no-tags', '--deepen=80', 'origin'],
+      ['fetch', '--no-tags', '--deepen=200', 'origin'],
+      ['fetch', '--no-tags', '--depth=1', 'https://github.com/liddar12/NFL2026.git', UPSTREAM_PIN],
+      ['fetch', '--no-tags', 'origin', UPSTREAM_PIN],
+    ];
+    for (const args of fetches) {
+      try {
+        execFileSync('git', args, {
+          cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+        });
+      } catch {
+        /* try next */
+      }
+      if (pinReady()) return;
+    }
+    assert.fail(
+      `upstream pin ${UPSTREAM_PIN} unavailable after read-only fetch — `
+      + 'refuse lock-equality claim (no HEAD~N fallback)',
+    );
+  };
+  ensureUpstreamPin();
 
   const after = {};
   for (const rel of tracked) {
