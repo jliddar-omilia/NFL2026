@@ -129,13 +129,39 @@ def fetch_champion_futures():
     return rows
 
 
+# Titles that mention two teams with "vs" but are NOT a single-game moneyline.
+# Season-series / futures / championship markets must never join onto a game row.
+_NON_GAME_TITLE = re.compile(
+    r"\b(season\s+series|series\s+winner|champion|championship|super\s*bowl|"
+    r"futures?|mvp|coach|rookie|division|conference)\b",
+    re.IGNORECASE,
+)
+
+
+def game_market_title_ok(title):
+    """True when a Polymarket event title may be treated as a single-game quote.
+
+    Requires a vs-style matchup and refuses series/futures/award wording. Pure.
+    """
+    text = title if type(title) is str else ""
+    if " vs" not in text.lower():
+        return False
+    if _NON_GAME_TITLE.search(text):
+        return False
+    return True
+
+
 def fetch_game_markets():
     """Per-game winner events (title \"X vs. Y\"), when listed. Best-effort:
-    returns list[{title, prices: {name: prob}}]; [] preseason is normal."""
+    returns list[{title, prices: {name: prob}}]; [] preseason is normal.
+
+    Season Series Winner and other non-game markets are excluded here — matching
+    two team names alone is not enough to bind a moneyline to one schedule game.
+    """
     out = []
     for ev in _nfl_events():
         title = (ev.get("title") or "")
-        if " vs" not in title.lower():
+        if not game_market_title_ok(title):
             continue
         prices = {}
         for m in ev.get("markets") or []:
@@ -144,5 +170,6 @@ def fetch_game_markets():
             if p is not None and name:
                 prices[name] = p
         if prices:
-            out.append({"title": title, "prices": prices})
+            out.append({"title": title, "prices": prices,
+                        "end_date": (ev.get("endDate") or ev.get("end_date") or "")})
     return out

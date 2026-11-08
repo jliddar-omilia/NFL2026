@@ -1,7 +1,7 @@
 {
   "season": 2026,
-  "generated_utc": "2026-11-06T10:18:33Z",
-  "as_of_utc": "2026-11-06T10:15:24Z",
+  "generated_utc": "2026-11-08T14:51:45Z",
+  "as_of_utc": "2026-11-08T14:49:20Z",
   "source": "scripts/build_parlay_ledger.py over data/parlays.json (legs as shipped), data/game_predictions.json (game, kickoff, p_team) and data/player_projections.json (the player behind a prop selection)",
   "note": "one entry per (season, week, game_id, market, selection), written the first time the leg is seen and never rewritten; `locked` is true only when that first sight preceded the game's kickoff \u2014 unlocked legs are kept for the record and excluded from scoring. p_team is the side's win probability the leg was priced with, so the seed pricing can be recomputed on identical legs. implied_prob is a yardstick, never an input.",
   "runs": [
@@ -5404,6 +5404,214 @@
       "as_of_utc": "2026-11-06T10:15:24Z",
       "week": 9,
       "legs_seen": 50,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-06T17:25:47Z",
+      "week": 9,
+      "legs_seen": 50,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-06T22:04:35Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 3,
+      "locked_added": 3,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-07T01:47:34Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-07T10:15:58Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-07T16:20:18Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-07T22:03:53Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T01:17:12Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 1,
+      "locked_added": 1,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T05:15:38Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T10:16:29Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T11:52:44Z",
+      "week": 9,
+      "legs_seen": 53,
+      "legs_added": 1,
+      "locked_added": 1,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T12:14:53Z",
+      "week": 9,
+      "legs_seen": 53,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T12:26:34Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T12:59:02Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T14:42:28Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T14:44:03Z",
+      "week": 9,
+      "legs_seen": 51,
+      "legs_added": 0,
+      "locked_added": 0,
+      "unlocked_added": 0,
+      "skipped": {
+        "unknown_market": 0,
+        "no_game": 0,
+        "bad_selection": 0
+      }
+    },
+    {
+      "as_of_utc": "2026-11-08T14:49:20Z",
+      "week": 9,
+      "legs_seen": 51,
       "legs_added": 0,
       "locked_added": 0,
       "unlocked_added": 0,
@@ -27284,6 +27492,32 @@
     {
       "season": 2026,
       "week": 9,
+      "market": "rb_rush_yds",
+      "selection": "C. McCaffrey 60+ rush yds",
+      "position": "RB",
+      "player": "Christian McCaffrey",
+      "gsis_id": "espn-3117251",
+      "team": "SF",
+      "side": "home",
+      "line": 59.5,
+      "mu": 42.93,
+      "sd": 38.87,
+      "z": -0.4262,
+      "game_id": "401873047",
+      "home": "SF",
+      "away": "LV",
+      "kickoff_utc": "2026-11-08T21:25Z",
+      "p_team": 0.7854,
+      "model_prob": 0.3914,
+      "implied_prob": 0.409,
+      "pricing": "calibrated",
+      "seen_utc": "2026-11-06T22:04:35Z",
+      "locked": true,
+      "locked_utc": "2026-11-06T22:04:35Z"
+    },
+    {
+      "season": 2026,
+      "week": 9,
       "market": "wr_rec_yds",
       "selection": "D. Samuel 60+ rec yds",
       "position": "WR",
@@ -27306,6 +27540,32 @@
       "seen_utc": "2026-11-03T05:42:45Z",
       "locked": true,
       "locked_utc": "2026-11-03T05:42:45Z"
+    },
+    {
+      "season": 2026,
+      "week": 9,
+      "market": "wr_rec_yds",
+      "selection": "T. Tucker 60+ rec yds",
+      "position": "WR",
+      "player": "Tre Tucker",
+      "gsis_id": "espn-4428718",
+      "team": "LV",
+      "side": "away",
+      "line": 59.5,
+      "mu": 36.2,
+      "sd": 41.58,
+      "z": -0.5604,
+      "game_id": "401873047",
+      "home": "SF",
+      "away": "LV",
+      "kickoff_utc": "2026-11-08T21:25Z",
+      "p_team": 0.2146,
+      "model_prob": 0.287,
+      "implied_prob": 0.2999,
+      "pricing": "calibrated",
+      "seen_utc": "2026-11-08T11:52:44Z",
+      "locked": true,
+      "locked_utc": "2026-11-08T11:52:44Z"
     },
     {
       "season": 2026,
@@ -27466,6 +27726,32 @@
     {
       "season": 2026,
       "week": 9,
+      "market": "rb_rush_yds",
+      "selection": "J. Jacobs 60+ rush yds",
+      "position": "RB",
+      "player": "Josh Jacobs",
+      "gsis_id": "espn-4047365",
+      "team": "GB",
+      "side": "away",
+      "line": 59.5,
+      "mu": 53.45,
+      "sd": 38.87,
+      "z": -0.1557,
+      "game_id": "401873049",
+      "home": "NE",
+      "away": "GB",
+      "kickoff_utc": "2026-11-08T21:25Z",
+      "p_team": 0.3427,
+      "model_prob": 0.3675,
+      "implied_prob": 0.384,
+      "pricing": "calibrated",
+      "seen_utc": "2026-11-06T22:04:35Z",
+      "locked": true,
+      "locked_utc": "2026-11-06T22:04:35Z"
+    },
+    {
+      "season": 2026,
+      "week": 9,
       "market": "wr_rec_yds",
       "selection": "A. Brown 60+ rec yds",
       "position": "WR",
@@ -27488,6 +27774,32 @@
       "seen_utc": "2026-11-03T17:46:36Z",
       "locked": true,
       "locked_utc": "2026-11-03T17:46:36Z"
+    },
+    {
+      "season": 2026,
+      "week": 9,
+      "market": "wr_rec_yds",
+      "selection": "C. Watson 60+ rec yds",
+      "position": "WR",
+      "player": "Christian Watson",
+      "gsis_id": "espn-4248528",
+      "team": "GB",
+      "side": "away",
+      "line": 59.5,
+      "mu": 41.81,
+      "sd": 41.58,
+      "z": -0.4255,
+      "game_id": "401873049",
+      "home": "NE",
+      "away": "GB",
+      "kickoff_utc": "2026-11-08T21:25Z",
+      "p_team": 0.3427,
+      "model_prob": 0.3162,
+      "implied_prob": 0.3304,
+      "pricing": "calibrated",
+      "seen_utc": "2026-11-06T22:04:35Z",
+      "locked": true,
+      "locked_utc": "2026-11-06T22:04:35Z"
     },
     {
       "season": 2026,
@@ -27644,6 +27956,32 @@
       "seen_utc": "2026-11-03T17:46:36Z",
       "locked": true,
       "locked_utc": "2026-11-03T17:46:36Z"
+    },
+    {
+      "season": 2026,
+      "week": 9,
+      "market": "moneyline",
+      "selection": "BUF ML",
+      "position": null,
+      "player": null,
+      "gsis_id": null,
+      "team": "BUF",
+      "side": "away",
+      "line": null,
+      "mu": null,
+      "sd": null,
+      "z": null,
+      "game_id": "401873051",
+      "home": "MIN",
+      "away": "BUF",
+      "kickoff_utc": "2026-11-10T01:15Z",
+      "p_team": 0.5933,
+      "model_prob": 0.5933,
+      "implied_prob": 0.6038,
+      "pricing": null,
+      "seen_utc": "2026-11-08T01:17:12Z",
+      "locked": true,
+      "locked_utc": "2026-11-08T01:17:12Z"
     },
     {
       "season": 2026,

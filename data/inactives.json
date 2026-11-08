@@ -1,0 +1,69 @@
+{
+  "season": 2026,
+  "week": 9,
+  "updated_utc": "2026-11-08T14:49:20Z",
+  "source": "espn core competitors/<team>/roster didNotPlay (game-day inactives)",
+  "window_hours": 3.0,
+  "counts": {
+    "games": 1,
+    "failed": 0,
+    "players": 10
+  },
+  "games": [
+    {
+      "game_id": "401873038",
+      "home": "ATL",
+      "away": "CIN",
+      "kickoff_utc": "2026-11-08T14:30Z",
+      "status": "STATUS_IN_PROGRESS",
+      "fetched_utc": "2026-11-08T14:49:20Z",
+      "inactive": {
+        "ATL": [
+          {
+            "espn_id": "4431194",
+            "name": "Bowman Jr."
+          },
+          {
+            "espn_id": "4870612",
+            "name": "Branch"
+          },
+          {
+            "espn_id": "14012",
+            "name": "Dalton"
+          },
+          {
+            "espn_id": "4569511",
+            "name": "Jackson"
+          },
+          {
+            "espn_id": "4575860",
+            "name": "Longerbeam"
+          },
+          {
+            "espn_id": "5344782",
+            "name": "Strand"
+          }
+        ],
+        "CIN": [
+          {
+            "espn_id": "4401811",
+            "name": "Dugger"
+          },
+          {
+            "espn_id": "4429000",
+            "name": "Hinton"
+          },
+          {
+            "espn_id": "4870866",
+            "name": "Lew"
+          },
+          {
+            "espn_id": "5081542",
+            "name": "Robinson"
+          }
+        ]
+      }
+    }
+  ],
+  "failed": []
+}

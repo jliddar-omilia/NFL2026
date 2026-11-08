@@ -91,6 +91,8 @@ def week_game_rows(predicted, week):
         venue = p.get("venue")
         if isinstance(venue, str) and venue.strip():
             row["venue"] = venue
+        if "neutral_site" in p:
+            row["neutral_site"] = p["neutral_site"] is True
         rows.append(row)
     return rows
 
@@ -339,7 +341,13 @@ def _inactives_doc(now, week_games, week, now_utc=None, fetch=None):
     """data/inactives.json for the current week: one entry per game in the
     window, each carrying the two posted lists. A game whose fetch fails is
     recorded under `failed` (loud), never invented. None when no game is in
-    the window (nothing to state)."""
+    the window (nothing to state).
+
+    ESPN didNotPlay rows are OBSERVATION-ONLY. Empty lists and successful
+    fetches do not establish official completeness or all-active. Official
+    confirmation eligibility (fail closed when required) lives in the separate
+    shadow confirmation module and is not applied by this writer.
+    """
     now_utc = now_utc or dt.datetime.now(dt.timezone.utc)
     fetch = fetch or espn.fetch_game_inactives
     todo = games_in_inactive_window(week_games, now_utc)
@@ -359,12 +367,27 @@ def _inactives_doc(now, week_games, week, now_utc=None, fetch=None):
                            "error": f"ESPN teams {r['home']}/{r['away']} != schedule "
                                     f"{g['home']}/{g['away']}"})
             continue
+        inactive = r["inactive"]
+        # Per-team coverage is always unknown for this provider: empty is not
+        # all-active, and a non-empty DNP list is not an official complete post.
+        coverage = {
+            team: {"coverage": "unknown", "complete": False,
+                   "dnp_rows": len(rows or []),
+                   "source_profile": "espn_core_roster_didnotplay_v1"}
+            for team, rows in (inactive or {}).items()
+        }
         games.append({"game_id": str(g["game_id"]), "home": g["home"], "away": g["away"],
                       "kickoff_utc": g.get("kickoff_utc"), "status": g.get("status"),
-                      "fetched_utc": now, "inactive": r["inactive"]})
+                      "fetched_utc": now, "inactive": inactive,
+                      "evidence_kind": "observation",
+                      "confirmation": "unconfirmed",
+                      "team_coverage": coverage})
     return {
         "season": SEASON, "week": week, "updated_utc": now,
-        "source": "espn core competitors/<team>/roster didNotPlay (game-day inactives)",
+        "source": ("espn core competitors/<team>/roster didNotPlay "
+                   "(observation only; not official confirmation)"),
+        "evidence_profile": "espn_core_roster_didnotplay_v1",
+        "confirmation": "unconfirmed",
         "window_hours": INACTIVES_WINDOW_HOURS,
         "counts": {"games": len(games), "failed": len(failed),
                    "players": sum(len(v) for g in games for v in g["inactive"].values())},
@@ -867,6 +890,7 @@ def main():
                   f"scale={_epa_hfa.get('scale')}")
 
     # Attach Elo priors and predict every game with the full-vector game model.
+    from scripts.home_field import home_field_elo, is_neutral_site  # noqa: PLC0415
     predicted = []
     for g in schedule:
         row = dict(g)
@@ -874,9 +898,13 @@ def main():
         row["away_elo"] = ratings.get(g["away"], elo_mod.INIT)
         # Learning-loop hook: prediction-time HFA = adopted flat params plus any
         # PROMOTED family deltas (all no-ops until the gate adopts them).
-        hfa_eff = hfa_live + float(_venue_deltas.get(g["home"], 0.0))
-        if _cold_delta and is_cold_game(g):
-            hfa_eff += _cold_delta
+        # Explicit neutralSite games keep home/away labels but receive NO ordinary
+        # home-field Elo (venue/cold home edges included). Absent flag keeps
+        # ordinary HFA; malformed flag fails closed to 0 (scripts/home_field.py).
+        _cold = _cold_delta if (_cold_delta and is_cold_game(g)) else 0.0
+        hfa_eff = home_field_elo(
+            g, hfa_live, venue_delta=float(_venue_deltas.get(g["home"], 0.0)),
+            cold_delta=_cold)
         if _rest_scale:
             hfa_eff += _rest_scale * _rest_diff_by_gid.get(g["game_id"], 0.0)
         if _epa_feats is not None:
@@ -920,6 +948,8 @@ def main():
         pred["week"] = g["week"]
         pred["venue"] = g.get("venue")
         pred["status"] = g.get("status")
+        if "neutral_site" in g or "neutralSite" in g:
+            pred["neutral_site"] = is_neutral_site(g)
         predicted.append(pred)
 
     # Full season (all weeks) for later use.

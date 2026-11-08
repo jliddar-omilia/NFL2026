@@ -3,7 +3,7 @@
     2021,
     2025
   ],
-  "updated_utc": "2026-11-06T10:15:24Z",
+  "updated_utc": "2026-11-08T14:49:20Z",
   "players": {
     "espn-4430807": {
       "name": "Bijan Robinson",
@@ -3799,53 +3799,6 @@
         "source": "ai_estimated"
       }
     },
-    "espn-2578570": {
-      "name": "Jacoby Brissett",
-      "position": "QB",
-      "seasons": [
-        {
-          "yr": 2021,
-          "pts": 72.32,
-          "receptions": 0.0,
-          "targets": 0.0,
-          "games": 11
-        },
-        {
-          "yr": 2022,
-          "pts": 168.62,
-          "receptions": 0.0,
-          "targets": 0.0,
-          "games": 16
-        },
-        {
-          "yr": 2023,
-          "pts": 22.86,
-          "receptions": 0.0,
-          "targets": 0.0,
-          "games": 3
-        },
-        {
-          "yr": 2024,
-          "pts": 45.24,
-          "receptions": 0.0,
-          "targets": 0.0,
-          "games": 8
-        },
-        {
-          "yr": 2025,
-          "pts": 227.44,
-          "receptions": 0.0,
-          "targets": 0.0,
-          "games": 14
-        }
-      ],
-      "trajectory": {
-        "slope_pts_per_yr": 18.69,
-        "curve_residual_per_yr": 1.3684,
-        "seasons_observed": 5,
-        "source": "measured"
-      }
-    },
     "espn-4372016": {
       "name": "Jaylen Waddle",
       "position": "WR",
@@ -3917,6 +3870,53 @@
         "curve_residual_per_yr": 0.0,
         "seasons_observed": 2,
         "source": "ai_estimated"
+      }
+    },
+    "espn-2578570": {
+      "name": "Jacoby Brissett",
+      "position": "QB",
+      "seasons": [
+        {
+          "yr": 2021,
+          "pts": 72.32,
+          "receptions": 0.0,
+          "targets": 0.0,
+          "games": 11
+        },
+        {
+          "yr": 2022,
+          "pts": 168.62,
+          "receptions": 0.0,
+          "targets": 0.0,
+          "games": 16
+        },
+        {
+          "yr": 2023,
+          "pts": 22.86,
+          "receptions": 0.0,
+          "targets": 0.0,
+          "games": 3
+        },
+        {
+          "yr": 2024,
+          "pts": 45.24,
+          "receptions": 0.0,
+          "targets": 0.0,
+          "games": 8
+        },
+        {
+          "yr": 2025,
+          "pts": 227.44,
+          "receptions": 0.0,
+          "targets": 0.0,
+          "games": 14
+        }
+      ],
+      "trajectory": {
+        "slope_pts_per_yr": 18.69,
+        "curve_residual_per_yr": 1.3684,
+        "seasons_observed": 5,
+        "source": "measured"
       }
     },
     "espn-15864": {
@@ -8705,6 +8705,32 @@
         "source": "measured"
       }
     },
+    "espn-4569682": {
+      "name": "Audric Estime",
+      "position": "RB",
+      "seasons": [
+        {
+          "yr": 2024,
+          "pts": 48.7,
+          "receptions": 5.0,
+          "targets": 5.0,
+          "games": 13
+        },
+        {
+          "yr": 2025,
+          "pts": 48.1,
+          "receptions": 12.0,
+          "targets": 13.0,
+          "games": 7
+        }
+      ],
+      "trajectory": {
+        "slope_pts_per_yr": 0.0,
+        "curve_residual_per_yr": 0.0,
+        "seasons_observed": 2,
+        "source": "ai_estimated"
+      }
+    },
     "espn-5123663": {
       "name": "Isaac TeSlaa",
       "position": "WR",
@@ -10094,39 +10120,6 @@
       "trajectory": {
         "slope_pts_per_yr": -0.93,
         "curve_residual_per_yr": 0.0895,
-        "seasons_observed": 3,
-        "source": "measured"
-      }
-    },
-    "espn-4599739": {
-      "name": "Kendre Miller",
-      "position": "RB",
-      "seasons": [
-        {
-          "yr": 2023,
-          "pts": 43.3,
-          "receptions": 10.0,
-          "targets": 11.0,
-          "games": 8
-        },
-        {
-          "yr": 2024,
-          "pts": 29.1,
-          "receptions": 5.0,
-          "targets": 8.0,
-          "games": 6
-        },
-        {
-          "yr": 2025,
-          "pts": 33.3,
-          "receptions": 5.0,
-          "targets": 5.0,
-          "games": 7
-        }
-      ],
-      "trajectory": {
-        "slope_pts_per_yr": -5.0,
-        "curve_residual_per_yr": -0.1459,
         "seasons_observed": 3,
         "source": "measured"
       }

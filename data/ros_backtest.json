@@ -1,6 +1,6 @@
 {
  "__meta__": {
-  "generated_utc": "2026-11-06T10:18:18Z",
+  "generated_utc": "2026-11-08T14:51:44Z",
   "method": "deployed_engine_season_rank_correlation",
   "granularity": "season",
   "baseline": "prior_season_points (last year's finish)",
@@ -102,9 +102,9 @@
      "measured": true
     },
     "RB": {
-     "n": 44,
-     "rho_ros": 0.7125,
-     "rho_lastyear": 0.5958,
+     "n": 43,
+     "rho_ros": 0.7039,
+     "rho_lastyear": 0.5754,
      "ndcg_ros": 0.9157,
      "ndcg_lastyear": 0.8307,
      "beats_baseline": true,
@@ -144,8 +144,8 @@
     },
     "RB": {
      "n": 53,
-     "rho_ros": 0.7011,
-     "rho_lastyear": 0.6443,
+     "rho_ros": 0.7002,
+     "rho_lastyear": 0.6327,
      "ndcg_ros": 0.8736,
      "ndcg_lastyear": 0.8606,
      "beats_baseline": true,
@@ -184,14 +184,14 @@
    "delta": 0.0233
   },
   "RB": {
-   "n": 147,
-   "rho_ros": 0.6173,
-   "rho_lastyear": 0.5309,
+   "n": 146,
+   "rho_ros": 0.6121,
+   "rho_lastyear": 0.5215,
    "ndcg_ros": 0.7562,
    "ndcg_lastyear": 0.7258,
    "beats_baseline": true,
    "measured": true,
-   "delta": 0.0864
+   "delta": 0.0906
   },
   "WR": {
    "n": 271,
