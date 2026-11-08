@@ -1952,12 +1952,23 @@ def _injury_identity_audit(records, rows):
     return codes, refusals
 
 
+def _is_confirmation_eligibility(el):
+    """Offer refusal from inactive_confirmation (independent of injury_source)."""
+    return isinstance(el, dict) and el.get("source") == "inactive_confirmation"
+
+
 def check_injury_source_eligibility(weekly, projections, injuries):
-    """Independent source/offer check; legacy documents without metadata remain readable."""
+    """Independent source/offer check; legacy documents without metadata remain readable.
+
+    Confirmation-required refusals (source=inactive_confirmation) are a separate
+    offer gate and may appear with or without injury_source metadata.
+    """
     meta = (weekly.get("model") or {}).get("injury_source")
     if meta is None:
-        if any(p.get("eligibility") for p in weekly.get("players", [])):
-            raise ValidationError("eligibility refusal has no injury_source receipt")
+        for p in weekly.get("players", []):
+            el = p.get("eligibility")
+            if el and not _is_confirmation_eligibility(el):
+                raise ValidationError("eligibility refusal has no injury_source receipt")
         return True
     doc = injuries or {}
     problems = []
@@ -2012,7 +2023,15 @@ def check_injury_source_eligibility(weekly, projections, injuries):
         expected_gate = ({"eligible": False, "reason": "source_unverified", "detail": refusal,
                           "week": week, "source": "injuries", "source_updated_utc": source}
                          if applicable and refusal else None)
-        if player.get("eligibility") != expected_gate:
+        el = player.get("eligibility")
+        if _is_confirmation_eligibility(el):
+            # Independent confirmed-required offer gate. When injury also refuses,
+            # the producer keeps the injury stamp; otherwise confirmation may stamp.
+            if expected_gate is not None:
+                problems.append("%s: injury refusal overwritten by confirmation eligibility" % pid)
+            elif el.get("eligible") is not False or el.get("reason") != "confirmation_required":
+                problems.append("%s: inactive_confirmation eligibility malformed" % pid)
+        elif el != expected_gate:
             problems.append("%s: eligibility differs from injury source evidence" % pid)
         # This assertion is independent of producer equality: refusing an offer
         # must not simultaneously assert a certain medical absence from the
@@ -2090,16 +2109,12 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
     skip_teams = set((gate_meta or {}).get("skipped_final_teams") or [])
     depth_teams = (depth_chart or {}).get("teams") if isinstance(depth_chart, dict) else None
     gate_counts = {"inactive": 0, "status": 0, "depth": 0, "promoted": 0}
-    # R79 — {espn athlete id: (team, game_id)} the posted lists name this week.
-    # An inactive-reason block must be backed by it, and (rule 9, NO SILENT
-    # INACTIVE) every projected player it names must be gated.
-    inact_ids = {}
-    if isinstance(inactives, dict) and inactives.get("week") in (None, gate_wk):
-        for _g in inactives.get("games") or []:
-            for _team, _rows in (_g.get("inactive") or {}).items():
-                for _r in _rows or []:
-                    if _r.get("espn_id"):
-                        inact_ids[str(_r["espn_id"])] = (_team, str(_g.get("game_id")))
+    # R79 — binding confirmed inactive ids only (same rule as build_weekly.inactive_ids).
+    # Observation/unconfirmed ESPN DNP never confirms and must not invent all-active.
+    # Legacy served reason=inactive without a confirmed list is a FALSE official claim
+    # and must red (not accepted as "compatibility").
+    from scripts.build_weekly import inactive_ids as _binding_inactive_ids  # noqa: PLC0415
+    inact_ids = _binding_inactive_ids(inactives, gate_wk) if isinstance(inactives, dict) else {}
 
     for pl in weekly.get("players", []):
         pid = pl.get("gsis_id")
@@ -2154,13 +2169,19 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
                 hit = inact_ids.get(eid) if eid else None
                 if hit is None:
                     problems.append("%s: this_week reason inactive but data/inactives.json "
-                                    "does not name him — a game-day claim needs its list"
+                                    "does not name him on a confirmed complete list — "
+                                    "observation DNP is not an official inactive claim"
                                     % pid)
+                elif tw.get("confirmation") != "confirmed":
+                    problems.append("%s: this_week reason inactive missing "
+                                    "confirmation='confirmed' (refuses observation-only "
+                                    "official-list claims)" % pid)
                 elif tw.get("game_id") != hit[1] or (record or {}).get("team") != hit[0]:
                     problems.append("%s: this_week.game_id %r / team %r disagree with the "
-                                    "list (%r, %r)" % (pid, tw.get("game_id"),
-                                                       (record or {}).get("team"),
-                                                       hit[1], hit[0]))
+                                    "confirmed list (%r, %r)" % (
+                                        pid, tw.get("game_id"),
+                                        (record or {}).get("team"),
+                                        hit[1], hit[0]))
                 gate_counts["inactive"] += 1
             elif reason == "status":
                 st = tw.get("status")
@@ -2198,6 +2219,36 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
                 problems.append("%s: this_week.reason %r unknown" % (pid, reason))
             if tw.get("playable") is False and row is not None and not season_block:
                 gated = [w for w in blocked_all if w.get("wk") == tw.get("wk")]
+        # Forged confirmation eligibility (independent of this_week): confirmed_*
+        # requires binding confirmed-list evidence — never accept observation alone.
+        el = pl.get("eligibility")
+        if _is_confirmation_eligibility(el):
+            st = el.get("state")
+            eid_el = str(pid)[5:] if str(pid).startswith("espn-") else None
+            bind = inact_ids.get(eid_el) if eid_el else None
+            if st == "confirmed_inactive" and bind is None:
+                problems.append("%s: eligibility.state confirmed_inactive without "
+                                "confirmed complete inactive-list evidence" % pid)
+            elif st == "confirmed_active" and bind is not None:
+                problems.append("%s: eligibility.state confirmed_active but player is "
+                                "on the confirmed inactive list" % pid)
+            elif st == "confirmed_active":
+                confirmed_games = [
+                    g for g in ((inactives or {}).get("games") or [])
+                    if isinstance(g, dict) and g.get("confirmation") == "confirmed"
+                ]
+                if not confirmed_games:
+                    problems.append("%s: eligibility.state confirmed_active without "
+                                    "any confirmed inactives evidence" % pid)
+        # Confirmation-required eligibility may explain a single fail-closed
+        # avail:false week without a this_week official/medical gate (honest
+        # unknown/ineligible after removing unsupported inactive claims).
+        if _is_confirmation_eligibility(el) and el.get("eligible") is False:
+            el_wk = el.get("week")
+            el_row = next((w for w in weeks if w.get("wk") == el_wk), None)
+            if el_row is not None and el_row.get("avail") is False \
+                    and not any(w is el_row for w in gated):
+                gated.append(el_row)
         # Rule 9 (R79) — NO SILENT INACTIVE: a projected player the posted list
         # names, whose team plays this week and is not FINAL, must be gated.
         _eid = str(pid)[5:] if str(pid).startswith("espn-") else None

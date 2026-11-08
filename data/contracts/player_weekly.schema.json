@@ -302,13 +302,28 @@
           "eligibility": {
             "type": "object", "additionalProperties": false,
             "required": ["eligible", "reason", "detail", "week", "source", "source_updated_utc"],
+            "description": "Offer refusal only (eligible is always false). Injury source refusals use reason=source_unverified / source=injuries. Confirmed-required MY-prop refusals use reason=confirmation_required / source=inactive_confirmation (optional state + require_confirmed). Absence of the block means the player was not refused by either gate. When source=inactive_confirmation and eligible=false with a concrete week, that refusal may explain exactly one fail-closed weeks[].avail=false / pts=0 row for that week without inventing an availability{} medical block or an official this_week inactive/status claim (validator + playable_this_week + availability/weekly_contract mirrors). Forged state=confirmed_inactive/active without binding confirmed-list evidence still reds.",
             "properties": {
               "eligible": { "enum": [false] },
-              "reason": { "enum": ["source_unverified"] },
+              "reason": { "enum": ["source_unverified", "confirmation_required"] },
               "detail": { "type": "string" },
-              "week": { "type": "integer", "minimum": 1, "maximum": 18 },
-              "source": { "enum": ["injuries"] },
-              "source_updated_utc": { "type": ["string", "null"] }
+              "week": {
+                "type": ["integer", "null"],
+                "minimum": 1,
+                "maximum": 18,
+                "description": "Slate week for the refusal. Null only for confirmation_required when the caller supplied no week (fail-closed helper); published weekly rows always carry 1..18."
+              },
+              "source": { "enum": ["injuries", "inactive_confirmation"] },
+              "source_updated_utc": { "type": ["string", "null"] },
+              "state": {
+                "type": "string",
+                "enum": ["provisional", "confirmed_active", "confirmed_inactive", "unknown_or_stale", "closed"],
+                "description": "inactive_confirmation player_state when source=inactive_confirmation; omitted on injury refusals."
+              },
+              "require_confirmed": {
+                "enum": [true],
+                "description": "Present and true when source=inactive_confirmation."
+              }
             }
           },
           "receptions_prior": {
@@ -435,7 +450,12 @@
                   "depth",
                   "depth_promoted"
                 ],
-                "description": "inactive = (R79) he is on his team's posted game-day inactive list (data/inactives.json). status = his injury status says he sits. depth = a listed QB behind a healthy starter (or a QB his team's chart does not list). depth_promoted = playable:true, the listed starter is out and this QB starts."
+                "description": "inactive = (R79) he is on a CONFIRMED complete game-day inactive list (data/inactives.json confirmation=confirmed). Observation ESPN DNP must not use this reason. status = his injury status says he sits. depth = a listed QB behind a healthy starter (or a QB his team's chart does not list). depth_promoted = playable:true, the listed starter is out and this QB starts."
+              },
+              "confirmation": {
+                "type": "string",
+                "enum": ["confirmed"],
+                "description": "reason inactive only: must be confirmed. Present solely when inactive_ids bound from a confirmed+complete list. Absence with reason=inactive is invalid."
               },
               "status": {
                 "type": "string",
@@ -453,7 +473,7 @@
               "game_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "reason inactive only: the ESPN game whose posted list names him (data/inactives.json games[].game_id)."
+                "description": "reason inactive only: the ESPN game whose confirmed list names him (data/inactives.json games[].game_id)."
               },
               "depth": {
                 "type": [

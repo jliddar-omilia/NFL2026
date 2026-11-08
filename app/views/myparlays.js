@@ -522,6 +522,11 @@ function playabilityWords(tw) {
     return tw.starter ? `${depth} behind ${tw.starter}` : depth;
   }
   if (tw.status) return String(tw.status);
+  if (tw.reason === 'inactive') {
+    return tw.confirmation === 'confirmed'
+      ? 'on the posted game-day inactive list'
+      : 'availability unverified (not an official inactive list)';
+  }
   if (tw.reason) return String(tw.reason);
   return 'no reason on file';
 }

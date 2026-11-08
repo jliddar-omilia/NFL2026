@@ -245,7 +245,15 @@ export function gateTag(g) {
   if (!g) return null;
   if (g.playable !== false) return g.reason === 'depth_promoted' ? ['MATCHUP · STARTS', ''] : null;
   const pre = 'Not playable this week — ';
-  if (g.reason === 'inactive') return ['INACTIVE', `${pre}on the posted game-day inactive list`];
+  // Official INACTIVE copy only when the gate carries confirmation=confirmed
+  // (producer stamps that solely from binding confirmed+complete lists).
+  // Legacy observation-bound reason=inactive must NOT claim a posted official list.
+  if (g.reason === 'inactive') {
+    if (g.confirmation === 'confirmed') {
+      return ['INACTIVE', `${pre}on the posted game-day inactive list`];
+    }
+    return null;
+  }
   if (g.reason === 'depth') {
     const d = Number(g.depth);
     return d >= 2 ? [`QB${d}`, `${pre}QB${d}${g.starter ? ` behind ${g.starter}` : ''}`]

@@ -1,11 +1,11 @@
 {
   "season": 2026,
   "week": 9,
-  "generated_utc": "2026-11-06T10:18:09Z",
+  "generated_utc": "2026-11-08T17:25:17Z",
   "available": true,
   "reason": null,
   "source": "nflverse depth_charts_2026 (latest snapshot, pos_rank 1, OL + DL front) x ESPN injuries (data/injuries.json); annotation only, changes no number",
-  "snapshot": "2026-11-06T08:09:32Z",
+  "snapshot": "2026-11-08T14:14:26Z",
   "positions": {
     "ol": [
       "C",
@@ -36,17 +36,16 @@
       "ol": {
         "starters": 5,
         "names": [
-          "Jayden Williams",
+          "Josh Fryar",
           "Isaac Seumalo",
           "Hjalte Froholdt",
-          "Jon Gaines II",
+          "Isaiah Adams",
           "Elijah Wilkinson"
         ],
         "out": [],
         "doubtful": [],
         "questionable": [
-          "Jayden Williams",
-          "Jon Gaines II"
+          "Isaiah Adams"
         ]
       },
       "dl": {
@@ -130,8 +129,7 @@
         "doubtful": [],
         "questionable": [
           "Dion Dawkins",
-          "Alec Anderson",
-          "Spencer Brown"
+          "Alec Anderson"
         ]
       },
       "dl": {
@@ -156,11 +154,11 @@
           "Robert Hunt",
           "Monroe Freeling"
         ],
-        "out": [],
-        "doubtful": [],
-        "questionable": [
+        "out": [
           "Damien Lewis"
-        ]
+        ],
+        "doubtful": [],
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -186,9 +184,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Theo Benedet"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 4,
@@ -200,9 +196,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Grady Jarrett"
-        ]
+        "questionable": []
       }
     },
     "CIN": {
@@ -244,9 +238,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Austin Barber"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 4,
@@ -256,11 +248,11 @@
           "Maliek Collins",
           "Jared Verse"
         ],
-        "out": [],
-        "doubtful": [],
-        "questionable": [
+        "out": [
           "Maliek Collins"
-        ]
+        ],
+        "doubtful": [],
+        "questionable": []
       }
     },
     "DAL": {
@@ -275,9 +267,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Tyler Smith"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -310,13 +300,11 @@
         "names": [
           "Zach Allen",
           "D.J. Jones",
-          "Eyioma Uwazurike"
+          "Malcolm Roach"
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Eyioma Uwazurike"
-        ]
+        "questionable": []
       }
     },
     "DET": {
@@ -325,15 +313,13 @@
         "names": [
           "Penei Sewell",
           "Christian Mahogany",
-          "Cade Mays",
+          "Juice Scruggs",
           "Tate Ratledge",
           "Blake Miller"
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Cade Mays"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 4,
@@ -358,13 +344,12 @@
           "Travis Glover",
           "Anthony Belton"
         ],
-        "out": [],
-        "doubtful": [],
-        "questionable": [
-          "Aaron Banks",
+        "out": [
           "Sean Rhyan",
           "Travis Glover"
-        ]
+        ],
+        "doubtful": [],
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -491,16 +476,14 @@
         "starters": 5,
         "names": [
           "Joe Alt",
-          "Kayode Awosika",
+          "Logan Taylor",
           "Jake Slaughter",
           "Cole Strange",
           "Travis Burke"
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Kayode Awosika"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -578,9 +561,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Kadyn Proctor"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 4,
@@ -592,10 +573,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Chop Robinson",
-          "Zach Sieler"
-        ]
+        "questionable": []
       }
     },
     "MIN": {
@@ -610,9 +588,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Christian Darrisaw"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -658,7 +634,7 @@
       "ol": {
         "starters": 5,
         "names": [
-          "Asim Richards",
+          "Kelvin Banks Jr.",
           "David Edwards",
           "Erik McCoy",
           "Cesar Ruiz",
@@ -666,9 +642,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Asim Richards"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -694,10 +668,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Andrew Thomas",
-          "Jermaine Eluemunor"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -708,9 +679,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Darius Alexander"
-        ]
+        "questionable": []
       }
     },
     "NYJ": {
@@ -796,17 +765,16 @@
         "starters": 5,
         "names": [
           "Charles Cross",
-          "Quenton Nelson",
-          "Jalen Sundell",
           "Grey Zabel",
+          "Jalen Sundell",
+          "Anthony Bradford",
           "Abraham Lucas"
         ],
-        "out": [],
+        "out": [
+          "Charles Cross"
+        ],
         "doubtful": [],
-        "questionable": [
-          "Charles Cross",
-          "Quenton Nelson"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -815,11 +783,11 @@
           "Byron Murphy II",
           "Jarran Reed"
         ],
-        "out": [],
-        "doubtful": [],
-        "questionable": [
+        "out": [
           "Leonard Williams"
-        ]
+        ],
+        "doubtful": [],
+        "questionable": []
       }
     },
     "SF": {
@@ -846,9 +814,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Nick Bosa"
-        ]
+        "questionable": []
       }
     },
     "TB": {
@@ -863,9 +829,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Tristan Wirfs"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -921,9 +885,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Sam Cosmi"
-        ]
+        "questionable": []
       },
       "dl": {
         "starters": 3,
@@ -934,9 +896,7 @@
         ],
         "out": [],
         "doubtful": [],
-        "questionable": [
-          "Shy Tuttle"
-        ]
+        "questionable": []
       }
     }
   },
@@ -944,12 +904,12 @@
     "teams": 32,
     "ol_starters": 160,
     "dl_starters": 108,
-    "ol_out": 0,
-    "dl_out": 0,
+    "ol_out": 4,
+    "dl_out": 2,
     "ol_doubtful": 0,
     "dl_doubtful": 0,
-    "ol_questionable": 26,
-    "dl_questionable": 10,
-    "starters_matched": 70
+    "ol_questionable": 6,
+    "dl_questionable": 1,
+    "starters_matched": 59
   }
 }

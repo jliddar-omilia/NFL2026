@@ -15,7 +15,10 @@ from scripts.validate_data import check_weekly_availability, check_no_unplayable
 NOW='2026-10-14T15:00:00Z'
 PROJ=[{'gsis_id':'espn-1','name':'Runner One','team':'SF','position':'RB','proj_points':170.0},
       {'gsis_id':'espn-2','name':'Receiver Two','team':'SEA','position':'WR','proj_points':170.0}]
-SCHED=[{'week':w,'home':'SF','away':'SEA'} for w in range(1,19) if w!=7]
+# Kickoff + game_id required so confirmation_offer_refusal can take the intended
+# provisional path (before T-90) instead of fail-closing on missing context.
+SCHED=[{'week':w,'home':'SF','away':'SEA','game_id':'W6G%d'%w,
+        'kickoff_utc':'2026-10-19T17:00:00Z'} for w in range(1,19) if w!=7]
 def report(status='Out', timestamp='2026-10-14T14:00:00Z', week=6, quarantine=None):
     d=av.enrich_document({'updated_utc':timestamp,'source':'espn','injuries':[
       {'team':'SF','player':'Runner One','status':status,'detail':None}]})
@@ -226,18 +229,31 @@ d=report('Out',quarantine=[{'team':'SF','player':None,'athlete_id':None,'status'
 records=[dict(p,injury_status='ACTIVE') for p in PROJ]
 d['injuries'].append(av.enrich({'team':'SEA','player':'Receiver Two','status':'Injured Reserve'}))
 bp._apply_injury_report(records,d,NOW,6)
-inactive={'week':6,'games':[{'game_id':'G','inactive':{'SF':[{'espn_id':'1'}]}}]}
+# Observation DNP does not bind; confirmed+complete still does (independent inactive).
+obs={'week':6,'confirmation':'unconfirmed','games':[{'game_id':'G','confirmation':'unconfirmed',
+ 'evidence_kind':'observation','inactive':{'SF':[{'espn_id':'1'}]},
+ 'team_coverage':{'SF':{'coverage':'unknown','complete':False,'dnp_rows':1,
+  'source_profile':'espn_core_roster_didnotplay_v1'}}}]}
+confirmed={'week':6,'confirmation':'confirmed','games':[{'game_id':'G','confirmation':'confirmed',
+ 'evidence_kind':'official','inactive':{'SF':[{'espn_id':'1'}]},
+ 'team_coverage':{'SF':{'coverage':'complete','complete':True,'dnp_rows':1,
+  'source_profile':'fixture_official_v1'}}}]}
+b_obs=bw.build_weekly_document(PROJ,SCHED,{'SF':1500,'SEA':1500},{},2026,NOW,
+ factors=bw.build_factors(2026),first_week=6,this_week=6,injury_document=d,inactives=obs)
+check_weekly_availability(b_obs,{'players':PROJ},d,inactives=obs)
 b=bw.build_weekly_document(PROJ,SCHED,{'SF':1500,'SEA':1500},{},2026,NOW,
- factors=bw.build_factors(2026),first_week=6,this_week=6,injury_document=d,inactives=inactive)
-check_weekly_availability(b,{'players':PROJ},d,inactives=inactive)
+ factors=bw.build_factors(2026),first_week=6,this_week=6,injury_document=d,inactives=confirmed)
+check_weekly_availability(b,{'players':PROJ},d,inactives=confirmed)
 # Filtering a quarantined namesake must not make a remaining mover name unique.
 names=[dict(PROJ[0],injury_status='ACTIVE'),dict(PROJ[1],name='Runner One',injury_status='ACTIVE')]
 nd=report('Active',quarantine=[{'athlete_id':'1','status':'Mystery'}])
 nd['injuries']=[av.enrich({'team':'OLD','player':'Runner One','status':'Out'})]
 bp._apply_injury_report(names,nd,NOW,6)
-emit({'records':records,'gate':b['players'][0]['this_week'],'names':names})`);
+emit({'records':records,'obs_gate':b_obs['players'][0].get('this_week'),
+ 'gate':b['players'][0].get('this_week'),'names':names})`);
  assert.equal(o.records[0].injury_status,'ACTIVE');assert.equal(o.records[0].absence_weeks,undefined);
  assert.equal(o.records[1].injury_status,'IR');assert.equal(o.records[1].absence_weeks,4);
+ assert.equal(o.obs_gate, null, 'observation DNP must not bind playable=false');
  assert.equal(o.gate.reason,'inactive');assert.equal(o.gate.playable,false);
  assert.deepEqual(o.names.map(p=>p.injury_status),['ACTIVE','ACTIVE']);
 });

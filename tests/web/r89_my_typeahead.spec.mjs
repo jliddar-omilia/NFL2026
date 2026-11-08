@@ -29,6 +29,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { SEED_PLAYER, SEED_ROWS, SKIP_REASON } from './_myseed.mjs';
+import { DIALS, DEFAULT_DIAL, PROP_DIAL_BAND } from '../../app/views/myparlays.js';
 
 /* The MY tests need a game that has not kicked off; between the last game of a
  * week and the next week's pool there is none, and MY correctly offers nothing.
@@ -65,6 +66,25 @@ const reach = (q) => ALL_NAMES.filter((name) => {
 function unambiguous(rows) {
   return rows.find((r) => reach(surnameOf(r.player)).length === 1) || null;
 }
+/** One row per player; SEED_ROWS is one market row per (player, market). */
+function uniqueByPlayer(rows) {
+  const seen = new Set();
+  return rows.filter((r) => (seen.has(r.gsis_id) ? false : (seen.add(r.gsis_id), true)));
+}
+/**
+ * Survives dialLegs at the default dial: a prop rung must sit inside
+ * PROP_DIAL_BAND of DIALS[DEFAULT_DIAL]. Without this, an unambiguous surname
+ * can still paint a seed chip and zero cards — 2026-11-08 Greg Dortch
+ * (espn-4037235) was first unambiguous on the BUF seed team, nearest rung
+ * 0.3401 outside EVEN's band, and r89 waited on .mp-card until timeout ×3
+ * (818f8260). SEED_PLAYER (Josh Allen) was never the LIVE_PLAYER that failed.
+ */
+function survivesDefaultDial(row) {
+  const target = DIALS[DEFAULT_DIAL];
+  const probs = SEED_ROWS.filter((r) => r.gsis_id === row.gsis_id)
+    .flatMap((r) => (r.rungs || []).map((x) => x.model_prob));
+  return probs.some((p) => Math.abs(Number(p) - target) - PROP_DIAL_BAND <= 1e-9);
+}
 
 /* The finished game of the pool week, and a player on it. Today that is
  * DET at BUF with 17 pooled players; the test asks the data, not the calendar. */
@@ -72,8 +92,10 @@ const FINAL_GAME = SCHEDULE.games.find((g) => Number(g.week) === WEEK && g.statu
 const FINAL_ROWS = FINAL_GAME
   ? POOL.players.filter((r) => r.team === FINAL_GAME.home || r.team === FINAL_GAME.away) : [];
 const FINAL_PLAYER = unambiguous(FINAL_ROWS) || FINAL_ROWS[0] || null;
-/* A player whose game has NOT kicked off (the derived upcoming seed). */
-const LIVE_PLAYER = unambiguous(SEED_ROWS) || SEED_PLAYER;
+/* A player whose game has NOT kicked off AND who builds cards at the default
+ * dial (the typeahead tests assert .mp-card after seeding at EVEN). */
+const LIVE_CARDABLE = uniqueByPlayer(SEED_ROWS).filter(survivesDefaultDial);
+const LIVE_PLAYER = unambiguous(LIVE_CARDABLE) || LIVE_CARDABLE[0] || SEED_PLAYER;
 
 function watch(page) {
   const errors = [];
