@@ -302,7 +302,7 @@
           "eligibility": {
             "type": "object", "additionalProperties": false,
             "required": ["eligible", "reason", "detail", "week", "source", "source_updated_utc"],
-            "description": "Offer refusal only (eligible is always false). Injury source refusals use reason=source_unverified / source=injuries. Confirmed-required MY-prop refusals use reason=confirmation_required / source=inactive_confirmation (optional state + require_confirmed). Absence of the block means the player was not refused by either gate.",
+            "description": "Offer refusal only (eligible is always false). Injury source refusals use reason=source_unverified / source=injuries. Confirmed-required MY-prop refusals use reason=confirmation_required / source=inactive_confirmation (optional state + require_confirmed). Absence of the block means the player was not refused by either gate. When source=inactive_confirmation and eligible=false with a concrete week, that refusal may explain exactly one fail-closed weeks[].avail=false / pts=0 row for that week without inventing an availability{} medical block or an official this_week inactive/status claim (validator + playable_this_week + availability/weekly_contract mirrors). Forged state=confirmed_inactive/active without binding confirmed-list evidence still reds.",
             "properties": {
               "eligible": { "enum": [false] },
               "reason": { "enum": ["source_unverified", "confirmation_required"] },

@@ -104,8 +104,15 @@ test('non-bye weekly points sum to the AVAILABILITY-ADJUSTED season projection',
       // this-week gate, which may zero exactly ONE week (the one `this_week`
       // names) and takes that week's pro-rata share off the total.
       const tw = p.this_week;
-      const gated = (tw && tw.playable === false)
+      const twGated = (tw && tw.playable === false)
         ? p.weeks.filter((w) => !w.bye && w.avail === false && Number(w.wk) === Number(tw.wk)).length : 0;
+      // Same contract as validate_data / availability.test: confirmation
+      // eligibility may honestly explain one fail-closed zeroed week.
+      const el = p.eligibility;
+      const elGated = (el && el.eligible === false && el.source === 'inactive_confirmation'
+        && el.week != null)
+        ? p.weeks.filter((w) => !w.bye && w.avail === false && Number(w.wk) === Number(el.week)).length : 0;
+      const gated = twGated + elGated;
       assert.equal(blocked - gated, 0,
         `${p.gsis_id}: weeks blocked without a season-class availability block`);
       const target = season * (nonBye - gated) / nonBye;

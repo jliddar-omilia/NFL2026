@@ -539,8 +539,18 @@ test('committed player_weekly.json: no orphan flags, and the meta adds up', () =
     // arithmetic below — which is unchanged.
     const tw = p.this_week;
     const seasonBlock = !!(a && a.class === 'season' && (a.weeks_out || a.out_for_season));
-    const gated = (tw && tw.playable === false && !seasonBlock)
+    const twGated = (tw && tw.playable === false && !seasonBlock)
       ? p.weeks.filter((w) => w.avail === false && Number(w.wk) === Number(tw.wk)).length : 0;
+    // Producer/consumer contract (validate_data + playable_this_week): a
+    // confirmation_required eligibility refusal may explain exactly one
+    // fail-closed avail:false week without inventing an availability{} block
+    // or an official this_week inactive/status claim. Mirror that here —
+    // not a loosened check: forged confirmed_* still red elsewhere.
+    const el = p.eligibility;
+    const elGated = (el && el.eligible === false && el.source === 'inactive_confirmation'
+      && el.week != null)
+      ? p.weeks.filter((w) => w.avail === false && Number(w.wk) === Number(el.week)).length : 0;
+    const gated = twGated + elGated;
     const nBlocked = p.weeks.filter((w) => w.avail === false).length - gated;
     if (!a) {
       assert.equal(nBlocked, 0, `${p.gsis_id}: weeks blocked with no availability block`);

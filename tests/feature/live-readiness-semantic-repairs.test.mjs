@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-/** Audited upstream main tip integrated into this draft via ordinary merge. */
-const UPSTREAM_PIN = '4bd7c9b330523d6e2f8f345e684f40a457760870';
+/** Audited current upstream main tip integrated into this draft (current-base). */
+const UPSTREAM_PIN = 'b849f81cc64bfd842471fd0b7be132c8b451a3f4';
 
 function runPy(code) {
   const out = execFileSync('python3', ['-'], {
@@ -393,10 +393,11 @@ print(json.dumps({
   assert.equal(r.confirmed_inactive_schema_valid, true);
 });
 
-test('combined nine-gate transition: served green; source-red reconstructable; forged reds; prop refuse', () => {
-  // Combined draft applies the reviewed machine JSON nine-row edits to served
-  // weekly. Source-only tip d2a8 remains RED evidence (reconstructed below);
-  // compatibility that accepted false official claims is still NOT a fix.
+test('current-base 17-gate transition: served green; source-red reconstructable; forged reds; prop refuse', () => {
+  // Current-base draft on upstream b849: honesty source + 17 observation-inactive
+  // label transitions. ce537 pinned-nine is prior evidence only (no inherited
+  // clearance). Eligibility-backed avail:false is a real producer/validator
+  // contract (not test suppression); forged confirmed_* still reds.
   const r = runPy(`
 import json, copy
 from scripts.validate_data import (
@@ -404,6 +405,7 @@ from scripts.validate_data import (
 from scripts.build_weekly import inactive_ids
 from scripts.models.parlay_builder import playable_this_week
 from scripts.build_leg_pool import prop_legs
+from scripts.availability import NOT_PLAYABLE
 
 weekly = json.load(open("data/player_weekly.json"))
 proj = json.load(open("data/player_projections.json"))
@@ -415,46 +417,57 @@ wk = (weekly.get("model") or {}).get("this_week", {}).get("wk")
 assert inactive_ids(inact, wk) == {}
 meta = weekly["model"]["this_week"]
 assert meta["by_reason"].get("inactive", 0) == 0
-assert meta["by_reason"].get("status") == 34
+assert meta["by_reason"].get("status") == 35
 assert meta["gated"] == 49
 
-# 1) Combined served weekly must validate (transition applied).
 validate_against_schema(weekly, schema, "player_weekly.json")
 check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
-inactive_left = [p["gsis_id"] for p in weekly["players"]
-                 if (p.get("this_week") or {}).get("reason") == "inactive"]
-assert inactive_left == []
+assert [p["gsis_id"] for p in weekly["players"]
+        if (p.get("this_week") or {}).get("reason") == "inactive"] == []
 
-NINE = [
-  "espn-4241478", "espn-4427366", "espn-4429148", "espn-4242557",
-  "espn-4428850", "espn-3676833", "espn-4427238", "espn-4683423", "espn-4431588",
+SEVENTEEN = [
+  "espn-4426354", "espn-4241478", "espn-4427366", "espn-4569618", "espn-4696981",
+  "espn-4429148", "espn-4242557", "espn-4428850", "espn-3676833", "espn-4427238",
+  "espn-4249417", "espn-3134353", "espn-4683423", "espn-4682745", "espn-4431588",
+  "espn-4039057", "espn-4567156",
 ]
-STATUS_OUT = {"espn-4241478", "espn-4428850", "espn-3676833"}
-ELIG = [g for g in NINE if g not in STATUS_OUT]
-for gid in NINE:
+STATUS = {
+  "espn-4241478", "espn-4569618", "espn-4696981", "espn-4428850",
+  "espn-3676833", "espn-4039057", "espn-4567156",
+}
+ELIG = [g for g in SEVENTEEN if g not in STATUS]
+assert len(SEVENTEEN) == 17 and len(STATUS) == 7 and len(ELIG) == 10
+
+for gid in SEVENTEEN:
     p = next(x for x in weekly["players"] if x["gsis_id"] == gid)
     row = next(w for w in p["weeks"] if w.get("wk") == wk)
     assert row.get("avail") is False and row.get("pts") == 0.0
     assert playable_this_week(p, wk) is False
-    if gid in STATUS_OUT:
+    if gid in STATUS:
         tw = p["this_week"]
-        assert tw["reason"] == "status" and tw["status"] == "OUT"
+        st = (p.get("availability") or {}).get("status")
+        assert tw["reason"] == "status" and tw["status"] == st and st in NOT_PLAYABLE
         assert "evidence" not in tw and "confidence" not in tw
         av = p.get("availability") or {}
-        assert av.get("status") == "OUT"
         assert av.get("evidence") in (None, "") and av.get("confidence") in (None, "")
     else:
         assert p.get("this_week") is None
         el = p["eligibility"]
         assert el["eligible"] is False and el["state"] == "unknown_or_stale"
+        assert el["source"] == "inactive_confirmation"
 
-# 2) Reconstruct source-tip RED: restore pre-transition inactive gates → reds.
-reconstructed = copy.deepcopy(weekly)
+# Reconstruct pre-transition observation inactive → RED (preserve source-red evidence).
 BEFORE = {
+  "espn-4426354": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873040", "points_lost": 14.27},
   "espn-4241478": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873044", "points_lost": 12.66},
   "espn-4427366": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873045", "points_lost": 12.45},
+  "espn-4569618": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873045", "points_lost": 12.35},
+  "espn-4696981": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873044", "points_lost": 10.58},
   "espn-4429148": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873044", "points_lost": 6.26},
   "espn-4242557": {"wk": 9, "playable": False, "reason": "inactive",
@@ -465,30 +478,39 @@ BEFORE = {
                    "game_id": "401873040", "points_lost": 5.41},
   "espn-4427238": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873039", "points_lost": 5.06},
+  "espn-4249417": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873042", "points_lost": 4.85},
+  "espn-3134353": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873045", "points_lost": 3.44},
   "espn-4683423": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873040", "points_lost": 3.25},
+  "espn-4682745": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873042", "points_lost": 3.15},
   "espn-4431588": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873041", "points_lost": 3.08},
+  "espn-4039057": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873041", "points_lost": 3.03},
+  "espn-4567156": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873043", "points_lost": 2.69},
 }
+reconstructed = copy.deepcopy(weekly)
 for gid, tw in BEFORE.items():
     p = next(x for x in reconstructed["players"] if x["gsis_id"] == gid)
     p.pop("eligibility", None)
     p["this_week"] = tw
-reconstructed["model"]["this_week"]["by_reason"]["inactive"] = 9
-reconstructed["model"]["this_week"]["by_reason"]["status"] = 31
-reconstructed["model"]["this_week"]["gated"] = 55
+reconstructed["model"]["this_week"]["by_reason"]["inactive"] = 17
+reconstructed["model"]["this_week"]["by_reason"]["status"] = 28
+reconstructed["model"]["this_week"]["gated"] = 59
 try:
     check_weekly_availability(reconstructed, proj, inj, depth_chart=depth, inactives=inact)
     source_red_reconstructed = False
 except ValidationError as exc:
     source_red_reconstructed = (
-        str(exc).count("observation DNP is not an official inactive claim") == 9)
+        str(exc).count("observation DNP is not an official inactive claim") == 17)
 
-# 3) Forged eligibility.confirmed_inactive without binding evidence must RED.
 forged = copy.deepcopy(weekly)
 victim = next(p for p in forged["players"] if p["gsis_id"] == "espn-4427366")
-if victim.get("this_week"):
-    del victim["this_week"]
+victim.pop("this_week", None)
 victim["eligibility"] = {
     "eligible": False, "reason": "confirmation_required",
     "detail": "forged", "state": "confirmed_inactive", "week": wk,
@@ -501,9 +523,8 @@ try:
 except ValidationError as exc:
     forged_reds = "confirmed_inactive without confirmed complete inactive-list evidence" in str(exc)
 
-# 4) Prop still refuses all nine via not_playable.
 prop_refused = 0
-for gid in NINE:
+for gid in SEVENTEEN:
     rec = next(p for p in weekly["players"] if p["gsis_id"] == gid)
     legs, counts = prop_legs(
         [{"gsis_id": gid, "name": "X", "team": "PHI", "position": "WR"}],
@@ -518,20 +539,20 @@ for gid in NINE:
 print(json.dumps({
   "ok": True,
   "combined_served_green": True,
-  "source_red_reconstructed_9": source_red_reconstructed,
+  "source_red_reconstructed_17": source_red_reconstructed,
   "forged_confirmed_inactive_reds": forged_reds,
-  "status_out": sorted(STATUS_OUT),
+  "status_converted": sorted(STATUS),
   "eligibility_only": ELIG,
-  "prop_refused_all_nine": prop_refused == 9,
+  "prop_refused_all_17": prop_refused == 17,
 }))
 `);
   assert.equal(r.ok, true);
   assert.equal(r.combined_served_green, true);
-  assert.equal(r.source_red_reconstructed_9, true);
+  assert.equal(r.source_red_reconstructed_17, true);
   assert.equal(r.forged_confirmed_inactive_reds, true);
-  assert.equal(r.prop_refused_all_nine, true);
-  assert.equal(r.status_out.length, 3);
-  assert.equal(r.eligibility_only.length, 6);
+  assert.equal(r.prop_refused_all_17, true);
+  assert.equal(r.status_converted.length, 7);
+  assert.equal(r.eligibility_only.length, 10);
 });
 
 test('UI gateTag: no official INACTIVE list claim without confirmation; eligibility → STATUS UNVERIFIED', async () => {

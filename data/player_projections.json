@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "updated_utc": "2026-11-08T16:16:22Z",
+  "updated_utc": "2026-11-08T16:38:36Z",
   "players": [
     {
       "gsis_id": "espn-3918298",
@@ -6211,38 +6211,6 @@
       "rookie": false
     },
     {
-      "gsis_id": "espn-3917914",
-      "name": "Olamide Zaccheaus",
-      "team": "ATL",
-      "position": "WR",
-      "proj_points": 95.81,
-      "low": 52.7,
-      "high": 138.93,
-      "signals_used": [
-        "injury_history"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 84.8,
-      "gated_low": 67.84,
-      "gated_high": 101.76,
-      "gated_rule": "prior_season_points",
-      "prior_games": 16,
-      "prior_ppg": 5.7373,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 97.53,
-      "candidate_points": 95.81,
-      "candidate_low": 52.7,
-      "candidate_high": 138.93,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9824,
-        "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
       "gsis_id": "espn-4597703",
       "name": "Tory Horton",
       "team": "SEA",
@@ -6688,6 +6656,39 @@
         "age_curve": 1.0,
         "injury_history": 0.9044,
         "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
+      "gsis_id": "espn-3917914",
+      "name": "Olamide Zaccheaus",
+      "team": "ATL",
+      "position": "WR",
+      "proj_points": 91.02,
+      "low": 37.77,
+      "high": 144.27,
+      "signals_used": [
+        "injury_history",
+        "injury_status"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 84.8,
+      "gated_low": 62.75,
+      "gated_high": 106.85,
+      "gated_rule": "prior_season_points",
+      "prior_games": 16,
+      "prior_ppg": 5.7373,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 97.53,
+      "candidate_points": 91.02,
+      "candidate_low": 37.77,
+      "candidate_high": 144.27,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9824,
+        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -7686,6 +7687,39 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4600981",
+      "name": "Pat Bryant",
+      "team": "DEN",
+      "position": "WR",
+      "proj_points": 75.0,
+      "low": 36.19,
+      "high": 113.82,
+      "signals_used": [
+        "age_curve",
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 74.8,
+      "gated_low": 57.6,
+      "gated_high": 92.0,
+      "gated_rule": "prior_season_points",
+      "prior_games": 15,
+      "prior_ppg": 4.9867,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 84.77,
+      "candidate_points": 75.0,
+      "candidate_low": 36.19,
+      "candidate_high": 113.82,
+      "candidate_signals": {
+        "age_curve": 0.94,
+        "injury_history": 0.9412,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-3043116",
       "name": "Demarcus Robinson",
       "team": "SF",
@@ -7846,40 +7880,6 @@
         "age_curve": 0.7,
         "injury_history": 0.8823,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4600981",
-      "name": "Pat Bryant",
-      "team": "DEN",
-      "position": "WR",
-      "proj_points": 71.25,
-      "low": 24.76,
-      "high": 117.74,
-      "signals_used": [
-        "age_curve",
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 74.8,
-      "gated_low": 53.11,
-      "gated_high": 96.49,
-      "gated_rule": "prior_season_points",
-      "prior_games": 15,
-      "prior_ppg": 4.9867,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 84.77,
-      "candidate_points": 71.25,
-      "candidate_low": 24.76,
-      "candidate_high": 117.74,
-      "candidate_signals": {
-        "age_curve": 0.94,
-        "injury_history": 0.9412,
-        "injury_status": 0.95
       },
       "rookie": false
     },
