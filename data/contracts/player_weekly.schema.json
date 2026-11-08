@@ -450,7 +450,12 @@
                   "depth",
                   "depth_promoted"
                 ],
-                "description": "inactive = (R79) he is on his team's posted game-day inactive list (data/inactives.json). status = his injury status says he sits. depth = a listed QB behind a healthy starter (or a QB his team's chart does not list). depth_promoted = playable:true, the listed starter is out and this QB starts."
+                "description": "inactive = (R79) he is on a CONFIRMED complete game-day inactive list (data/inactives.json confirmation=confirmed). Observation ESPN DNP must not use this reason. status = his injury status says he sits. depth = a listed QB behind a healthy starter (or a QB his team's chart does not list). depth_promoted = playable:true, the listed starter is out and this QB starts."
+              },
+              "confirmation": {
+                "type": "string",
+                "enum": ["confirmed"],
+                "description": "reason inactive only: must be confirmed. Present solely when inactive_ids bound from a confirmed+complete list. Absence with reason=inactive is invalid."
               },
               "status": {
                 "type": "string",
@@ -468,7 +473,7 @@
               "game_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "reason inactive only: the ESPN game whose posted list names him (data/inactives.json games[].game_id)."
+                "description": "reason inactive only: the ESPN game whose confirmed list names him (data/inactives.json games[].game_id)."
               },
               "depth": {
                 "type": [

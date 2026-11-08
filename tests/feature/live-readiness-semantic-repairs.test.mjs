@@ -393,48 +393,156 @@ print(json.dumps({
   assert.equal(r.confirmed_inactive_schema_valid, true);
 });
 
-test('legacy observation inactive gates: fail-closed transition; never confirm; unnamed still reds', () => {
+test('served legacy inactive claims red; proposed patch fixture is honest+fail-closed', () => {
+  // Served tree stays untouched. Compatibility that accepts false official
+  // claims is NOT a fix. Temp in-memory patch demonstrates the design.
   const r = runPy(`
 import json, copy
-from scripts.validate_data import check_weekly_availability, ValidationError
+from scripts.validate_data import (
+    check_weekly_availability, validate_against_schema, ValidationError, _load)
 from scripts.build_weekly import inactive_ids
+from scripts.models.parlay_builder import playable_this_week
+from scripts.build_leg_pool import prop_legs, atd_legs
 
 weekly = json.load(open("data/player_weekly.json"))
 proj = json.load(open("data/player_projections.json"))
 inj = json.load(open("data/injuries.json"))
 inact = json.load(open("data/inactives.json"))
 depth = json.load(open("data/depth_chart.json"))
-# Served bytes already carry 9 legacy observation-backed inactive gates.
-# Transition must accept them fail-closed without promoting DNP to confirmed.
-assert inactive_ids(inact, (weekly.get("model") or {}).get("this_week", {}).get("wk")) == {}
-check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
+schema = _load("data/contracts/player_weekly.schema.json")
+wk = (weekly.get("model") or {}).get("this_week", {}).get("wk")
+assert inactive_ids(inact, wk) == {}
 
-# Unnamed claim still reds — assertion not dropped. Re-label an existing
-# legacy inactive gate to a player id that inactives.json does not name.
-bad = copy.deepcopy(weekly)
-gated = next(p for p in bad["players"]
-             if (p.get("this_week") or {}).get("reason") == "inactive")
-old_id = gated["gsis_id"]
-gated["gsis_id"] = "espn-0000000"
-# Keep model counts aligned so the red is the naming assertion, not summary drift.
+# 1) Unpatched served legacy reason=inactive must RED (not accepted).
 try:
-    check_weekly_availability(bad, proj, inj, depth_chart=depth, inactives=inact)
-    unnamed_red = False
+    check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
+    served_reds = False
 except ValidationError as exc:
-    unnamed_red = ("espn-0000000: this_week reason inactive but data/inactives.json"
-                   in str(exc))
-assert old_id  # preserved for readability of the surgical relabel
+    served_reds = "observation DNP is not an official inactive claim" in str(exc)
 
-print(json.dumps({"ok": True, "legacy_obs_gate_accepted_failclosed": True,
-                  "unnamed_inactive_still_reds": unnamed_red,
-                  "producer_still_nonbinding": True,
-                  "served_bytes_unmutated": True}))
+# 2) Forged eligibility.confirmed_inactive without binding evidence must RED.
+forged = copy.deepcopy(weekly)
+# Clear unsupported inactive gates first so the red is the forged stamp.
+n_cleared = 0
+for p in forged["players"]:
+    tw = p.get("this_week") or {}
+    if tw.get("reason") == "inactive":
+        del p["this_week"]
+        n_cleared += 1
+meta = forged["model"]["this_week"]
+meta["by_reason"]["inactive"] = 0
+meta["gated"] = meta["gated"] - n_cleared
+victim = next(p for p in forged["players"] if p["gsis_id"] == "espn-4241478")
+victim["eligibility"] = {
+    "eligible": False, "reason": "confirmation_required",
+    "detail": "forged", "state": "confirmed_inactive", "week": wk,
+    "source": "inactive_confirmation", "source_updated_utc": inact.get("updated_utc"),
+    "require_confirmed": True,
+}
+try:
+    check_weekly_availability(forged, proj, inj, depth_chart=depth, inactives=inact)
+    forged_reds = False
+except ValidationError as exc:
+    forged_reds = "confirmed_inactive without confirmed complete inactive-list evidence" in str(exc)
+
+# 3) Proposed nine-gate patch applied ONLY in memory (served file untouched).
+# OUT/DOUBTFUL/… → honest status gate; others → drop inactive + eligibility
+# unknown/ineligible; always retain avail:false/pts 0 (no invented points).
+from scripts.availability import NOT_PLAYABLE
+patched = copy.deepcopy(weekly)
+gates = []
+src_utc = inact.get("updated_utc") or weekly.get("updated_utc")
+status_converted = 0
+for p in patched["players"]:
+    tw = p.get("this_week") or {}
+    if tw.get("reason") != "inactive":
+        continue
+    gates.append(p["gsis_id"])
+    row = next(w for w in p["weeks"] if w.get("wk") == wk)
+    assert row.get("avail") is False and row.get("pts") == 0.0
+    st = ((p.get("availability") or {}).get("status") or "")
+    if st in NOT_PLAYABLE:
+        p["this_week"] = {"wk": wk, "playable": False, "reason": "status",
+                          "status": st, "points_lost": tw.get("points_lost", 0.0)}
+        status_converted += 1
+    else:
+        del p["this_week"]
+        p["eligibility"] = {
+            "eligible": False, "reason": "confirmation_required",
+            "detail": "legacy_observation_inactive_unsupported",
+            "state": "unknown_or_stale", "week": wk,
+            "source": "inactive_confirmation", "source_updated_utc": src_utc,
+            "require_confirmed": True,
+        }
+assert len(gates) == 9
+meta = patched["model"]["this_week"]
+meta["by_reason"]["inactive"] = 0
+meta["by_reason"]["status"] = meta["by_reason"].get("status", 0) + status_converted
+# model.gated counts this_week rows only (eligibility-backed zeroes are not
+# this_week gates): drop the six non-status inactive removals.
+elig_only = len(gates) - status_converted
+meta["gated"] = meta["gated"] - elig_only
+validate_against_schema(patched, schema, "player_weekly.json")
+check_weekly_availability(patched, proj, inj, depth_chart=depth, inactives=inact)
+
+# Prop/ATD still refuse; UI STATUS UNVERIFIED path via eligibility.
+from scripts.build_weekly import build_factors  # noqa: F401
+players = [{"gsis_id": gid, "name": gid, "team": "PHI", "position": "WR"} for gid in gates[:1]]
+weekly_map = {p["gsis_id"]: p for p in patched["players"]}
+rec = weekly_map[gates[0]]
+assert playable_this_week(rec, wk) is False
+legs, counts = prop_legs(
+    [{"gsis_id": gates[0], "name": "X", "team": "PHI", "position": "WR"}],
+    {gates[0]: rec},
+    [{"game_id": "G", "home": "PHI", "away": "NYG", "week": wk,
+      "probs": {"home": 0.55, "away": 0.45}}],
+    {"WR": {"a": 0.0, "b": 1.0, "c": 0.0}}, {"WR": (-2.0, 2.0)},
+    {"WR": 20.0}, {"WR": [50.0]}, wk=wk)
+assert legs == [] and counts.get("not_playable", 0) >= 1
+
+print(json.dumps({
+  "ok": True,
+  "served_legacy_inactive_reds": served_reds,
+  "forged_confirmed_inactive_reds": forged_reds,
+  "patched_gates": gates,
+  "patched_schema_and_validator_green": True,
+  "patched_playable_false": True,
+  "prop_not_playable": counts.get("not_playable"),
+  "served_file_unmutated": True,
+}))
 `);
   assert.equal(r.ok, true);
-  assert.equal(r.legacy_obs_gate_accepted_failclosed, true);
-  assert.equal(r.unnamed_inactive_still_reds, true);
-  assert.equal(r.producer_still_nonbinding, true);
-  assert.equal(r.served_bytes_unmutated, true);
+  assert.equal(r.served_legacy_inactive_reds, true);
+  assert.equal(r.forged_confirmed_inactive_reds, true);
+  assert.equal(r.patched_gates.length, 9);
+  assert.equal(r.patched_schema_and_validator_green, true);
+  assert.equal(r.patched_playable_false, true);
+  assert.ok(r.prop_not_playable >= 1);
+  assert.equal(r.served_file_unmutated, true);
+});
+
+test('UI gateTag: no official INACTIVE list claim without confirmation; eligibility → STATUS UNVERIFIED', async () => {
+  const mod = await import('../../app/views/players.js');
+  const { availabilityOf } = await import('../../app/availability.js');
+  assert.equal(
+    mod.gateTag({ wk: 9, playable: false, reason: 'inactive', game_id: '401873044' }),
+    null,
+  );
+  assert.deepEqual(
+    mod.gateTag({ wk: 9, playable: false, reason: 'inactive', game_id: 'G',
+      confirmation: 'confirmed' }),
+    ['INACTIVE', 'Not playable this week — on the posted game-day inactive list'],
+  );
+  const chip = availabilityOf({
+    eligibility: {
+      eligible: false, reason: 'confirmation_required', detail: 'legacy_observation_inactive_unsupported',
+      state: 'unknown_or_stale', week: 9, source: 'inactive_confirmation',
+      source_updated_utc: '2026-11-08T16:16:22Z', require_confirmed: true,
+    },
+    weeks: [{ wk: 9, bye: false, pts: 0, avail: false }],
+  }, 9, 9);
+  assert.equal(chip.label, 'STATUS UNVERIFIED');
+  assert.equal(chip.unverified, true);
 });
 
 test('neutralSite=true zeros ordinary HFA; malformed/conflict refuse HFA+weather consistently', () => {

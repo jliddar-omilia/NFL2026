@@ -352,8 +352,14 @@ emit(res)`);
 
 /* 6 — the app ------------------------------------------------------------------- */
 
-test('R79: the PLAYERS headline reads WK n · INACTIVE with a spelled-out title', () => {
-  assert.deepEqual(gateTag({ wk: 2, playable: false, reason: 'inactive', game_id: 'G', points_lost: 9.1 }),
+test('R79: the PLAYERS headline reads WK n · INACTIVE only for confirmed official lists', () => {
+  assert.deepEqual(
+    gateTag({ wk: 2, playable: false, reason: 'inactive', game_id: 'G',
+      confirmation: 'confirmed', points_lost: 9.1 }),
     ['INACTIVE', 'Not playable this week — on the posted game-day inactive list']);
+  assert.equal(
+    gateTag({ wk: 2, playable: false, reason: 'inactive', game_id: 'G', points_lost: 9.1 }),
+    null,
+    'observation-only / unconfirmed reason=inactive must not claim a posted official list');
   assert.equal(gateTag({ wk: 2, playable: true, reason: 'inactive' }), null, 'playable is never tagged inactive');
 });

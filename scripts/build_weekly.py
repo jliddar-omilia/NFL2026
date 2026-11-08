@@ -896,7 +896,7 @@ def this_week_gate(projections, unavail, injuries, depth_doc, wk, sched_by_team,
         if team != p.get("team"):
             continue          # the list names a team the pool disagrees with: not ours to resolve
         gates[p["gsis_id"]] = {"wk": wk, "playable": False, "reason": "inactive",
-                               "game_id": game_id}
+                               "game_id": game_id, "confirmation": "confirmed"}
         meta["by_reason"]["inactive"] += 1
 
     # --- status --------------------------------------------------------------

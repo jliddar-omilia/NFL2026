@@ -2109,18 +2109,12 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
     skip_teams = set((gate_meta or {}).get("skipped_final_teams") or [])
     depth_teams = (depth_chart or {}).get("teams") if isinstance(depth_chart, dict) else None
     gate_counts = {"inactive": 0, "status": 0, "depth": 0, "promoted": 0}
-    # R79 — binding confirmed inactive ids (same rule as build_weekly.inactive_ids).
+    # R79 — binding confirmed inactive ids only (same rule as build_weekly.inactive_ids).
     # Observation/unconfirmed ESPN DNP never confirms and must not invent all-active.
-    # Legacy served weekly may still carry reason=inactive from the old producer that
-    # bound DNP; those claims are accepted only as fail-closed transition when the
-    # observation list still names the player (never as official confirmation).
-    from scripts.build_weekly import (  # noqa: PLC0415
-        inactive_ids as _binding_inactive_ids,
-        observed_inactive_ids as _observed_inactive_ids,
-    )
+    # Legacy served reason=inactive without a confirmed list is a FALSE official claim
+    # and must red (not accepted as "compatibility").
+    from scripts.build_weekly import inactive_ids as _binding_inactive_ids  # noqa: PLC0415
     inact_ids = _binding_inactive_ids(inactives, gate_wk) if isinstance(inactives, dict) else {}
-    observed_ids = (_observed_inactive_ids(inactives, gate_wk)
-                    if isinstance(inactives, dict) else {})
 
     for pl in weekly.get("players", []):
         pid = pl.get("gsis_id")
@@ -2173,31 +2167,21 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
             if reason == "inactive":
                 eid = str(pid)[5:] if str(pid).startswith("espn-") else None
                 hit = inact_ids.get(eid) if eid else None
-                obs = observed_ids.get(eid) if eid else None
-                if hit is not None:
-                    if tw.get("game_id") != hit[1] or (record or {}).get("team") != hit[0]:
-                        problems.append("%s: this_week.game_id %r / team %r disagree with the "
-                                        "confirmed list (%r, %r)" % (
-                                            pid, tw.get("game_id"),
-                                            (record or {}).get("team"),
-                                            hit[1], hit[0]))
-                elif obs is not None:
-                    # Legacy transition: old producer stamped reason=inactive from
-                    # observation DNP. Keep fail-closed (playable false); do not
-                    # promote observation to official confirmation.
-                    if tw.get("playable") is not False:
-                        problems.append("%s: legacy observation inactive claim must remain "
-                                        "playable:false (fail closed, not all-active)" % pid)
-                    if tw.get("game_id") != obs[1] or (record or {}).get("team") != obs[0]:
-                        problems.append("%s: this_week.game_id %r / team %r disagree with the "
-                                        "observation list (%r, %r)" % (
-                                            pid, tw.get("game_id"),
-                                            (record or {}).get("team"),
-                                            obs[1], obs[0]))
-                else:
+                if hit is None:
                     problems.append("%s: this_week reason inactive but data/inactives.json "
-                                    "does not name him — a game-day claim needs its list"
+                                    "does not name him on a confirmed complete list — "
+                                    "observation DNP is not an official inactive claim"
                                     % pid)
+                elif tw.get("confirmation") != "confirmed":
+                    problems.append("%s: this_week reason inactive missing "
+                                    "confirmation='confirmed' (refuses observation-only "
+                                    "official-list claims)" % pid)
+                elif tw.get("game_id") != hit[1] or (record or {}).get("team") != hit[0]:
+                    problems.append("%s: this_week.game_id %r / team %r disagree with the "
+                                    "confirmed list (%r, %r)" % (
+                                        pid, tw.get("game_id"),
+                                        (record or {}).get("team"),
+                                        hit[1], hit[0]))
                 gate_counts["inactive"] += 1
             elif reason == "status":
                 st = tw.get("status")
@@ -2235,6 +2219,36 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
                 problems.append("%s: this_week.reason %r unknown" % (pid, reason))
             if tw.get("playable") is False and row is not None and not season_block:
                 gated = [w for w in blocked_all if w.get("wk") == tw.get("wk")]
+        # Forged confirmation eligibility (independent of this_week): confirmed_*
+        # requires binding confirmed-list evidence — never accept observation alone.
+        el = pl.get("eligibility")
+        if _is_confirmation_eligibility(el):
+            st = el.get("state")
+            eid_el = str(pid)[5:] if str(pid).startswith("espn-") else None
+            bind = inact_ids.get(eid_el) if eid_el else None
+            if st == "confirmed_inactive" and bind is None:
+                problems.append("%s: eligibility.state confirmed_inactive without "
+                                "confirmed complete inactive-list evidence" % pid)
+            elif st == "confirmed_active" and bind is not None:
+                problems.append("%s: eligibility.state confirmed_active but player is "
+                                "on the confirmed inactive list" % pid)
+            elif st == "confirmed_active":
+                confirmed_games = [
+                    g for g in ((inactives or {}).get("games") or [])
+                    if isinstance(g, dict) and g.get("confirmation") == "confirmed"
+                ]
+                if not confirmed_games:
+                    problems.append("%s: eligibility.state confirmed_active without "
+                                    "any confirmed inactives evidence" % pid)
+        # Confirmation-required eligibility may explain a single fail-closed
+        # avail:false week without a this_week official/medical gate (honest
+        # unknown/ineligible after removing unsupported inactive claims).
+        if _is_confirmation_eligibility(el) and el.get("eligible") is False:
+            el_wk = el.get("week")
+            el_row = next((w for w in weeks if w.get("wk") == el_wk), None)
+            if el_row is not None and el_row.get("avail") is False \
+                    and not any(w is el_row for w in gated):
+                gated.append(el_row)
         # Rule 9 (R79) — NO SILENT INACTIVE: a projected player the posted list
         # names, whose team plays this week and is not FINAL, must be gated.
         _eid = str(pid)[5:] if str(pid).startswith("espn-") else None
