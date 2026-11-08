@@ -44,10 +44,10 @@
     },
     "this_week": {
       "wk": 9,
-      "gated": 55,
+      "gated": 49,
       "by_reason": {
-        "inactive": 9,
-        "status": 31,
+        "inactive": 0,
+        "status": 34,
         "depth": 15
       },
       "promoted": 1,
@@ -7224,8 +7224,8 @@
       "this_week": {
         "wk": 9,
         "playable": false,
-        "reason": "inactive",
-        "game_id": "401873044",
+        "reason": "status",
+        "status": "OUT",
         "points_lost": 12.66
       },
       "weeks": [
@@ -7524,13 +7524,6 @@
       "bonus_games": {
         "bonus_rush_yd_100": 4
       },
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873045",
-        "points_lost": 12.45
-      },
       "weeks": [
         {
           "wk": 1,
@@ -7659,7 +7652,17 @@
           "bye": false,
           "pts": 12.43
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4432577",
@@ -26855,13 +26858,6 @@
         "rec_tgt": 61.8
       },
       "base_applied_pts": 69.2,
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873044",
-        "points_lost": 6.26
-      },
       "weeks": [
         {
           "wk": 1,
@@ -26990,7 +26986,17 @@
           "bye": false,
           "pts": 5.58
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4243389",
@@ -27285,13 +27291,6 @@
         "status": "QUESTIONABLE",
         "class": "week"
       },
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873043",
-        "points_lost": 6.2
-      },
       "weeks": [
         {
           "wk": 1,
@@ -27420,7 +27419,17 @@
           "bye": false,
           "pts": 6.82
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4038441",
@@ -29712,8 +29721,8 @@
       "this_week": {
         "wk": 9,
         "playable": false,
-        "reason": "inactive",
-        "game_id": "401873044",
+        "reason": "status",
+        "status": "OUT",
         "points_lost": 5.48
       },
       "weeks": [
@@ -30146,8 +30155,8 @@
       "this_week": {
         "wk": 9,
         "playable": false,
-        "reason": "inactive",
-        "game_id": "401873040",
+        "reason": "status",
+        "status": "OUT",
         "points_lost": 5.41
       },
       "weeks": [
@@ -31282,13 +31291,6 @@
         "rush_yd": 105.9
       },
       "base_applied_pts": 86.28,
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873039",
-        "points_lost": 5.06
-      },
       "weeks": [
         {
           "wk": 1,
@@ -31417,7 +31419,17 @@
           "bye": false,
           "pts": 4.56
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4429275",
@@ -39446,13 +39458,6 @@
         "fum_lost": 3.8
       },
       "base_applied_pts": 55.38,
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873040",
-        "points_lost": 3.25
-      },
       "weeks": [
         {
           "wk": 1,
@@ -39581,7 +39586,17 @@
           "bye": false,
           "pts": 2.73
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4240603",
@@ -40163,13 +40178,6 @@
         "rec_tgt": 33.0
       },
       "base_applied_pts": 24.26,
-      "this_week": {
-        "wk": 9,
-        "playable": false,
-        "reason": "inactive",
-        "game_id": "401873041",
-        "points_lost": 3.08
-      },
       "weeks": [
         {
           "wk": 1,
@@ -40298,7 +40306,17 @@
           "bye": false,
           "pts": 2.89
         }
-      ]
+      ],
+      "eligibility": {
+        "eligible": false,
+        "reason": "confirmation_required",
+        "detail": "legacy_observation_inactive_unsupported",
+        "state": "unknown_or_stale",
+        "week": 9,
+        "source": "inactive_confirmation",
+        "source_updated_utc": "2026-11-08T16:16:22Z",
+        "require_confirmed": true
+      }
     },
     {
       "gsis_id": "espn-4586312",

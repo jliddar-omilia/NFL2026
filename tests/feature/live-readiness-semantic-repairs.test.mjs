@@ -393,16 +393,17 @@ print(json.dumps({
   assert.equal(r.confirmed_inactive_schema_valid, true);
 });
 
-test('served legacy inactive claims red; proposed patch fixture is honest+fail-closed', () => {
-  // Served tree stays untouched. Compatibility that accepts false official
-  // claims is NOT a fix. Temp in-memory patch demonstrates the design.
+test('combined nine-gate transition: served green; source-red reconstructable; forged reds; prop refuse', () => {
+  // Combined draft applies the reviewed machine JSON nine-row edits to served
+  // weekly. Source-only tip d2a8 remains RED evidence (reconstructed below);
+  // compatibility that accepted false official claims is still NOT a fix.
   const r = runPy(`
 import json, copy
 from scripts.validate_data import (
     check_weekly_availability, validate_against_schema, ValidationError, _load)
 from scripts.build_weekly import inactive_ids
 from scripts.models.parlay_builder import playable_this_week
-from scripts.build_leg_pool import prop_legs, atd_legs
+from scripts.build_leg_pool import prop_legs
 
 weekly = json.load(open("data/player_weekly.json"))
 proj = json.load(open("data/player_projections.json"))
@@ -412,27 +413,82 @@ depth = json.load(open("data/depth_chart.json"))
 schema = _load("data/contracts/player_weekly.schema.json")
 wk = (weekly.get("model") or {}).get("this_week", {}).get("wk")
 assert inactive_ids(inact, wk) == {}
+meta = weekly["model"]["this_week"]
+assert meta["by_reason"].get("inactive", 0) == 0
+assert meta["by_reason"].get("status") == 34
+assert meta["gated"] == 49
 
-# 1) Unpatched served legacy reason=inactive must RED (not accepted).
+# 1) Combined served weekly must validate (transition applied).
+validate_against_schema(weekly, schema, "player_weekly.json")
+check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
+inactive_left = [p["gsis_id"] for p in weekly["players"]
+                 if (p.get("this_week") or {}).get("reason") == "inactive"]
+assert inactive_left == []
+
+NINE = [
+  "espn-4241478", "espn-4427366", "espn-4429148", "espn-4242557",
+  "espn-4428850", "espn-3676833", "espn-4427238", "espn-4683423", "espn-4431588",
+]
+STATUS_OUT = {"espn-4241478", "espn-4428850", "espn-3676833"}
+ELIG = [g for g in NINE if g not in STATUS_OUT]
+for gid in NINE:
+    p = next(x for x in weekly["players"] if x["gsis_id"] == gid)
+    row = next(w for w in p["weeks"] if w.get("wk") == wk)
+    assert row.get("avail") is False and row.get("pts") == 0.0
+    assert playable_this_week(p, wk) is False
+    if gid in STATUS_OUT:
+        tw = p["this_week"]
+        assert tw["reason"] == "status" and tw["status"] == "OUT"
+        assert "evidence" not in tw and "confidence" not in tw
+        av = p.get("availability") or {}
+        assert av.get("status") == "OUT"
+        assert av.get("evidence") in (None, "") and av.get("confidence") in (None, "")
+    else:
+        assert p.get("this_week") is None
+        el = p["eligibility"]
+        assert el["eligible"] is False and el["state"] == "unknown_or_stale"
+
+# 2) Reconstruct source-tip RED: restore pre-transition inactive gates → reds.
+reconstructed = copy.deepcopy(weekly)
+BEFORE = {
+  "espn-4241478": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873044", "points_lost": 12.66},
+  "espn-4427366": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873045", "points_lost": 12.45},
+  "espn-4429148": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873044", "points_lost": 6.26},
+  "espn-4242557": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873043", "points_lost": 6.2},
+  "espn-4428850": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873044", "points_lost": 5.48},
+  "espn-3676833": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873040", "points_lost": 5.41},
+  "espn-4427238": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873039", "points_lost": 5.06},
+  "espn-4683423": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873040", "points_lost": 3.25},
+  "espn-4431588": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873041", "points_lost": 3.08},
+}
+for gid, tw in BEFORE.items():
+    p = next(x for x in reconstructed["players"] if x["gsis_id"] == gid)
+    p.pop("eligibility", None)
+    p["this_week"] = tw
+reconstructed["model"]["this_week"]["by_reason"]["inactive"] = 9
+reconstructed["model"]["this_week"]["by_reason"]["status"] = 31
+reconstructed["model"]["this_week"]["gated"] = 55
 try:
-    check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
-    served_reds = False
+    check_weekly_availability(reconstructed, proj, inj, depth_chart=depth, inactives=inact)
+    source_red_reconstructed = False
 except ValidationError as exc:
-    served_reds = "observation DNP is not an official inactive claim" in str(exc)
+    source_red_reconstructed = (
+        str(exc).count("observation DNP is not an official inactive claim") == 9)
 
-# 2) Forged eligibility.confirmed_inactive without binding evidence must RED.
+# 3) Forged eligibility.confirmed_inactive without binding evidence must RED.
 forged = copy.deepcopy(weekly)
-# Clear unsupported inactive gates first so the red is the forged stamp.
-n_cleared = 0
-for p in forged["players"]:
-    tw = p.get("this_week") or {}
-    if tw.get("reason") == "inactive":
-        del p["this_week"]
-        n_cleared += 1
-meta = forged["model"]["this_week"]
-meta["by_reason"]["inactive"] = 0
-meta["gated"] = meta["gated"] - n_cleared
-victim = next(p for p in forged["players"] if p["gsis_id"] == "espn-4241478")
+victim = next(p for p in forged["players"] if p["gsis_id"] == "espn-4427366")
+if victim.get("this_week"):
+    del victim["this_week"]
 victim["eligibility"] = {
     "eligible": False, "reason": "confirmation_required",
     "detail": "forged", "state": "confirmed_inactive", "week": wk,
@@ -445,80 +501,37 @@ try:
 except ValidationError as exc:
     forged_reds = "confirmed_inactive without confirmed complete inactive-list evidence" in str(exc)
 
-# 3) Proposed nine-gate patch applied ONLY in memory (served file untouched).
-# OUT/DOUBTFUL/… → honest status gate; others → drop inactive + eligibility
-# unknown/ineligible; always retain avail:false/pts 0 (no invented points).
-from scripts.availability import NOT_PLAYABLE
-patched = copy.deepcopy(weekly)
-gates = []
-src_utc = inact.get("updated_utc") or weekly.get("updated_utc")
-status_converted = 0
-for p in patched["players"]:
-    tw = p.get("this_week") or {}
-    if tw.get("reason") != "inactive":
-        continue
-    gates.append(p["gsis_id"])
-    row = next(w for w in p["weeks"] if w.get("wk") == wk)
-    assert row.get("avail") is False and row.get("pts") == 0.0
-    st = ((p.get("availability") or {}).get("status") or "")
-    if st in NOT_PLAYABLE:
-        p["this_week"] = {"wk": wk, "playable": False, "reason": "status",
-                          "status": st, "points_lost": tw.get("points_lost", 0.0)}
-        status_converted += 1
-    else:
-        del p["this_week"]
-        p["eligibility"] = {
-            "eligible": False, "reason": "confirmation_required",
-            "detail": "legacy_observation_inactive_unsupported",
-            "state": "unknown_or_stale", "week": wk,
-            "source": "inactive_confirmation", "source_updated_utc": src_utc,
-            "require_confirmed": True,
-        }
-assert len(gates) == 9
-meta = patched["model"]["this_week"]
-meta["by_reason"]["inactive"] = 0
-meta["by_reason"]["status"] = meta["by_reason"].get("status", 0) + status_converted
-# model.gated counts this_week rows only (eligibility-backed zeroes are not
-# this_week gates): drop the six non-status inactive removals.
-elig_only = len(gates) - status_converted
-meta["gated"] = meta["gated"] - elig_only
-validate_against_schema(patched, schema, "player_weekly.json")
-check_weekly_availability(patched, proj, inj, depth_chart=depth, inactives=inact)
-
-# Prop/ATD still refuse; UI STATUS UNVERIFIED path via eligibility.
-from scripts.build_weekly import build_factors  # noqa: F401
-players = [{"gsis_id": gid, "name": gid, "team": "PHI", "position": "WR"} for gid in gates[:1]]
-weekly_map = {p["gsis_id"]: p for p in patched["players"]}
-rec = weekly_map[gates[0]]
-assert playable_this_week(rec, wk) is False
-legs, counts = prop_legs(
-    [{"gsis_id": gates[0], "name": "X", "team": "PHI", "position": "WR"}],
-    {gates[0]: rec},
-    [{"game_id": "G", "home": "PHI", "away": "NYG", "week": wk,
-      "probs": {"home": 0.55, "away": 0.45}}],
-    {"WR": {"a": 0.0, "b": 1.0, "c": 0.0}}, {"WR": (-2.0, 2.0)},
-    {"WR": 20.0}, {"WR": [50.0]}, wk=wk)
-assert legs == [] and counts.get("not_playable", 0) >= 1
+# 4) Prop still refuses all nine via not_playable.
+prop_refused = 0
+for gid in NINE:
+    rec = next(p for p in weekly["players"] if p["gsis_id"] == gid)
+    legs, counts = prop_legs(
+        [{"gsis_id": gid, "name": "X", "team": "PHI", "position": "WR"}],
+        {gid: rec},
+        [{"game_id": "G", "home": "PHI", "away": "NYG", "week": wk,
+          "probs": {"home": 0.55, "away": 0.45}}],
+        {"WR": {"a": 0.0, "b": 1.0, "c": 0.0}}, {"WR": (-2.0, 2.0)},
+        {"WR": 20.0}, {"WR": [50.0]}, wk=wk)
+    assert legs == [] and counts.get("not_playable", 0) >= 1
+    prop_refused += 1
 
 print(json.dumps({
   "ok": True,
-  "served_legacy_inactive_reds": served_reds,
+  "combined_served_green": True,
+  "source_red_reconstructed_9": source_red_reconstructed,
   "forged_confirmed_inactive_reds": forged_reds,
-  "patched_gates": gates,
-  "patched_schema_and_validator_green": True,
-  "patched_playable_false": True,
-  "prop_not_playable": counts.get("not_playable"),
-  "served_file_unmutated": True,
+  "status_out": sorted(STATUS_OUT),
+  "eligibility_only": ELIG,
+  "prop_refused_all_nine": prop_refused == 9,
 }))
 `);
   assert.equal(r.ok, true);
-  assert.equal(r.served_legacy_inactive_reds, true);
+  assert.equal(r.combined_served_green, true);
+  assert.equal(r.source_red_reconstructed_9, true);
   assert.equal(r.forged_confirmed_inactive_reds, true);
-  assert.equal(r.patched_gates.length, 9);
-  assert.equal(r.patched_schema_and_validator_green, true);
-  assert.equal(r.patched_playable_false, true);
-  assert.ok(r.prop_not_playable >= 1);
-  assert.equal(r.served_file_unmutated, true);
+  assert.equal(r.prop_refused_all_nine, true);
+  assert.equal(r.status_out.length, 3);
+  assert.equal(r.eligibility_only.length, 6);
 });
 
 test('UI gateTag: no official INACTIVE list claim without confirmation; eligibility → STATUS UNVERIFIED', async () => {
@@ -722,7 +735,8 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
     const b = headBlob(rel);
     assert.equal(a, b, `${rel} working-tree drift vs HEAD`);
     after[rel] = a;
-    if (rel.startsWith('data/contracts/')) continue;
+    // contracts: source honesty schema; player_weekly: reviewed nine-gate draft only.
+    if (rel.startsWith('data/contracts/') || rel === 'data/player_weekly.json') continue;
     assert.equal(a, pinBlob(rel), `${rel} must equal integrated upstream ${UPSTREAM_PIN}`);
   }
   for (const [rel, blob] of Object.entries(after)) {
@@ -780,6 +794,13 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
   });
 
   // Own edits = non-merge commits on HEAD not in UPSTREAM_PIN.
+  // Authorized mutable data paths on this draft: contracts + the reviewed
+  // nine-gate player_weekly transition ONLY. Immutable protected archives
+  // (cards/history/scores/receipts) must never appear.
+  const ALLOWED_OWN_DATA = new Set([
+    'data/contracts/', // prefix
+    'data/player_weekly.json', // exact — nine-gate honesty transition
+  ]);
   const own = execFileSync('git', ['rev-list', '--no-merges', `${UPSTREAM_PIN}..HEAD`], {
     cwd: ROOT, encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
@@ -790,10 +811,36 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
       cwd: ROOT, encoding: 'utf8',
     }).trim().split('\n').filter(Boolean);
     for (const p of files) {
-      if (p.startsWith('data/') && !p.startsWith('data/contracts/')) ownDataHits.push(`${c.slice(0, 8)}:${p}`);
+      if (!p.startsWith('data/')) continue;
+      const ok = p.startsWith('data/contracts/') || ALLOWED_OWN_DATA.has(p);
+      if (!ok) ownDataHits.push(`${c.slice(0, 8)}:${p}`);
     }
   }
   assert.deepEqual(ownDataHits, [], `own commits must not mutate lock/receipts: ${ownDataHits.join(',')}`);
+
+  // Immutable protected set vs pin: 0 mismatch (weekly intentionally excluded).
+  const IMMUTABLE_PREFIXES = [
+    'data/my_cards/', 'data/parlays/', 'data/atd_cards/', 'data/atd_my_cards/',
+    'data/atd_game_cards/',
+  ];
+  const IMMUTABLE_FILES = [
+    'data/my_card_scores.json', 'data/parlay_leg_scores.json', 'data/bet_facts.json',
+    'data/learning_loops.json', 'data/estimate_scores.json', 'data/leg_pool.json',
+    'data/atd_cards.json', 'data/atd_card_scores.json', 'data/atd_week.json',
+    'data/parlays.json', 'data/my_cards.json', 'data/inactives.json',
+  ];
+  for (const rel of tracked) {
+    const imm = IMMUTABLE_FILES.includes(rel)
+      || IMMUTABLE_PREFIXES.some((pre) => rel.startsWith(pre));
+    if (!imm) continue;
+    assert.equal(workBlob(rel), pinBlob(rel), `immutable ${rel} must equal pin`);
+  }
+  // Weekly is the authorized mutable data path for this combined draft.
+  assert.notEqual(
+    workBlob('data/player_weekly.json'),
+    pinBlob('data/player_weekly.json'),
+    'combined draft must differ from pin on player_weekly only by nine-gate transition',
+  );
 
   // Ancestry proof: audited upstream pin is ancestor of this draft HEAD.
   execFileSync('git', ['merge-base', '--is-ancestor', UPSTREAM_PIN, 'HEAD'], {
