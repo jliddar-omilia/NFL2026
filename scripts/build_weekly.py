@@ -186,8 +186,15 @@ def _schedule_game_for_team(schedule_games, team, week):
     return None
 
 
-def _confirmation_context_refusal(week, detail, state="unknown_or_stale"):
-    """Explicit ineligible stamp when offer context cannot be evaluated."""
+def _confirmation_context_refusal(week, detail, state="unknown_or_stale",
+                                  source_updated_utc=None):
+    """Explicit ineligible stamp when offer context cannot be evaluated.
+
+    Shape matches data/contracts/player_weekly.schema.json eligibility
+    (confirmation_required / inactive_confirmation), including required
+    source_updated_utc. week may be null only when the caller had no slate week
+    (fail-closed helper); build_weekly always stamps with an integer week.
+    """
     return {
         "eligible": False,
         "reason": "confirmation_required",
@@ -195,45 +202,68 @@ def _confirmation_context_refusal(week, detail, state="unknown_or_stale"):
         "state": state,
         "week": week,
         "source": "inactive_confirmation",
+        "source_updated_utc": source_updated_utc,
         "require_confirmed": True,
     }
 
 
 def confirmation_offer_refusal(projection, schedule_games, week, checked_utc,
-                               inactives_doc):
+                               inactives_doc, registry=None, evidence=None):
     """Fail-closed MY-prop offer refusal from recommendation_eligibility, or None.
 
     Real pipeline caller of inactive_confirmation.recommendation_eligibility.
     Returns None ONLY when the player is offerable (provisional before T-90 or
     confirmed_active) — that silence means "no refusal stamp", not "unknown".
     Missing week / game / kickoff / clock / non-espn identity returns an explicit
-    eligible=False stamp (fail closed). Observation-only ESPN DNP never confirms.
-    Does not mutate forecasts, locks, or week points.
+    eligible=False stamp (fail closed) that validates against player_weekly
+    eligibility. Observation-only ESPN DNP never confirms. Does not mutate
+    forecasts, locks, or week points.
+
+    `registry` / `evidence` are optional test/pilot hooks. Production callers omit
+    both: registry defaults to OFFICIAL_SOURCES (empty) and evidence is derived
+    from observation-only espn_observations(inactives_doc). Passing a temporary
+    registered profile proves confirmed+complete semantics without promoting
+    ESPN DNP to official.
     """
     from scripts import inactive_confirmation as ic  # noqa: PLC0415 (local)
 
+    src_utc = None
+    if isinstance(inactives_doc, dict) and isinstance(inactives_doc.get("updated_utc"), str):
+        src_utc = inactives_doc.get("updated_utc")
+    elif isinstance(checked_utc, str):
+        src_utc = checked_utc
+
     if week is None:
-        return _confirmation_context_refusal(None, "missing_week")
+        return _confirmation_context_refusal(None, "missing_week",
+                                             source_updated_utc=src_utc)
     team = (projection or {}).get("team")
     if not team:
-        return _confirmation_context_refusal(week, "missing_team")
+        return _confirmation_context_refusal(week, "missing_team",
+                                             source_updated_utc=src_utc)
     game = _schedule_game_for_team(schedule_games, team, week)
     if not game:
-        return _confirmation_context_refusal(week, "missing_game")
+        return _confirmation_context_refusal(week, "missing_game",
+                                             source_updated_utc=src_utc)
     if not game.get("kickoff_utc"):
-        return _confirmation_context_refusal(week, "missing_kickoff")
+        return _confirmation_context_refusal(week, "missing_kickoff",
+                                             source_updated_utc=src_utc)
     if not game.get("game_id"):
-        return _confirmation_context_refusal(week, "missing_game_id")
+        return _confirmation_context_refusal(week, "missing_game_id",
+                                             source_updated_utc=src_utc)
     now = ic.parse_utc(checked_utc) if isinstance(checked_utc, str) else None
     if now is None:
-        return _confirmation_context_refusal(week, "bad_clock")
+        return _confirmation_context_refusal(week, "bad_clock",
+                                             source_updated_utc=src_utc)
     gid = str((projection or {}).get("gsis_id") or "")
     espn_id = gid[5:] if gid.startswith("espn-") else None
     if not espn_id:
-        return _confirmation_context_refusal(week, "missing_espn_id")
-    evidence = (ic.espn_observations(inactives_doc) or {}).get(game["game_id"], [])
+        return _confirmation_context_refusal(week, "missing_espn_id",
+                                             source_updated_utc=src_utc)
+    if evidence is None:
+        evidence = (ic.espn_observations(inactives_doc) or {}).get(game["game_id"], [])
+    reg = ic.OFFICIAL_SOURCES if registry is None else registry
     el = ic.recommendation_eligibility(
-        espn_id, team, game, now, evidence, require_confirmed=True)
+        espn_id, team, game, now, evidence, registry=reg, require_confirmed=True)
     if el.get("eligible"):
         return None  # provisional / confirmed_active — intended offer path
     return {
@@ -243,6 +273,7 @@ def confirmation_offer_refusal(projection, schedule_games, week, checked_utc,
         "state": el.get("state"),
         "week": week,
         "source": "inactive_confirmation",
+        "source_updated_utc": src_utc,
         "require_confirmed": True,
     }
 

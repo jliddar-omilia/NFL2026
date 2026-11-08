@@ -168,6 +168,9 @@ for label, ref in cases.items():
     assert ref is not None and ref["eligible"] is False, label
     assert ref["reason"] == "confirmation_required", label
     assert ref["detail"], label
+    assert "source_updated_utc" in ref, label
+    assert ref["source"] == "inactive_confirmation", label
+    assert ref["require_confirmed"] is True, label
 
 # T-90 without official source + build_weekly stamp → prop_legs AND atd_legs refuse
 doc2 = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T23:00:00Z",
@@ -175,6 +178,8 @@ doc2 = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T23:00:00Z"
                              depth_chart=None, inactives=INACT)
 by2 = {p["gsis_id"]: p for p in doc2["players"]}
 assert by2["espn-9"]["eligibility"]["eligible"] is False
+assert by2["espn-9"]["eligibility"]["source"] == "inactive_confirmation"
+assert "source_updated_utc" in by2["espn-9"]["eligibility"]
 assert playable_this_week(by2["espn-9"], 3) is False
 assert by2["espn-9"].get("this_week") is None
 
@@ -226,6 +231,166 @@ print(json.dumps({
   assert.equal(r.prop_not_playable, 1);
   assert.equal(r.atd_offered, 0);
   assert.equal(r.wired_caller, 'build_weekly.confirmation_offer_refusal');
+});
+
+test('post-T90 stamped generation validates player_weekly.schema; confirmed≠DNP', () => {
+  // Real producer stamps → schema validator (not fixture avoidance). Covers
+  // fail-closed unknown/unconfirmed, genuine confirmed+complete via a temporary
+  // registered profile (never ESPN DNP), and pre-T90 provisional silence.
+  const r = runPy(`
+import json, copy, os
+from scripts.build_weekly import (build_weekly_document, build_factors,
+                                  confirmation_offer_refusal, _fixture)
+from scripts.models.parlay_builder import playable_this_week
+from scripts.validate_data import validate_against_schema, ValidationError, _load
+from scripts import inactive_confirmation as ic
+
+_, ELOS, SCHED0 = _fixture()
+SCHED = []
+for g in SCHED0:
+    row = dict(g)
+    if g.get("week") == 3 and g.get("home") == "DAL" and g.get("away") == "SFX":
+        row["game_id"] = "G3"
+        row["kickoff_utc"] = "2026-09-18T00:15Z"
+    else:
+        row["game_id"] = "G%s" % g.get("week")
+        row["kickoff_utc"] = "2026-09-%02dT17:00Z" % (10 + int(g.get("week") or 1))
+    SCHED.append(row)
+FX = lambda: build_factors(2026, None, None, None)
+PROJ = [
+  {"gsis_id": "espn-1", "name": "QB One", "team": "SFX", "position": "QB", "proj_points": 300.0},
+  {"gsis_id": "espn-9", "name": "DAL RB", "team": "DAL", "position": "RB", "proj_points": 180.0},
+]
+INACT = {"season": 2026, "week": 3, "updated_utc": "2026-09-17T23:00:00Z",
+  "source": "fixture", "window_hours": 3.0, "confirmation": "unconfirmed",
+  "counts": {"games": 1, "failed": 0, "players": 1},
+  "games": [{"game_id": "G3", "home": "DAL", "away": "SFX", "kickoff_utc": "2026-09-18T00:15Z",
+             "status": "STATUS_SCHEDULED", "fetched_utc": "2026-09-17T23:00:00Z",
+             "evidence_kind": "observation", "confirmation": "unconfirmed",
+             "team_coverage": {
+               "DAL": {"coverage": "unknown", "complete": False, "dnp_rows": 1,
+                       "source_profile": "espn_core_roster_didnotplay_v1"},
+               "SFX": {"coverage": "unknown", "complete": False, "dnp_rows": 0,
+                       "source_profile": "espn_core_roster_didnotplay_v1"}},
+             "inactive": {"DAL": [{"espn_id": "9", "name": "D. RB"}], "SFX": []}}],
+  "failed": []}
+
+schema = _load(os.path.join("data", "contracts", "player_weekly.schema.json"))
+RELABEL = {"SFX": "SF", "GBX": "GB"}
+def real_teams(d):
+    d = copy.deepcopy(d)
+    for p in d["players"]:
+        for w in p["weeks"]:
+            w["opp"] = RELABEL.get(w["opp"], w["opp"])
+    return d
+
+# 1) Real post-T90 rebuild with observation DNP stamps → schema green
+doc = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T23:00:00Z",
+                            injuries=[], factors=FX(), this_week=3, first_week=3,
+                            depth_chart=None, inactives=INACT)
+by = {p["gsis_id"]: p for p in doc["players"]}
+stamp = by["espn-9"]["eligibility"]
+assert stamp["eligible"] is False
+assert stamp["reason"] == "confirmation_required"
+assert stamp["source"] == "inactive_confirmation"
+assert stamp["state"] == "unknown_or_stale"
+assert stamp["require_confirmed"] is True
+assert stamp["source_updated_utc"] == "2026-09-17T23:00:00Z"
+assert stamp["week"] == 3
+validate_against_schema(real_teams(doc), schema, "player_weekly.json")
+assert playable_this_week(by["espn-9"], 3) is False
+
+# 2) Fail-closed missing-context stamps each validate under eligibility schema
+el_schema = schema["properties"]["players"]["items"]["properties"]["eligibility"]
+ctx = {
+  "missing_week": confirmation_offer_refusal(PROJ[1], SCHED, None, "2026-09-17T23:00:00Z", INACT),
+  "missing_kickoff": confirmation_offer_refusal(
+      PROJ[1], [{**g, "kickoff_utc": None} if g.get("game_id")=="G3" else g for g in SCHED],
+      3, "2026-09-17T23:00:00Z", INACT),
+  "bad_clock": confirmation_offer_refusal(PROJ[1], SCHED, 3, "not-a-clock", INACT),
+}
+for label, ref in ctx.items():
+    assert ref["eligible"] is False and ref["source"] == "inactive_confirmation", label
+    assert "source_updated_utc" in ref, label
+    validate_against_schema(ref, el_schema, "eligibility:" + label)
+
+# 3) Pre-T90 provisional: no stamp; document still schema-valid
+doc_pre = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T21:30:00Z",
+                                injuries=[], factors=FX(), this_week=3, first_week=3,
+                                depth_chart=None, inactives=INACT)
+by_pre = {p["gsis_id"]: p for p in doc_pre["players"]}
+assert by_pre["espn-9"].get("eligibility") is None
+assert playable_this_week(by_pre["espn-9"], 3) is True
+validate_against_schema(real_teams(doc_pre), schema, "player_weekly.json")
+
+# 4) Genuine confirmed+complete via temporary registered profile — NOT ESPN DNP
+OFFICIAL = frozenset({"fixture_official_inactives_v1"})
+assert "espn_core_roster_didnotplay_v1" not in OFFICIAL
+assert "espn_core_roster_didnotplay_v1" in ic.OBSERVATION_ONLY_SOURCES
+game = next(g for g in SCHED if g.get("game_id") == "G3")
+now_s = "2026-09-17T23:00:00Z"
+digest = "a" * 64
+official_complete = [{
+  "source_profile": "fixture_official_inactives_v1",
+  "game_id": "G3", "home": "DAL", "away": "SFX",
+  "kickoff_utc": game["kickoff_utc"], "team": "DAL",
+  "posted_utc": now_s, "fetched_utc": now_s,
+  "complete": True,
+  "inactive_ids": ["99"], "active_ids": ["9", "1"],
+  "raw_sha256": digest,
+}]
+# Observation DNP still refuses even if somehow passed as evidence under empty registry
+dnp_only = confirmation_offer_refusal(
+    PROJ[1], SCHED, 3, now_s, INACT, registry=frozenset(), evidence=None)
+assert dnp_only is not None and dnp_only["state"] == "unknown_or_stale"
+validate_against_schema(dnp_only, el_schema, "eligibility:dnp_unconfirmed")
+
+# confirmed_active → None (offerable); DNP was never the confirming source
+active = confirmation_offer_refusal(
+    PROJ[1], SCHED, 3, now_s, INACT, registry=OFFICIAL, evidence=official_complete)
+assert active is None, "confirmed_active must remain offerable (no refusal stamp)"
+
+# confirmed_inactive → schema-valid refusal stamp; still not DNP-as-official
+inactive_ev = [{**official_complete[0],
+                "inactive_ids": ["9", "99"], "active_ids": ["1"]}]
+inactive_ref = confirmation_offer_refusal(
+    PROJ[1], SCHED, 3, now_s, INACT, registry=OFFICIAL, evidence=inactive_ev)
+assert inactive_ref is not None
+assert inactive_ref["eligible"] is False
+assert inactive_ref["state"] == "confirmed_inactive"
+assert inactive_ref["detail"] == "official_inactive"
+assert inactive_ref["source"] == "inactive_confirmation"
+assert inactive_ref["source_updated_utc"] == "2026-09-17T23:00:00Z"
+validate_against_schema(inactive_ref, el_schema, "eligibility:confirmed_inactive")
+# Attach to a generated doc and prove full weekly schema still accepts it
+doc_ci = copy.deepcopy(doc)
+for p in doc_ci["players"]:
+    if p["gsis_id"] == "espn-9":
+        p["eligibility"] = inactive_ref
+validate_against_schema(real_teams(doc_ci), schema, "player_weekly.json")
+assert playable_this_week({"gsis_id": "espn-9", "weeks": by["espn-9"]["weeks"],
+                           "eligibility": inactive_ref}, 3) is False
+
+# Production OFFICIAL_SOURCES remains empty — no accidental DNP promotion
+assert ic.OFFICIAL_SOURCES == frozenset()
+
+print(json.dumps({
+  "ok": True,
+  "post_T90_schema_valid": True,
+  "fail_closed_ctx_schema_valid": True,
+  "pre_T90_provisional_schema_valid": True,
+  "dnp_never_official": True,
+  "confirmed_active_None": True,
+  "confirmed_inactive_schema_valid": True,
+}))
+`);
+  assert.equal(r.ok, true);
+  assert.equal(r.post_T90_schema_valid, true);
+  assert.equal(r.fail_closed_ctx_schema_valid, true);
+  assert.equal(r.pre_T90_provisional_schema_valid, true);
+  assert.equal(r.dnp_never_official, true);
+  assert.equal(r.confirmed_active_None, true);
+  assert.equal(r.confirmed_inactive_schema_valid, true);
 });
 
 test('neutralSite=true zeros ordinary HFA; malformed/conflict refuse HFA+weather consistently', () => {
