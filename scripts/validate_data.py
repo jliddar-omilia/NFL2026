@@ -2090,16 +2090,11 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
     skip_teams = set((gate_meta or {}).get("skipped_final_teams") or [])
     depth_teams = (depth_chart or {}).get("teams") if isinstance(depth_chart, dict) else None
     gate_counts = {"inactive": 0, "status": 0, "depth": 0, "promoted": 0}
-    # R79 — {espn athlete id: (team, game_id)} the posted lists name this week.
-    # An inactive-reason block must be backed by it, and (rule 9, NO SILENT
-    # INACTIVE) every projected player it names must be gated.
-    inact_ids = {}
-    if isinstance(inactives, dict) and inactives.get("week") in (None, gate_wk):
-        for _g in inactives.get("games") or []:
-            for _team, _rows in (_g.get("inactive") or {}).items():
-                for _r in _rows or []:
-                    if _r.get("espn_id"):
-                        inact_ids[str(_r["espn_id"])] = (_team, str(_g.get("game_id")))
+    # R79 — binding confirmed inactive ids only (same rule as
+    # build_weekly.inactive_ids). Observation/unconfirmed ESPN DNP does not
+    # require a this_week.playable=false gate and must not invent all-active.
+    from scripts.build_weekly import inactive_ids as _binding_inactive_ids  # noqa: PLC0415
+    inact_ids = _binding_inactive_ids(inactives, gate_wk) if isinstance(inactives, dict) else {}
 
     for pl in weekly.get("players", []):
         pid = pl.get("gsis_id")

@@ -125,7 +125,9 @@ def target(season, game):
     """
     if type(game) is not dict or type(season) is not int:
         return None, 'weather_game_identity_unknown'
-    if any(k in game and game[k] is not False for k in ('neutral_site', 'neutralSite')):
+    # Shared with home_field: True / malformed / conflict refuse ordinary venue.
+    from scripts.home_field import is_neutral_site  # noqa: PLC0415 (local)
+    if is_neutral_site(game):
         return None, 'weather_neutral_venue_unbound'
     home, away, week = game.get('home'), game.get('away'), game.get('week')
     gid = game.get('game_id')

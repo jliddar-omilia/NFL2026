@@ -76,8 +76,9 @@ def assert_game_refused(home_rows, away_rows=None, *, reverse=False):
     assert 'espn-101' not in gates, 'refused observation manufactured QB1 inactive'
     assert gates['espn-102']['reason'] == 'depth' and gates['espn-102']['playable'] is False
     assert meta['promoted'] == 0, 'refused observation promoted QB2'
-    assert gates['espn-303']['reason'] == 'inactive' and gates['espn-303']['game_id'] == 'GOOD'
-    assert meta['by_reason']['inactive'] == 1
+    # Observation-only ESPN DNP on GOOD never binds playable=false / inactive.
+    assert 'espn-303' not in gates or gates['espn-303'].get('reason') != 'inactive'
+    assert meta['by_reason']['inactive'] == 0
     return doc
 `;
 
@@ -188,21 +189,24 @@ print(json.dumps({'cross_team_combinations':cases, 'cross_game_global_deduplicat
   assert.deepEqual(result, {cross_team_combinations: 18, cross_game_global_deduplication: false});
 });
 
-test('genuine boolean true still gates QB1 and promotes QB2; false, absent and empty observations do neither', () => {
+test('genuine boolean true records observation DNP without binding inactive or promoting QB2; false/absent/empty do neither', () => {
   const result = python(String.raw`
 doc,gates,meta,warning,_ = weekly([{'playerId':'101','didNotPlay':True,'displayName':{'not':'text'}}])
 assert doc['counts'] == {'games':2,'failed':0,'players':2} and warning == ''
-assert gates['espn-101']['reason'] == 'inactive' and gates['espn-101']['game_id'] == 'BAD'
-assert gates['espn-102']['reason'] == 'depth_promoted' and gates['espn-102']['playable'] is True
-assert meta['promoted'] == 1 and gates['espn-303']['reason'] == 'inactive'
+# Observation DNP is stamped, but this_week_gate does not bind playable=false.
+assert 'espn-101' not in gates
+assert gates['espn-102']['reason'] == 'depth' and gates['espn-102']['playable'] is False
+assert meta['promoted'] == 0 and meta['by_reason']['inactive'] == 0
+assert 'espn-303' not in gates
 assert doc['games'][0]['inactive']['SF'] == [{'espn_id':'101','name':''}]
+assert doc.get('confirmation') == 'unconfirmed'
+assert W.inactive_ids(doc, 6) == {}
+assert W.observed_inactive_ids(doc, 6) == {'101':('SF','BAD'), '303':('GB','GOOD')}
 for observation in (None, [], [{'playerId':101,'didNotPlay':False,'active':False}], [{'playerId':101,'active':False}]):
     doc,gates,meta,warning,_ = weekly(observation)
     assert doc['counts'] == {'games':2,'failed':0,'players':1} and warning == ''
     assert 'espn-101' not in gates and gates['espn-102']['reason'] == 'depth'
-    assert meta['promoted'] == 0
-    # Core identity keys remain; evidence annotations may stamp observation-only
-    # metadata that explicitly refuses confirmation/completeness authority.
+    assert meta['promoted'] == 0 and meta['by_reason']['inactive'] == 0
     required = {'game_id','home','away','kickoff_utc','status','fetched_utc','inactive'}
     assert required <= set(doc['games'][0])
     assert doc.get('confirmation') == 'unconfirmed'
@@ -211,9 +215,9 @@ for observation in (None, [], [{'playerId':101,'didNotPlay':False,'active':False
     cov = doc['games'][0].get('team_coverage') or {}
     for team, row in cov.items():
         assert row['complete'] is False and row['coverage'] == 'unknown', team
-print(json.dumps({'genuine_true_promotes':True, 'nonnegative_observations_do_not_promote':4,
+print(json.dumps({'genuine_true_binds_inactive':False, 'nonnegative_observations_do_not_promote':4,
                   'confirmation_authority_claimed':False}))
 `);
-  assert.deepEqual(result, {genuine_true_promotes: true, nonnegative_observations_do_not_promote: 4,
+  assert.deepEqual(result, {genuine_true_binds_inactive: false, nonnegative_observations_do_not_promote: 4,
     confirmation_authority_claimed: false});
 });

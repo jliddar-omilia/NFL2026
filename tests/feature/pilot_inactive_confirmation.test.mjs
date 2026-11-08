@@ -212,15 +212,17 @@ print(json.dumps({"ok": ok,
   for (const k of ['live_mode', 'old_profile', 'half_override', 'extra_key', 'short_sha']) assert.equal(r[k], true, k);
 });
 
-test('production is unchanged: only listed offline tools and the locked test-only canary may reference pilot modules', () => {
+test('production is unchanged: only listed offline tools, the locked canary, and the offer-gate caller may reference pilot modules', () => {
   const hits = [];
-  // Checkpoint 2 adds standalone offline tools, not a production caller. The
-  // owner separately authorized ONE test-only canary workflow, whose read-only
-  // command/checkout contract is locked by pilot_canary_workflow.test.mjs.
+  // Checkpoint 2 offline tools + canary remain. PR2 additionally authorizes
+  // build_weekly.py as the sole production offer-gate caller of
+  // recommendation_eligibility (confirmation_offer_refusal). Learning /
+  // selflearning_pilot stays disabled; OFFICIAL_SOURCES stays empty.
   const offline = new Set([
     'inactive_confirmation.py', 'pilot_config.py', 'pilot_capture.py',
     'learning_journal.py', 'export_learning.py', 'capture_outcome_evidence.py',
     'run_parlay_feedback.py', 'learning_history_guard.py',
+    'build_weekly.py',
   ].map(name => join('scripts', name)));
   const pilotReferences = /inactive_confirmation|pilot_config|selflearning_pilot|pilot_capture|learning_journal|export_learning|capture_outcome_evidence|run_parlay_feedback|learning_history_guard/;
   const walk = (dir) => {

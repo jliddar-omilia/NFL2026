@@ -168,6 +168,60 @@ def injury_eligibility(projection, doc, state, week, scope=None):
                 "source_updated_utc": state.get("source_updated_utc")}
     return None
 
+
+def _schedule_game_for_team(schedule_games, team, week):
+    """The schedule row for `team` in `week`, or None. Pure."""
+    if week is None or not team:
+        return None
+    for g in schedule_games or []:
+        if not isinstance(g, dict) or g.get("week") != week:
+            continue
+        if team in (g.get("home"), g.get("away")):
+            return {
+                "game_id": str(g.get("game_id") or ""),
+                "home": g.get("home"),
+                "away": g.get("away"),
+                "kickoff_utc": g.get("kickoff_utc"),
+            }
+    return None
+
+
+def confirmation_offer_refusal(projection, schedule_games, week, checked_utc,
+                               inactives_doc):
+    """Fail-closed MY-prop offer refusal from recommendation_eligibility, or None.
+
+    Real pipeline caller of inactive_confirmation.recommendation_eligibility.
+    Provisional (before T-90) and confirmed_active may offer; observation-only
+    ESPN DNP never confirms. Does not mutate forecasts, locks, or week points.
+    """
+    from scripts import inactive_confirmation as ic  # noqa: PLC0415 (local)
+
+    game = _schedule_game_for_team(schedule_games, (projection or {}).get("team"), week)
+    if not game or not game.get("kickoff_utc") or not game.get("game_id"):
+        return None
+    now = ic.parse_utc(checked_utc) if isinstance(checked_utc, str) else None
+    if now is None:
+        return None
+    gid = str((projection or {}).get("gsis_id") or "")
+    espn_id = gid[5:] if gid.startswith("espn-") else None
+    if not espn_id:
+        return None
+    evidence = (ic.espn_observations(inactives_doc) or {}).get(game["game_id"], [])
+    el = ic.recommendation_eligibility(
+        espn_id, projection.get("team"), game, now, evidence, require_confirmed=True)
+    if el.get("eligible"):
+        return None
+    return {
+        "eligible": False,
+        "reason": "confirmation_required",
+        "detail": el.get("reason"),
+        "state": el.get("state"),
+        "week": week,
+        "source": "inactive_confirmation",
+        "require_confirmed": True,
+    }
+
+
 WEEKS = 18
 INJURY_WEEKS = 3    # injury shaping horizon: the FIRST 3 PLAYABLE non-bye weeks
 # status -> near-term availability multiplier (documented prior, NOT fitted).
@@ -686,17 +740,45 @@ def load_inactives(path=INACTIVES_PATH):
 
 
 def inactive_ids(inactives_doc, wk=None):
-    """{espn athlete id: (team, game_id)} over every fetched game in the document
-    (for week `wk` when given). Pure."""
+    """{espn athlete id: (team, game_id)} that BIND the this-week inactive gate.
+
+    Only games stamped confirmation=='confirmed' with per-team complete=True
+    bind. ESPN DNP observations (confirmation unconfirmed / evidence_kind
+    observation / complete False / missing confirmation) are omitted — they
+    stay unknown, not confirmed inactive and not all-active. Pure.
+    """
     out = {}
     if not isinstance(inactives_doc, dict):
         return out
     if wk is not None and inactives_doc.get("week") not in (None, wk):
         return out
     for g in inactives_doc.get("games") or []:
+        if not isinstance(g, dict) or g.get("confirmation") != "confirmed":
+            continue
+        coverage = g.get("team_coverage") if isinstance(g.get("team_coverage"), dict) else {}
+        for team, rows in (g.get("inactive") or {}).items():
+            cov = coverage.get(team) if isinstance(coverage.get(team), dict) else {}
+            if cov.get("complete") is not True:
+                continue
+            for r in rows or []:
+                if isinstance(r, dict) and r.get("espn_id"):
+                    out[str(r["espn_id"])] = (team, str(g.get("game_id")))
+    return out
+
+
+def observed_inactive_ids(inactives_doc, wk=None):
+    """Raw ESPN DNP athlete ids for audit only — never used to bind playable=false."""
+    out = {}
+    if not isinstance(inactives_doc, dict):
+        return out
+    if wk is not None and inactives_doc.get("week") not in (None, wk):
+        return out
+    for g in inactives_doc.get("games") or []:
+        if not isinstance(g, dict):
+            continue
         for team, rows in (g.get("inactive") or {}).items():
             for r in rows or []:
-                if r.get("espn_id"):
+                if isinstance(r, dict) and r.get("espn_id"):
                     out[str(r["espn_id"])] = (team, str(g.get("game_id")))
     return out
 
@@ -708,10 +790,9 @@ def this_week_gate(projections, unavail, injuries, depth_doc, wk, sched_by_team,
     THE ONE PLACE "does he play this week?" is decided (R77). Three sources, in
     priority order, all of them facts a feed stated -- never a guess:
 
-      inactive -- (R79) his ESPN athlete id is on his team's posted game-day
-                 inactive list (data/inactives.json, fetched from kickoff-3h
-                 until FINAL). The most authoritative fact there is: a healthy
-                 scratch at any position is caught here and nowhere else.
+      inactive -- (R79) his ESPN athlete id is on a CONFIRMED, complete game-day
+                 inactive list. Observation-only ESPN didNotPlay rows in
+                 data/inactives.json do NOT bind (unknown, not inactive).
       status  -- his canonical injury status is in availability.NOT_PLAYABLE
                  (OUT / DOUBTFUL / IR / PUP / NFI / SUSPENDED). QUESTIONABLE
                  stays playable (owner rule: priced and labelled, not zeroed).
@@ -1189,6 +1270,17 @@ def build_weekly_document(projections, schedule_games, elos, receptions_by_id,
                                             scope=quarantine)
             if eligibility:
                 row["eligibility"] = eligibility
+        # Confirmed-required MY-prop offer gate (real consumer of
+        # recommendation_eligibility). Observation DNP never confirms; after
+        # T-90 without official evidence the offer path fails closed via
+        # playable_this_week → eligibility.eligible False. Does not rewrite
+        # week points or bind this_week.playable from unconfirmed DNP.
+        if this_week is not None and p.get("team") not in set(gate_skip_teams or ()) \
+                and this_week in sched_by_team.get(p.get("team"), {}):
+            conf = confirmation_offer_refusal(
+                p, schedule_games, this_week, updated_utc, inactives)
+            if conf and (row.get("eligibility") or {}).get("eligible") is not False:
+                row["eligibility"] = conf
         row["weeks"] = weeks
         players.append(row)
 

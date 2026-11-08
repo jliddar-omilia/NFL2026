@@ -2,8 +2,10 @@
 """Official inactive confirmation and T-90 withholding for MY player props.
 
 Lean pilot, checkpoint 1. Pure policy: no IO, no network, no serving write.
-Nothing here is wired into the pipeline or the app; the pilot stays disabled
-(config/selflearning_pilot.json enabled=false) and production is unchanged.
+`recommendation_eligibility` is called from build_weekly.confirmation_offer_refusal
+(stamped onto weekly rows; playable_this_week / build_leg_pool refuse offers).
+Learning / selflearning_pilot remains disabled; this module does not activate
+learning or rewrite forecasts, locks, or receipts.
 
 Per player, per game, at a given clock:
 
