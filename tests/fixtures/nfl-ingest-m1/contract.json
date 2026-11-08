@@ -1,0 +1,136 @@
+{
+  "LEG_KEYS": [
+    "comparison_operator",
+    "direction",
+    "game_id",
+    "gsis_id",
+    "line",
+    "market",
+    "model_prob",
+    "position",
+    "selection",
+    "side"
+  ],
+  "MANIFEST_KEYS": [
+    "version",
+    "season",
+    "week",
+    "pool_generated_utc",
+    "source_snapshots",
+    "offered_cards",
+    "selection_policy_version",
+    "joint_model_version"
+  ],
+  "SOURCE_NAMES": [
+    "leg_pool",
+    "parlay_calibration",
+    "schedule"
+  ],
+  "ack_shapes": {
+    "generation": {
+      "durable": true,
+      "object_id": "<sha256:...>",
+      "receipts": [
+        {
+          "receipt_id": "...",
+          "source_receipt_id": "...",
+          "status": "recorded|duplicate"
+        }
+      ],
+      "rejections": [
+        {
+          "reason": "machine_code",
+          "source_receipt_id": "..."
+        }
+      ],
+      "version": 1
+    },
+    "object": {
+      "durable": true,
+      "object_id": "<sha256:...>",
+      "status": "recorded|duplicate",
+      "version": 1
+    }
+  },
+  "auth": {
+    "header": "Authorization: Bearer <SELFLEARN_NFL_INGEST_TOKEN>",
+    "must_differ_from": [
+      "SELFLEARN_OPERATOR_TOKEN",
+      "SELFLEARN_NFL_OUTCOME_INGEST_TOKEN",
+      "SELFLEARN_NFL_CORRECTIONS_TOKEN"
+    ],
+    "note": "Engine-side scoped ingest token already issued; NFL Actions must wire the matching secret before producer --send.",
+    "placeholder_ban": [
+      "",
+      "[SENSITIVE]"
+    ],
+    "token_min_chars": 32
+  },
+  "base_url_production": "https://self-learning-beige.vercel.app",
+  "engine_routes": {
+    "generations": "POST /api/v1/nfl/generations",
+    "objects": "POST /api/v1/nfl/objects"
+  },
+  "fixture_ids": {
+    "envelope_id": "sha256:489eab0d28dbb669314f5891f2464a083d9b98cefe800e21b4acd2813825c1e4",
+    "generation_id": "sha256:9037f21ee369c0bd92215fda7f8b8a6c2c4f386c79c5e7952fadfc99baec0edb",
+    "leg_pool_object_id": "sha256:49cea4aee0247936d28e9c0e5ed38447e186b2af373a9cfdda507c63e11d5cfb",
+    "parlay_calibration_object_id": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "schedule_object_id": "sha256:ea363e413a89a5b5afc699de95baff34ae5c1b83c0f620ce95e7b44a121dd32b",
+    "source_receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a"
+  },
+  "generation_request_keys": [
+    "version",
+    "object_id"
+  ],
+  "hash_rules": {
+    "fingerprint": "sha256: + sha256(json.dumps(value, sort_keys=True, separators=(',',':'), ensure_ascii=True, allow_nan=False))",
+    "generation_id": "fingerprint({k: manifest[k] for k in MANIFEST_KEYS})",
+    "generation_object_id": "fingerprint(payload without envelope_id); payload.envelope_id == object_id",
+    "source_snapshot_object_id": "fingerprint(payload)"
+  },
+  "kind": "nfl.ingest_contract.m1.v1",
+  "kinds": [
+    "source_snapshot",
+    "generation"
+  ],
+  "limits": {
+    "m1_serial_http_operations": [
+      "POST /api/v1/nfl/objects source_snapshot leg_pool",
+      "POST /api/v1/nfl/objects source_snapshot schedule",
+      "POST /api/v1/nfl/objects source_snapshot parlay_calibration",
+      "POST /api/v1/nfl/objects generation envelope",
+      "POST /api/v1/nfl/generations finalize"
+    ],
+    "max_body_bytes": 3145728,
+    "max_json_depth": 24,
+    "producer_timeout_retry_guidance": {
+      "per_request_client_timeout_seconds": "Must tolerate engine per-request Supabase work up to 12s plus RTT. A 20s producer client timeout is not contract-forbidden pending measurement; lowering below 12 risks cutting off legitimate store waits.",
+      "retries": "Retry only with identical immutable object_id/envelope_id. 503/transport \u2192 retry; 422 \u2192 fix payload (do not retry); 409 \u2192 conflict, do not overwrite; 401/403 \u2192 stop. Object ACK status=duplicate and finalize receipt status=duplicate are successful idempotent replays.",
+      "total_wall_clock": "M1 serial path is 5 HTTP calls. Bound total wall clock as N_ops \u00d7 per_request_client_timeout \u00d7 (1 + retry_budget), independent of the 12s-per-Supabase-request constant. Vercel 60s caps a single server invocation, not the producer's multi-request job."
+    },
+    "supabase_http_timeout_seconds_per_request": 12,
+    "timeout_clarification": "Engine urllib open(..., timeout=12) applies per Supabase store HTTP request inside a handler \u2014 not a whole-capture or multi-request producer budget. Vercel maxDuration is 60s per function invocation. Do not reinterpret 12s as total capture time, and do not demand exporter client 20\u219212 without measured per-request latency evidence.",
+    "vercel_function_max_duration_seconds": 60
+  },
+  "object_request_keys": [
+    "version",
+    "kind",
+    "object_id",
+    "payload"
+  ],
+  "publication_status": {
+    "allowed_on_receipt": [
+      "generated_unverified",
+      "verified_publication"
+    ],
+    "learned_eligibility": {
+      "generated_unverified": "capture_ok_fit_ineligible",
+      "invented_served_enum": "forbidden",
+      "verified_publication": "stronger_publication_claim_not_automatic_fit; still needs journal revision/as-of binder"
+    },
+    "population_required": "eligible_pool_prop_rungs_before_display_dedupe",
+    "required_on_generation_capture": "generated_unverified"
+  },
+  "version": 1
+}

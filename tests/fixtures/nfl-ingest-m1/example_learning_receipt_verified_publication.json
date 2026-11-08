@@ -1,0 +1,56 @@
+{
+  "learning_receipt": {
+    "base_model_version": "sha256:fe86f5b0c3131c981e08b0d2e92c0197dc2740263686cde76f2d2bb350fa7186",
+    "base_prob": 0.62,
+    "calibrator": null,
+    "calibrator_version": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "comparison_operator": "gte",
+    "contract_id": "sha256:b3913e105c5a417db65c59f20d05f961affedded61ac4aa4d07b3d2cd57a3378",
+    "direction": "over",
+    "features": {
+      "calibration": {
+        "a": 0.4895482253187058,
+        "b": 0.0,
+        "c": 0.0
+      },
+      "correlation_tags": [
+        "game:G1"
+      ],
+      "direction": "over",
+      "line": 249.5,
+      "market": "qb_pass_yds",
+      "mu": 260.0,
+      "p_team": 0.55,
+      "sd": 45.0,
+      "selection": "over",
+      "z": 0.23333333333333334
+    },
+    "forecast_created_utc": "2026-09-01T14:00:00Z",
+    "game_id": "G1",
+    "generation_sha": "fixture-m1",
+    "input_context": {
+      "availability": "active",
+      "eligibility": {
+        "eligible": true
+      },
+      "this_week": {
+        "wk": 6
+      }
+    },
+    "line": 249.5,
+    "market": "qb_pass_yds",
+    "player_id": "00-0034857",
+    "publication_status": "verified_publication",
+    "receipt_id": "sha256:e2910f36d6aee22de77a2d45f19f7b21aa531124a2fc53a0e91c81df9a2189b2",
+    "season": 2026,
+    "served_prob": 0.62,
+    "side": "home",
+    "source_snapshot_id": "sha256:b4bb16e26f63e21dc2a092decb15f5b24d0dce50d388e5099edfac6e9f7a7028",
+    "source_timestamps": {
+      "fixture": "2026-09-01T14:00:00Z"
+    },
+    "version": 1,
+    "week": 6
+  },
+  "note": "Illustrates allowed receipt publication_status enum value. Generation capture still requires generated_unverified; this file is NOT a drop-in generation fixture."
+}

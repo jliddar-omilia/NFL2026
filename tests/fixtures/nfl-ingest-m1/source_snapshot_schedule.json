@@ -1,0 +1,16 @@
+{
+  "kind": "source_snapshot",
+  "object_id": "sha256:ea363e413a89a5b5afc699de95baff34ae5c1b83c0f620ce95e7b44a121dd32b",
+  "payload": {
+    "games": [
+      {
+        "game_id": "G1",
+        "kickoff_utc": "2026-09-02T00:15:00Z",
+        "status": "STATUS_SCHEDULED",
+        "week": 6
+      }
+    ],
+    "season": 2026
+  },
+  "version": 1
+}

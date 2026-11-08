@@ -1,0 +1,115 @@
+{
+  "kind": "generation",
+  "object_id": "sha256:489eab0d28dbb669314f5891f2464a083d9b98cefe800e21b4acd2813825c1e4",
+  "payload": {
+    "envelope_id": "sha256:489eab0d28dbb669314f5891f2464a083d9b98cefe800e21b4acd2813825c1e4",
+    "generations": [
+      {
+        "generation_id": "sha256:9037f21ee369c0bd92215fda7f8b8a6c2c4f386c79c5e7952fadfc99baec0edb",
+        "joint_model_version": "sha256:0538f0f7caa83f80b39f19474312fa3fcfa7eea99455bd1c63b2c74ababc525a",
+        "offered_cards": [
+          {
+            "card_id": "card-fixture-1",
+            "receipt_ids": [
+              "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a"
+            ]
+          }
+        ],
+        "pool_generated_utc": "2026-09-01T14:00:00Z",
+        "population": "eligible_pool_prop_rungs_before_display_dedupe",
+        "publication_status": "generated_unverified",
+        "receipt_ids": [
+          "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a"
+        ],
+        "recorded_utc": "2026-09-01T14:01:00Z",
+        "season": 2026,
+        "selection_policy_version": "sha256:35feb85fa66825cfe4a26210dfd982aed6c623144046685992783699fdde48c8",
+        "source_snapshots": {
+          "leg_pool": "sha256:49cea4aee0247936d28e9c0e5ed38447e186b2af373a9cfdda507c63e11d5cfb",
+          "parlay_calibration": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "schedule": "sha256:ea363e413a89a5b5afc699de95baff34ae5c1b83c0f620ce95e7b44a121dd32b"
+        },
+        "version": 1,
+        "week": 6
+      }
+    ],
+    "receipts": [
+      {
+        "generation_id": "sha256:9037f21ee369c0bd92215fda7f8b8a6c2c4f386c79c5e7952fadfc99baec0edb",
+        "kickoff_utc": "2026-09-02T00:15:00Z",
+        "learning_receipt": {
+          "base_model_version": "sha256:fe86f5b0c3131c981e08b0d2e92c0197dc2740263686cde76f2d2bb350fa7186",
+          "base_prob": 0.62,
+          "calibrator": null,
+          "calibrator_version": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "comparison_operator": "gte",
+          "contract_id": "sha256:b3913e105c5a417db65c59f20d05f961affedded61ac4aa4d07b3d2cd57a3378",
+          "direction": "over",
+          "features": {
+            "calibration": {
+              "a": 0.4895482253187058,
+              "b": 0.0,
+              "c": 0.0
+            },
+            "correlation_tags": [
+              "game:G1"
+            ],
+            "direction": "over",
+            "line": 249.5,
+            "market": "qb_pass_yds",
+            "mu": 260.0,
+            "p_team": 0.55,
+            "sd": 45.0,
+            "selection": "over",
+            "z": 0.23333333333333334
+          },
+          "forecast_created_utc": "2026-09-01T14:00:00Z",
+          "game_id": "G1",
+          "generation_sha": "fixture-m1",
+          "input_context": {
+            "availability": "active",
+            "eligibility": {
+              "eligible": true
+            },
+            "this_week": {
+              "wk": 6
+            }
+          },
+          "line": 249.5,
+          "market": "qb_pass_yds",
+          "player_id": "00-0034857",
+          "publication_status": "generated_unverified",
+          "receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a",
+          "season": 2026,
+          "served_prob": 0.62,
+          "side": "home",
+          "source_snapshot_id": "sha256:b4bb16e26f63e21dc2a092decb15f5b24d0dce50d388e5099edfac6e9f7a7028",
+          "source_timestamps": {
+            "fixture": "2026-09-01T14:00:00Z"
+          },
+          "version": 1,
+          "week": 6
+        },
+        "leg": {
+          "comparison_operator": "gte",
+          "direction": "over",
+          "game_id": "G1",
+          "gsis_id": "00-0034857",
+          "line": 249.5,
+          "market": "qb_pass_yds",
+          "model_prob": 0.62,
+          "position": "QB",
+          "selection": "over",
+          "side": "home"
+        },
+        "publication_status": "generated_unverified",
+        "receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a",
+        "recorded_utc": "2026-09-01T14:01:00Z"
+      }
+    ],
+    "season": 2026,
+    "version": 1,
+    "week": 6
+  },
+  "version": 1
+}
