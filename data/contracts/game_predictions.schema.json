@@ -71,6 +71,14 @@
             "minLength": 1,
             "description": "Display only: this event's actual stadium from the schedule (neutral/international sites included). Absent when the schedule names none; never inferred from the home team."
           },
+          "neutral_site": {
+            "type": "boolean",
+            "description": "True when ESPN competitions[].neutralSite is explicitly true. Ordinary home-field Elo is not applied. Absent when the schedule omitted the flag."
+          },
+          "status": {
+            "type": ["string", "null"],
+            "description": "ESPN status name when carried on the slate row."
+          },
           "probs": {
             "type": "object",
             "additionalProperties": false,
