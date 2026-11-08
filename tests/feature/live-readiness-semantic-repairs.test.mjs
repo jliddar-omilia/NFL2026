@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-/** Audited current upstream main tip integrated into this draft (current-base). */
-const UPSTREAM_PIN = 'b849f81cc64bfd842471fd0b7be132c8b451a3f4';
+/** Audited current upstream main tip integrated into this draft (8bc-current). */
+const UPSTREAM_PIN = '8bc970eeddab1ed4f5fbc0a731e395d302b5f47d';
 
 function runPy(code) {
   const out = execFileSync('python3', ['-'], {
@@ -394,10 +394,11 @@ print(json.dumps({
 });
 
 test('current-base 17-gate transition: served green; source-red reconstructable; forged reds; prop refuse', () => {
-  // Current-base draft on upstream b849: honesty source + 17 observation-inactive
-  // label transitions. ce537 pinned-nine is prior evidence only (no inherited
-  // clearance). Eligibility-backed avail:false is a real producer/validator
-  // contract (not test suppression); forged confirmed_* still reds.
+  // 8bc-current draft: honesty source + 17 observation-inactive label transitions
+  // reclassified from exact 8bc970ee feeds (12 OUT status / 5 eligibility).
+  // Pin-scoped 6d7 / b849 evidence retained separately — no clearance inheritance.
+  // Eligibility-backed avail:false is a real producer/validator contract; forged
+  // confirmed_* still reds.
   const r = runPy(`
 import json, copy
 from scripts.validate_data import (
@@ -417,8 +418,8 @@ wk = (weekly.get("model") or {}).get("this_week", {}).get("wk")
 assert inactive_ids(inact, wk) == {}
 meta = weekly["model"]["this_week"]
 assert meta["by_reason"].get("inactive", 0) == 0
-assert meta["by_reason"].get("status") == 35
-assert meta["gated"] == 49
+assert meta["by_reason"].get("status") == 40
+assert meta["gated"] == 54
 
 validate_against_schema(weekly, schema, "player_weekly.json")
 check_weekly_availability(weekly, proj, inj, depth_chart=depth, inactives=inact)
@@ -432,11 +433,12 @@ SEVENTEEN = [
   "espn-4039057", "espn-4567156",
 ]
 STATUS = {
-  "espn-4241478", "espn-4569618", "espn-4696981", "espn-4428850",
-  "espn-3676833", "espn-4039057", "espn-4567156",
+  "espn-4426354", "espn-4241478", "espn-4569618", "espn-4696981", "espn-4428850",
+  "espn-3676833", "espn-4249417", "espn-3134353", "espn-4682745", "espn-4683423",
+  "espn-4039057", "espn-4567156",
 }
 ELIG = [g for g in SEVENTEEN if g not in STATUS]
-assert len(SEVENTEEN) == 17 and len(STATUS) == 7 and len(ELIG) == 10
+assert len(SEVENTEEN) == 17 and len(STATUS) == 12 and len(ELIG) == 5
 
 for gid in SEVENTEEN:
     p = next(x for x in weekly["players"] if x["gsis_id"] == gid)
@@ -447,6 +449,7 @@ for gid in SEVENTEEN:
         tw = p["this_week"]
         st = (p.get("availability") or {}).get("status")
         assert tw["reason"] == "status" and tw["status"] == st and st in NOT_PLAYABLE
+        assert st == "OUT"
         assert "evidence" not in tw and "confidence" not in tw
         av = p.get("availability") or {}
         assert av.get("evidence") in (None, "") and av.get("confidence") in (None, "")
@@ -457,9 +460,10 @@ for gid in SEVENTEEN:
         assert el["source"] == "inactive_confirmation"
 
 # Reconstruct pre-transition observation inactive → RED (preserve source-red evidence).
+# Points_lost from exact 8bc970ee feeds (not transplanted b849 afterstates).
 BEFORE = {
   "espn-4426354": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873040", "points_lost": 14.27},
+                   "game_id": "401873040", "points_lost": 15.01},
   "espn-4241478": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873044", "points_lost": 12.66},
   "espn-4427366": {"wk": 9, "playable": False, "reason": "inactive",
@@ -467,11 +471,11 @@ BEFORE = {
   "espn-4569618": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873045", "points_lost": 12.35},
   "espn-4696981": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873044", "points_lost": 10.58},
+                   "game_id": "401873044", "points_lost": 11.73},
+  "espn-4242557": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873043", "points_lost": 6.5},
   "espn-4429148": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873044", "points_lost": 6.26},
-  "espn-4242557": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873043", "points_lost": 6.2},
   "espn-4428850": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873044", "points_lost": 5.48},
   "espn-3676833": {"wk": 9, "playable": False, "reason": "inactive",
@@ -479,13 +483,13 @@ BEFORE = {
   "espn-4427238": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873039", "points_lost": 5.06},
   "espn-4249417": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873042", "points_lost": 4.85},
+                   "game_id": "401873042", "points_lost": 4.84},
   "espn-3134353": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873045", "points_lost": 3.44},
+                   "game_id": "401873045", "points_lost": 3.48},
+  "espn-4682745": {"wk": 9, "playable": False, "reason": "inactive",
+                   "game_id": "401873042", "points_lost": 3.28},
   "espn-4683423": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873040", "points_lost": 3.25},
-  "espn-4682745": {"wk": 9, "playable": False, "reason": "inactive",
-                   "game_id": "401873042", "points_lost": 3.15},
   "espn-4431588": {"wk": 9, "playable": False, "reason": "inactive",
                    "game_id": "401873041", "points_lost": 3.08},
   "espn-4039057": {"wk": 9, "playable": False, "reason": "inactive",
@@ -551,8 +555,8 @@ print(json.dumps({
   assert.equal(r.source_red_reconstructed_17, true);
   assert.equal(r.forged_confirmed_inactive_reds, true);
   assert.equal(r.prop_refused_all_17, true);
-  assert.equal(r.status_converted.length, 7);
-  assert.equal(r.eligibility_only.length, 10);
+  assert.equal(r.status_converted.length, 12);
+  assert.equal(r.eligibility_only.length, 5);
 });
 
 test('UI gateTag: no official INACTIVE list claim without confirmation; eligibility → STATUS UNVERIFIED', async () => {
