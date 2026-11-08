@@ -228,11 +228,28 @@ test('historical lock/archive/receipt bytes unchanged by this draft (idempotent 
   for (const [rel, blob] of Object.entries(after)) {
     assert.equal(workBlob(rel), blob, `${rel} non-idempotent`);
   }
-  // Diff scope guard: no data/** path outside contracts/ is in this commit.
-  const changed = execFileSync('git', ['diff', '--name-only', 'origin/main...HEAD'], {
+  // Diff scope guard: no data/** path outside contracts/ in this draft's
+  // commits. CI PR checkouts often lack origin/main — prefer GITHUB_BASE_SHA,
+  // then origin/main|main, then the two tip commits of this draft.
+  const resolveBase = () => {
+    if (process.env.GITHUB_BASE_SHA) return process.env.GITHUB_BASE_SHA;
+    for (const cand of ['origin/main', 'main']) {
+      try {
+        execFileSync('git', ['rev-parse', '--verify', cand], {
+          cwd: ROOT, stdio: 'ignore',
+        });
+        return cand;
+      } catch {
+        /* try next */
+      }
+    }
+    return 'HEAD~2';
+  };
+  const base = resolveBase();
+  const changed = execFileSync('git', ['diff', '--name-only', `${base}...HEAD`], {
     cwd: ROOT, encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
   const dataHits = changed.filter((p) => p.startsWith('data/') && !p.startsWith('data/contracts/'));
-  assert.deepEqual(dataHits, [], `unexpected data mutations: ${dataHits.join(',')}`);
+  assert.deepEqual(dataHits, [], `unexpected data mutations vs ${base}: ${dataHits.join(',')}`);
   assert.ok(Object.keys(after).length >= 8);
 });
