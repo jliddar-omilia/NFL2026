@@ -818,18 +818,31 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
     cwd: ROOT, stdio: 'ignore',
   });
 
-  // Own edits = non-merge commits on HEAD not in UPSTREAM_PIN.
-  // Authorized mutable data paths on this draft: contracts + the reviewed
-  // nine-gate player_weekly transition ONLY. Immutable protected archives
-  // (cards/history/scores/receipts) must never appear.
+  // Own edits = non-merge commits AFTER the merge that integrated UPSTREAM_PIN.
+  // Pipeline upstream tips are often unrelated-history orphans; PIN..HEAD would
+  // otherwise list every prior upstream data commit merged on the other parent
+  // (e.g. b849 when pin moved to 8bc) and false-fail this lock. The integrating
+  // merge itself is excluded by --no-merges; only post-integration draft edits
+  // are checked. Authorized mutable data: contracts + reviewed player_weekly.
   const ALLOWED_OWN_DATA = new Set([
     'data/contracts/', // prefix
-    'data/player_weekly.json', // exact — nine-gate honesty transition
+    'data/player_weekly.json', // exact — 17-gate honesty transition
   ]);
-  const own = execFileSync('git', ['rev-list', '--no-merges', `${UPSTREAM_PIN}..HEAD`], {
+  const merges = execFileSync('git', ['rev-list', '--merges', `${UPSTREAM_PIN}..HEAD`], {
     cwd: ROOT, encoding: 'utf8',
   }).trim().split('\n').filter(Boolean);
-  assert.ok(own.length >= 1, 'expected own draft commits after upstream pin');
+  let integrating = null;
+  for (const m of merges) {
+    const parents = execFileSync('git', ['rev-parse', `${m}^@`], {
+      cwd: ROOT, encoding: 'utf8',
+    }).trim().split('\n').filter(Boolean);
+    if (parents.includes(UPSTREAM_PIN)) { integrating = m; break; }
+  }
+  assert.ok(integrating, `expected a merge that integrates upstream pin ${UPSTREAM_PIN}`);
+  const own = execFileSync('git', ['rev-list', '--no-merges', `${integrating}..HEAD`], {
+    cwd: ROOT, encoding: 'utf8',
+  }).trim().split('\n').filter(Boolean);
+  assert.ok(own.length >= 1, 'expected own draft commits after integrating merge');
   const ownDataHits = [];
   for (const c of own) {
     const files = execFileSync('git', ['diff-tree', '--no-commit-id', '--name-only', '-r', c], {
@@ -864,7 +877,7 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
   assert.notEqual(
     workBlob('data/player_weekly.json'),
     pinBlob('data/player_weekly.json'),
-    'combined draft must differ from pin on player_weekly only by nine-gate transition',
+    'combined draft must differ from pin on player_weekly only by 17-gate transition',
   );
 
   // Ancestry proof: audited upstream pin is ancestor of this draft HEAD.
