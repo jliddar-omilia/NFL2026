@@ -4,6 +4,14 @@
 Dry-run is the default and performs no writes, credential reads, or network I/O.
 The source journal remains the authority; the output directory holds immutable
 delivery requests and server acknowledgements, never generated sports data.
+
+Timeout / retry (M1 contract): engine Supabase work is 12s *per store HTTP
+request*, not a whole-capture budget. Vercel caps one server invocation at 60s.
+The producer default client timeout stays 20s (must tolerate 12s + RTT); do not
+blindly lower 20→12. Bound total wall clock as
+N_ops × per_request_client_timeout × (1 + retry_budget) for the serial M1 path
+(5 HTTP ops: 3 source objects + generation envelope + finalize). Retries use
+identical immutable object_id/envelope_id only.
 """
 import argparse
 import hashlib
@@ -42,13 +50,20 @@ _SAFE_ERRORS = frozenset("""duplicate_json_key nonfinite_json invalid_json missi
 invalid_object_id object_body_exceeds_3_mib missing_snapshot_directory journal_path_outside_snapshot_root
 invalid_generation_envelope envelope_hash_mismatch invalid_generation_manifest generation_hash_or_filename_mismatch
 generation_period_mismatch invalid_source_references source_path_outside_snapshot_root source_hash_mismatch
-invalid_receipt_references invalid_https_base_url redirect_rejected ack_body_too_large transport_retry_exhausted
-invalid_http_status invalid_ack_body invalid_retry_configuration invalid_durable_ack invalid_object_ack_status
-invalid_generation_ack unknown_or_duplicate_receipt_ack duplicate_generic_receipt_ack invalid_receipt_ack_status
-invalid_rejection_reason missing_receipt_ack delivery_symlink_rejected invalid_delivery_path
-delivery_path_outside_output_root immutable_delivery_conflict missing_or_invalid_ingest_token
-delivery_directory_overlaps_sports_data plan_changed_since_validation send_requires_base_url_and_out_dir
-credential_echo_refused transport_failed export_failed""".split())
+invalid_receipt_references capture_requires_generated_unverified invalid_https_base_url redirect_rejected
+ack_body_too_large transport_retry_exhausted invalid_http_status invalid_ack_body invalid_retry_configuration
+invalid_durable_ack invalid_object_ack_status invalid_generation_ack unknown_or_duplicate_receipt_ack
+duplicate_generic_receipt_ack invalid_receipt_ack_status invalid_rejection_reason missing_receipt_ack
+delivery_symlink_rejected invalid_delivery_path delivery_path_outside_output_root immutable_delivery_conflict
+missing_or_invalid_ingest_token delivery_directory_overlaps_sports_data plan_changed_since_validation
+send_requires_base_url_and_out_dir credential_echo_refused transport_failed export_failed""".split())
+
+CAPTURE_PUBLICATION_STATUS = "generated_unverified"
+TOKEN_PLACEHOLDER_BAN = frozenset(("", "[SENSITIVE]"))
+TOKEN_MIN_CHARS = 32
+# Default producer HTTP timeout (seconds). Contract: tolerate engine 12s/request
+# + RTT; N_ops=5 serial; total bound = N_ops * timeout * (1 + retries).
+DEFAULT_HTTP_TIMEOUT_SECONDS = 20
 
 
 def _safe_error(error, credentials=()):
@@ -129,6 +144,8 @@ def _json(raw):
 
     try:
         text = raw.decode("utf-8") if isinstance(raw, (bytes, bytearray)) else raw
+        if "\x00" in text:
+            raise ExportError("invalid_json")
         # Refuse extreme nesting before calling the decoder: its recursion
         # limits differ between Python 3.9 and 3.12. Quoted brackets are data.
         depth, quoted, escaped = 0, False, False
@@ -156,10 +173,22 @@ def _json(raw):
             if depth > MAX_JSON_DEPTH:
                 raise ExportError("invalid_json")
             if isinstance(node, dict):
-                pending.extend((child, depth + 1) for child in node.values())
+                for key, child in node.items():
+                    if not isinstance(key, str) or "\x00" in key:
+                        raise ExportError("invalid_json")
+                    if isinstance(child, str) and "\x00" in child:
+                        raise ExportError("invalid_json")
+                    pending.append((child, depth + 1))
             elif isinstance(node, list):
-                pending.extend((child, depth + 1) for child in node)
+                for child in node:
+                    if isinstance(child, str) and "\x00" in child:
+                        raise ExportError("invalid_json")
+                    pending.append((child, depth + 1))
         return value
+    except ExportError:
+        # ExportError subclasses ValueError; keep machine codes (duplicate_json_key,
+        # nonfinite_json) rather than collapsing them into invalid_json.
+        raise
     except (ValueError, TypeError, UnicodeError, RecursionError):
         raise ExportError("invalid_json") from None
 
@@ -231,6 +260,10 @@ each receipt. Orphan source files are not uploaded.
             if fingerprint(payload) != digest:
                 raise ExportError("source_hash_mismatch")
             sources[digest] = _request("source_snapshot", digest, payload)
+        # M1 capture must stay generated_unverified (fit-ineligible). Stronger
+        # publication claims are not accepted on the generation capture path.
+        if generation.get("publication_status") != CAPTURE_PUBLICATION_STATUS:
+            raise ExportError("capture_requires_generated_unverified")
         expected = generation.get("receipt_ids")
         if not isinstance(expected, list) or any(not isinstance(r, str) or not HASH.fullmatch(r) for r in expected):
             raise ExportError("invalid_receipt_references")
@@ -240,6 +273,9 @@ each receipt. Orphan source files are not uploaded.
                     or row.get("generation_id") != gid
                     or row.get("receipt_id") != row["learning_receipt"].get("receipt_id")):
                 raise ExportError("invalid_receipt_references")
+            if (row.get("publication_status") != CAPTURE_PUBLICATION_STATUS
+                    or row["learning_receipt"].get("publication_status") != CAPTURE_PUBLICATION_STATUS):
+                raise ExportError("capture_requires_generated_unverified")
             rows.append(_hash(row.get("receipt_id")))
         if len(set(expected)) != len(expected) or len(set(rows)) != len(rows) or set(rows) != set(expected):
             raise ExportError("invalid_receipt_references")
@@ -282,8 +318,11 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
         raise ExportError("redirect_rejected")
 
 
-def http_transport(destination, token, timeout=20):
-    """Return (path, bytes) -> (HTTP status, response bytes); redirects never follow."""
+def http_transport(destination, token, timeout=DEFAULT_HTTP_TIMEOUT_SECONDS):
+    """Return (path, bytes) -> (HTTP status, response bytes); redirects never follow.
+
+    No Origin header (server-to-server). Timeout is per request, not total capture.
+    """
     opener = urllib.request.build_opener(_NoRedirect())
 
     def post(path, body):
@@ -443,7 +482,10 @@ An ACK is cached only after exact ID/partition checks. Interrupted delivery may
 repeat a POST, whose stable content ID lets the server return a duplicate ACK.
 """
     destination = base_url(destination)
-    if (not isinstance(token, str) or not token.strip() or len(token) > 8192
+    # Exact Bearer match is enforced server-side; client refuses short tokens and
+    # banned placeholders before any network I/O (engine: len>=32, not [SENSITIVE]).
+    if (not isinstance(token, str) or token in TOKEN_PLACEHOLDER_BAN or not token.strip()
+            or len(token) < TOKEN_MIN_CHARS or len(token) > 8192
             or any(not 0x21 <= ord(c) <= 0x7e for c in token)):
         raise ExportError("missing_or_invalid_ingest_token")
     if type(attempts) is not int or not 1 <= attempts <= 5:

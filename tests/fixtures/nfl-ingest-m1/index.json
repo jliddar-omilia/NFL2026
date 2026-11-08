@@ -1,0 +1,24 @@
+{
+  "files": {
+    "contract": "contract.json",
+    "example_verified_publication_receipt": "example_learning_receipt_verified_publication.json",
+    "expected_finalize_ack": "expected_finalize_ack_shape.json",
+    "expected_object_ack_recorded": "expected_object_ack_recorded.json",
+    "finalize_request": "finalize_request.json",
+    "generation_envelope": "generation_envelope.json",
+    "objects_upload_sequence": "objects_upload_sequence.json",
+    "source_snapshot_leg_pool": "source_snapshot_leg_pool.json",
+    "source_snapshot_parlay_calibration": "source_snapshot_parlay_calibration.json",
+    "source_snapshot_schedule": "source_snapshot_schedule.json"
+  },
+  "ids": {
+    "envelope_id": "sha256:489eab0d28dbb669314f5891f2464a083d9b98cefe800e21b4acd2813825c1e4",
+    "generation_id": "sha256:9037f21ee369c0bd92215fda7f8b8a6c2c4f386c79c5e7952fadfc99baec0edb",
+    "leg_pool_object_id": "sha256:49cea4aee0247936d28e9c0e5ed38447e186b2af373a9cfdda507c63e11d5cfb",
+    "parlay_calibration_object_id": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+    "schedule_object_id": "sha256:ea363e413a89a5b5afc699de95baff34ae5c1b83c0f620ce95e7b44a121dd32b",
+    "source_receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a"
+  },
+  "kind": "nfl.ingest_fixture_index.m1.v1",
+  "version": 1
+}

@@ -1,0 +1,10 @@
+{
+  "order": [
+    "source_snapshot_leg_pool.json",
+    "source_snapshot_schedule.json",
+    "source_snapshot_parlay_calibration.json",
+    "generation_envelope.json"
+  ],
+  "then": "finalize_request.json",
+  "version": 1
+}

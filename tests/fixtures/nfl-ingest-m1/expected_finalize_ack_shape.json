@@ -1,0 +1,14 @@
+{
+  "durable": true,
+  "note": "receipt_id is engine-sealed generic envelope id; source_receipt_id is NFL learning_receipt.receipt_id",
+  "object_id": "sha256:489eab0d28dbb669314f5891f2464a083d9b98cefe800e21b4acd2813825c1e4",
+  "receipts": [
+    {
+      "receipt_id": "<engine_sealed_receipt_id>",
+      "source_receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a",
+      "status": "recorded"
+    }
+  ],
+  "rejections": [],
+  "version": 1
+}

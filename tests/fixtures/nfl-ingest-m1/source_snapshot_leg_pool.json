@@ -1,0 +1,82 @@
+{
+  "kind": "source_snapshot",
+  "object_id": "sha256:49cea4aee0247936d28e9c0e5ed38447e186b2af373a9cfdda507c63e11d5cfb",
+  "payload": {
+    "base_model_version": "sha256:fe86f5b0c3131c981e08b0d2e92c0197dc2740263686cde76f2d2bb350fa7186",
+    "generated_utc": "2026-09-01T14:00:00Z",
+    "players": [
+      {
+        "game_id": "G1",
+        "gsis_id": "00-0034857",
+        "market": "qb_pass_yds",
+        "position": "QB",
+        "rungs": [
+          {
+            "comparison_operator": "gte",
+            "direction": "over",
+            "learning_receipt": {
+              "base_model_version": "sha256:fe86f5b0c3131c981e08b0d2e92c0197dc2740263686cde76f2d2bb350fa7186",
+              "base_prob": 0.62,
+              "calibrator": null,
+              "calibrator_version": "sha256:74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+              "comparison_operator": "gte",
+              "contract_id": "sha256:b3913e105c5a417db65c59f20d05f961affedded61ac4aa4d07b3d2cd57a3378",
+              "direction": "over",
+              "features": {
+                "calibration": {
+                  "a": 0.4895482253187058,
+                  "b": 0.0,
+                  "c": 0.0
+                },
+                "correlation_tags": [
+                  "game:G1"
+                ],
+                "direction": "over",
+                "line": 249.5,
+                "market": "qb_pass_yds",
+                "mu": 260.0,
+                "p_team": 0.55,
+                "sd": 45.0,
+                "selection": "over",
+                "z": 0.23333333333333334
+              },
+              "forecast_created_utc": "2026-09-01T14:00:00Z",
+              "game_id": "G1",
+              "generation_sha": "fixture-m1",
+              "input_context": {
+                "availability": "active",
+                "eligibility": {
+                  "eligible": true
+                },
+                "this_week": {
+                  "wk": 6
+                }
+              },
+              "line": 249.5,
+              "market": "qb_pass_yds",
+              "player_id": "00-0034857",
+              "publication_status": "generated_unverified",
+              "receipt_id": "sha256:95216aac303e23069ee2864d64101e109865048c2b1cbbb693ee0ea1fc76af3a",
+              "season": 2026,
+              "served_prob": 0.62,
+              "side": "home",
+              "source_snapshot_id": "sha256:b4bb16e26f63e21dc2a092decb15f5b24d0dce50d388e5099edfac6e9f7a7028",
+              "source_timestamps": {
+                "fixture": "2026-09-01T14:00:00Z"
+              },
+              "version": 1,
+              "week": 6
+            },
+            "line": 249.5,
+            "model_prob": 0.62,
+            "selection": "over"
+          }
+        ],
+        "side": "home"
+      }
+    ],
+    "season": 2026,
+    "week": 6
+  },
+  "version": 1
+}

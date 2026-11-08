@@ -212,23 +212,28 @@ print(json.dumps({"ok": ok,
   for (const k of ['live_mode', 'old_profile', 'half_override', 'extra_key', 'short_sha']) assert.equal(r[k], true, k);
 });
 
-test('production is unchanged: only listed offline tools and the locked test-only canary may reference pilot modules', () => {
+test('production is unchanged: only listed offline tools and locked default-off SelfLearning workflows may reference pilot modules', () => {
   const hits = [];
   // Checkpoint 2 adds standalone offline tools, not a production caller. The
-  // owner separately authorized ONE test-only canary workflow, whose read-only
-  // command/checkout contract is locked by pilot_canary_workflow.test.mjs.
+  // owner authorized: (1) test-only canary (pilot_canary_workflow.test.mjs) and
+  // (2) default-off shadow capture (pilot_shadow_workflow.test.mjs). Neither
+  // enables learning, serving, or corrections; capture stays gated on enabled=1.
   const offline = new Set([
     'inactive_confirmation.py', 'pilot_config.py', 'pilot_capture.py',
     'learning_journal.py', 'export_learning.py', 'capture_outcome_evidence.py',
     'run_parlay_feedback.py', 'learning_history_guard.py',
   ].map(name => join('scripts', name)));
+  const allowedWorkflows = new Set([
+    join('.github', 'workflows', 'selflearning-canary.yml'),
+    join('.github', 'workflows', 'selflearning-shadow-capture.yml'),
+  ]);
   const pilotReferences = /inactive_confirmation|pilot_config|selflearning_pilot|pilot_capture|learning_journal|export_learning|capture_outcome_evidence|run_parlay_feedback|learning_history_guard/;
   const walk = (dir) => {
     for (const name of readdirSync(join(ROOT, dir))) {
       const rel = join(dir, name);
       if (statSync(join(ROOT, rel)).isDirectory()) { walk(rel); continue; }
       if (!/\.(js|mjs|py|ya?ml|sh|html)$/.test(name)) continue;
-      if (offline.has(rel) || rel === join('.github', 'workflows', 'selflearning-canary.yml')) continue;
+      if (offline.has(rel) || allowedWorkflows.has(rel)) continue;
       const src = readFileSync(join(ROOT, rel), 'utf8');
       if (pilotReferences.test(src)) hits.push(rel);
     }
