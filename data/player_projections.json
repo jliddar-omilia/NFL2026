@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "updated_utc": "2026-11-08T16:38:36Z",
+  "updated_utc": "2026-11-08T17:22:48Z",
   "players": [
     {
       "gsis_id": "espn-3918298",
@@ -255,6 +255,38 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4374302",
+      "name": "Amon-Ra St. Brown",
+      "team": "DET",
+      "position": "WR",
+      "proj_points": 315.72,
+      "low": 173.65,
+      "high": 457.8,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 324.0,
+      "gated_low": 259.2,
+      "gated_high": 388.8,
+      "gated_rule": "prior_season_points",
+      "prior_games": 17,
+      "prior_ppg": 18.9055,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 321.39,
+      "candidate_points": 315.72,
+      "candidate_low": 173.65,
+      "candidate_high": 457.8,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9824,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-4242335",
       "name": "Jonathan Taylor",
       "team": "IND",
@@ -347,39 +379,6 @@
         "age_curve": 1.0,
         "injury_history": 0.9824,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4374302",
-      "name": "Amon-Ra St. Brown",
-      "team": "DET",
-      "position": "WR",
-      "proj_points": 299.93,
-      "low": 124.47,
-      "high": 475.4,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 324.0,
-      "gated_low": 239.76,
-      "gated_high": 408.24,
-      "gated_rule": "prior_season_points",
-      "prior_games": 17,
-      "prior_ppg": 18.9055,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 321.39,
-      "candidate_points": 299.93,
-      "candidate_low": 124.47,
-      "candidate_high": 475.4,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9824,
-        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -769,6 +768,38 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4426354",
+      "name": "George Pickens",
+      "team": "DAL",
+      "position": "WR",
+      "proj_points": 255.38,
+      "low": 140.46,
+      "high": 370.31,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 291.9,
+      "gated_low": 233.52,
+      "gated_high": 350.28,
+      "gated_rule": "prior_season_points",
+      "prior_games": 17,
+      "prior_ppg": 15.3613,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 261.14,
+      "candidate_points": 255.38,
+      "candidate_low": 140.46,
+      "candidate_high": 370.31,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9779,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-4431452",
       "name": "Drake Maye",
       "team": "NE",
@@ -993,39 +1024,6 @@
         "age_curve": 0.82,
         "injury_history": 0.8588,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4426354",
-      "name": "George Pickens",
-      "team": "DAL",
-      "position": "WR",
-      "proj_points": 242.61,
-      "low": 100.69,
-      "high": 384.54,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 291.9,
-      "gated_low": 216.01,
-      "gated_high": 367.79,
-      "gated_rule": "prior_season_points",
-      "prior_games": 17,
-      "prior_ppg": 15.3613,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 261.14,
-      "candidate_points": 242.61,
-      "candidate_low": 100.69,
-      "candidate_high": 384.54,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9779,
-        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -1831,38 +1829,6 @@
       "rookie": false
     },
     {
-      "gsis_id": "espn-4361579",
-      "name": "Javonte Williams",
-      "team": "DAL",
-      "position": "RB",
-      "proj_points": 204.79,
-      "low": 103.42,
-      "high": 306.17,
-      "signals_used": [
-        "injury_history"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 242.8,
-      "gated_low": 189.38,
-      "gated_high": 296.22,
-      "gated_rule": "prior_season_points",
-      "prior_games": 16,
-      "prior_ppg": 13.2127,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 224.62,
-      "candidate_points": 204.79,
-      "candidate_low": 103.42,
-      "candidate_high": 306.17,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9118,
-        "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
       "gsis_id": "espn-3128429",
       "name": "Courtland Sutton",
       "team": "DEN",
@@ -2055,6 +2021,38 @@
         "age_curve": 0.895,
         "injury_history": 0.9176,
         "injury_status": 0.95
+      },
+      "rookie": false
+    },
+    {
+      "gsis_id": "espn-4696981",
+      "name": "Cam Skattebo",
+      "team": "NYG",
+      "position": "RB",
+      "proj_points": 199.53,
+      "low": 82.81,
+      "high": 316.26,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 127.7,
+      "gated_low": 94.5,
+      "gated_high": 160.9,
+      "gated_rule": "prior_season_points",
+      "prior_games": 8,
+      "prior_ppg": 15.9625,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 271.36,
+      "candidate_points": 199.53,
+      "candidate_low": 82.81,
+      "candidate_high": 316.26,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.7353,
+        "injury_status": 1.0
       },
       "rookie": false
     },
@@ -2378,6 +2376,39 @@
         "age_curve": 1.0,
         "injury_history": 0.951,
         "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
+      "gsis_id": "espn-4361579",
+      "name": "Javonte Williams",
+      "team": "DAL",
+      "position": "RB",
+      "proj_points": 194.55,
+      "low": 71.98,
+      "high": 317.12,
+      "signals_used": [
+        "injury_history",
+        "injury_status"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 242.8,
+      "gated_low": 174.82,
+      "gated_high": 310.78,
+      "gated_rule": "prior_season_points",
+      "prior_games": 16,
+      "prior_ppg": 13.2127,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 224.62,
+      "candidate_points": 194.55,
+      "candidate_low": 71.98,
+      "candidate_high": 317.12,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9118,
+        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -2863,39 +2894,6 @@
         "age_curve": 1.0,
         "injury_history": 0.951,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4696981",
-      "name": "Cam Skattebo",
-      "team": "NYG",
-      "position": "RB",
-      "proj_points": 179.58,
-      "low": 50.28,
-      "high": 308.88,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 127.7,
-      "gated_low": 86.84,
-      "gated_high": 168.56,
-      "gated_rule": "prior_season_points",
-      "prior_games": 8,
-      "prior_ppg": 15.9625,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 271.36,
-      "candidate_points": 179.58,
-      "candidate_low": 50.28,
-      "candidate_high": 308.88,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.7353,
-        "injury_status": 0.9
       },
       "rookie": false
     },
@@ -3579,6 +3577,38 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4242355",
+      "name": "Jake Ferguson",
+      "team": "DAL",
+      "position": "TE",
+      "proj_points": 162.73,
+      "low": 74.86,
+      "high": 250.6,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 188.1,
+      "gated_low": 142.96,
+      "gated_high": 233.24,
+      "gated_rule": "prior_season_points",
+      "prior_games": 17,
+      "prior_ppg": 9.8622,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 167.66,
+      "candidate_points": 162.73,
+      "candidate_low": 74.86,
+      "candidate_high": 250.6,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9706,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-4688380",
       "name": "Cam Ward",
       "team": "TEN",
@@ -3735,39 +3765,6 @@
         "age_curve": 1.0,
         "injury_history": 0.9706,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4242355",
-      "name": "Jake Ferguson",
-      "team": "DAL",
-      "position": "TE",
-      "proj_points": 154.59,
-      "low": 50.24,
-      "high": 258.94,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 188.1,
-      "gated_low": 131.67,
-      "gated_high": 244.53,
-      "gated_rule": "prior_season_points",
-      "prior_games": 17,
-      "prior_ppg": 9.8622,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 167.66,
-      "candidate_points": 154.59,
-      "candidate_low": 50.24,
-      "candidate_high": 258.94,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9706,
-        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -5623,6 +5620,38 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4242557",
+      "name": "Colby Parkinson",
+      "team": "LAR",
+      "position": "TE",
+      "proj_points": 110.71,
+      "low": 50.92,
+      "high": 170.49,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 129.8,
+      "gated_low": 98.65,
+      "gated_high": 160.95,
+      "gated_rule": "prior_season_points",
+      "prior_games": 15,
+      "prior_ppg": 7.0512,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 119.87,
+      "candidate_points": 110.71,
+      "candidate_low": 50.92,
+      "candidate_high": 170.49,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9235,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-3925357",
       "name": "Calvin Ridley",
       "team": "TEN",
@@ -5980,39 +6009,6 @@
       "rookie": false
     },
     {
-      "gsis_id": "espn-4242557",
-      "name": "Colby Parkinson",
-      "team": "LAR",
-      "position": "TE",
-      "proj_points": 105.17,
-      "low": 34.18,
-      "high": 176.16,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 129.8,
-      "gated_low": 90.86,
-      "gated_high": 168.74,
-      "gated_rule": "prior_season_points",
-      "prior_games": 15,
-      "prior_ppg": 7.0512,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 119.87,
-      "candidate_points": 105.17,
-      "candidate_low": 34.18,
-      "candidate_high": 176.16,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9235,
-        "injury_status": 0.95
-      },
-      "rookie": false
-    },
-    {
       "gsis_id": "espn-4038441",
       "name": "Justice Hill",
       "team": "BAL",
@@ -6207,6 +6203,38 @@
         "age_curve": 0.9,
         "injury_history": 0.6647,
         "injury_status": 0.95
+      },
+      "rookie": false
+    },
+    {
+      "gsis_id": "espn-3917914",
+      "name": "Olamide Zaccheaus",
+      "team": "ATL",
+      "position": "WR",
+      "proj_points": 95.81,
+      "low": 52.7,
+      "high": 138.93,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 84.8,
+      "gated_low": 67.84,
+      "gated_high": 101.76,
+      "gated_rule": "prior_season_points",
+      "prior_games": 16,
+      "prior_ppg": 5.7373,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 97.53,
+      "candidate_points": 95.81,
+      "candidate_low": 52.7,
+      "candidate_high": 138.93,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.9824,
+        "injury_status": 1.0
       },
       "rookie": false
     },
@@ -6563,38 +6591,6 @@
       "rookie": false
     },
     {
-      "gsis_id": "espn-4569559",
-      "name": "Devaughn Vele",
-      "team": "NO",
-      "position": "WR",
-      "proj_points": 91.96,
-      "low": 50.58,
-      "high": 133.34,
-      "signals_used": [
-        "injury_history"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 66.3,
-      "gated_low": 53.04,
-      "gated_high": 79.56,
-      "gated_rule": "prior_season_points",
-      "prior_games": 13,
-      "prior_ppg": 6.1308,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 104.22,
-      "candidate_points": 91.96,
-      "candidate_low": 50.58,
-      "candidate_high": 133.34,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.8823,
-        "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
       "gsis_id": "espn-3676833",
       "name": "KaVontae Turpin",
       "team": "DAL",
@@ -6656,39 +6652,6 @@
         "age_curve": 1.0,
         "injury_history": 0.9044,
         "injury_status": 1.0
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-3917914",
-      "name": "Olamide Zaccheaus",
-      "team": "ATL",
-      "position": "WR",
-      "proj_points": 91.02,
-      "low": 37.77,
-      "high": 144.27,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 84.8,
-      "gated_low": 62.75,
-      "gated_high": 106.85,
-      "gated_rule": "prior_season_points",
-      "prior_games": 16,
-      "prior_ppg": 5.7373,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 97.53,
-      "candidate_points": 91.02,
-      "candidate_low": 37.77,
-      "candidate_high": 144.27,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.9824,
-        "injury_status": 0.95
       },
       "rookie": false
     },
@@ -6851,6 +6814,39 @@
       "candidate_signals": {
         "age_curve": 1.0,
         "injury_history": 1.0,
+        "injury_status": 0.95
+      },
+      "rookie": false
+    },
+    {
+      "gsis_id": "espn-4569559",
+      "name": "Devaughn Vele",
+      "team": "NO",
+      "position": "WR",
+      "proj_points": 87.36,
+      "low": 36.26,
+      "high": 138.47,
+      "signals_used": [
+        "injury_history",
+        "injury_status"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 66.3,
+      "gated_low": 49.06,
+      "gated_high": 83.54,
+      "gated_rule": "prior_season_points",
+      "prior_games": 13,
+      "prior_ppg": 6.1308,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 104.22,
+      "candidate_points": 87.36,
+      "candidate_low": 36.26,
+      "candidate_high": 138.47,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.8823,
         "injury_status": 0.95
       },
       "rookie": false
@@ -8695,6 +8691,38 @@
       "rookie": false
     },
     {
+      "gsis_id": "espn-4682745",
+      "name": "Jaylen Wright",
+      "team": "MIA",
+      "position": "RB",
+      "proj_points": 56.15,
+      "low": 23.3,
+      "high": 89.0,
+      "signals_used": [
+        "injury_history"
+      ],
+      "baseline_rule": "prior_ppg_x_projected_games",
+      "shipped_estimate": "candidate",
+      "gated_points": 48.2,
+      "gated_low": 35.67,
+      "gated_high": 60.73,
+      "gated_rule": "prior_season_points",
+      "prior_games": 10,
+      "prior_ppg": 3.8067,
+      "projected_games": 17,
+      "absence_weeks": 0,
+      "candidate_baseline": 64.71,
+      "candidate_points": 56.15,
+      "candidate_low": 23.3,
+      "candidate_high": 89.0,
+      "candidate_signals": {
+        "age_curve": 1.0,
+        "injury_history": 0.8677,
+        "injury_status": 1.0
+      },
+      "rookie": false
+    },
+    {
       "gsis_id": "espn-4367209",
       "name": "Greg Dulcich",
       "team": "MIA",
@@ -8788,39 +8816,6 @@
       "candidate_signals": {
         "age_curve": 1.0,
         "injury_history": 0.8236,
-        "injury_status": 0.95
-      },
-      "rookie": false
-    },
-    {
-      "gsis_id": "espn-4682745",
-      "name": "Jaylen Wright",
-      "team": "MIA",
-      "position": "RB",
-      "proj_points": 53.34,
-      "low": 14.94,
-      "high": 91.75,
-      "signals_used": [
-        "injury_history",
-        "injury_status"
-      ],
-      "baseline_rule": "prior_ppg_x_projected_games",
-      "shipped_estimate": "candidate",
-      "gated_points": 48.2,
-      "gated_low": 32.78,
-      "gated_high": 63.62,
-      "gated_rule": "prior_season_points",
-      "prior_games": 10,
-      "prior_ppg": 3.8067,
-      "projected_games": 17,
-      "absence_weeks": 0,
-      "candidate_baseline": 64.71,
-      "candidate_points": 53.34,
-      "candidate_low": 14.94,
-      "candidate_high": 91.75,
-      "candidate_signals": {
-        "age_curve": 1.0,
-        "injury_history": 0.8677,
         "injury_status": 0.95
       },
       "rookie": false
