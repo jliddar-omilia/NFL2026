@@ -513,11 +513,19 @@ test('hash-proof base validation rejects nonexistent/blob/tree and non-ancestor 
   assert.throws(() => requireCommitAncestor(tree), /type tree/);
 
   // A real commit that is NOT an ancestor of this draft HEAD must fail.
-  // Use an orphan empty commit object if available; otherwise synthesize via
-  // commit-tree without updating any ref (read-only to branch history).
-  const orphan = execFileSync('git', [
-    'commit-tree', tree, '-m', 'orphan-hash-proof-adversarial',
-  ], { cwd: ROOT, encoding: 'utf8' }).trim();
+  // Synthesize an orphan commit object without commit-tree (CI runners often
+  // lack user.email / user.name, which makes commit-tree refuse).
+  const orphanBody = [
+    `tree ${tree}`,
+    'author Hash Proof Adversarial <hash-proof@example.invalid> 0 +0000',
+    'committer Hash Proof Adversarial <hash-proof@example.invalid> 0 +0000',
+    '',
+    'orphan-hash-proof-adversarial',
+    '',
+  ].join('\n');
+  const orphan = execFileSync('git', ['hash-object', '-t', 'commit', '-w', '--stdin'], {
+    cwd: ROOT, encoding: 'utf8', input: orphanBody,
+  }).trim();
   assert.equal(gitOk(['cat-file', '-t', orphan]), 'commit');
   assert.equal(weakRevParseOk(orphan), true);
   assert.throws(() => requireCommitAncestor(orphan), /not an ancestor|Command failed/);

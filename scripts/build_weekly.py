@@ -1349,7 +1349,13 @@ def build_weekly_document(projections, schedule_games, elos, receptions_by_id,
 
 def _fixture():
     def g(wk, home, away):
-        return {"week": wk, "home": home, "away": away}
+        # game_id + kickoff_utc match production schedule shape so
+        # confirmation_offer_refusal can take the intended provisional path
+        # under common selftest clocks (e.g. 2026-09-17T00:00Z) instead of
+        # fail-closing on missing context.
+        return {"week": wk, "home": home, "away": away,
+                "game_id": "FX%d-%s-%s" % (wk, home, away),
+                "kickoff_utc": "2026-09-20T17:00:00Z"}
     # SFX plays weeks 1, 3, 4, 5, 6 — week 2 is a bye, so the "first 3 playable
     # weeks" window has to skip it.
     sched = [g(1, "SFX", "DAL"), g(2, "DAL", "GBX"), g(3, "DAL", "SFX"),
