@@ -186,31 +186,56 @@ def _schedule_game_for_team(schedule_games, team, week):
     return None
 
 
+def _confirmation_context_refusal(week, detail, state="unknown_or_stale"):
+    """Explicit ineligible stamp when offer context cannot be evaluated."""
+    return {
+        "eligible": False,
+        "reason": "confirmation_required",
+        "detail": detail,
+        "state": state,
+        "week": week,
+        "source": "inactive_confirmation",
+        "require_confirmed": True,
+    }
+
+
 def confirmation_offer_refusal(projection, schedule_games, week, checked_utc,
                                inactives_doc):
     """Fail-closed MY-prop offer refusal from recommendation_eligibility, or None.
 
     Real pipeline caller of inactive_confirmation.recommendation_eligibility.
-    Provisional (before T-90) and confirmed_active may offer; observation-only
-    ESPN DNP never confirms. Does not mutate forecasts, locks, or week points.
+    Returns None ONLY when the player is offerable (provisional before T-90 or
+    confirmed_active) — that silence means "no refusal stamp", not "unknown".
+    Missing week / game / kickoff / clock / non-espn identity returns an explicit
+    eligible=False stamp (fail closed). Observation-only ESPN DNP never confirms.
+    Does not mutate forecasts, locks, or week points.
     """
     from scripts import inactive_confirmation as ic  # noqa: PLC0415 (local)
 
-    game = _schedule_game_for_team(schedule_games, (projection or {}).get("team"), week)
-    if not game or not game.get("kickoff_utc") or not game.get("game_id"):
-        return None
+    if week is None:
+        return _confirmation_context_refusal(None, "missing_week")
+    team = (projection or {}).get("team")
+    if not team:
+        return _confirmation_context_refusal(week, "missing_team")
+    game = _schedule_game_for_team(schedule_games, team, week)
+    if not game:
+        return _confirmation_context_refusal(week, "missing_game")
+    if not game.get("kickoff_utc"):
+        return _confirmation_context_refusal(week, "missing_kickoff")
+    if not game.get("game_id"):
+        return _confirmation_context_refusal(week, "missing_game_id")
     now = ic.parse_utc(checked_utc) if isinstance(checked_utc, str) else None
     if now is None:
-        return None
+        return _confirmation_context_refusal(week, "bad_clock")
     gid = str((projection or {}).get("gsis_id") or "")
     espn_id = gid[5:] if gid.startswith("espn-") else None
     if not espn_id:
-        return None
+        return _confirmation_context_refusal(week, "missing_espn_id")
     evidence = (ic.espn_observations(inactives_doc) or {}).get(game["game_id"], [])
     el = ic.recommendation_eligibility(
-        espn_id, projection.get("team"), game, now, evidence, require_confirmed=True)
+        espn_id, team, game, now, evidence, require_confirmed=True)
     if el.get("eligible"):
-        return None
+        return None  # provisional / confirmed_active — intended offer path
     return {
         "eligible": False,
         "reason": "confirmation_required",

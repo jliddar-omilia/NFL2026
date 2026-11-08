@@ -214,15 +214,15 @@ print(json.dumps({"ok": ok,
 
 test('production is unchanged: only listed offline tools, the locked canary, and the offer-gate caller may reference pilot modules', () => {
   const hits = [];
-  // Checkpoint 2 offline tools + canary remain. PR2 additionally authorizes
-  // build_weekly.py as the sole production offer-gate caller of
-  // recommendation_eligibility (confirmation_offer_refusal). Learning /
+  // Checkpoint 2 offline tools + canary remain. PR2 authorizes build_weekly.py
+  // as the offer-gate caller of recommendation_eligibility, and validate_data.py
+  // as the invariant checker for confirmation eligibility stamps. Learning /
   // selflearning_pilot stays disabled; OFFICIAL_SOURCES stays empty.
   const offline = new Set([
     'inactive_confirmation.py', 'pilot_config.py', 'pilot_capture.py',
     'learning_journal.py', 'export_learning.py', 'capture_outcome_evidence.py',
     'run_parlay_feedback.py', 'learning_history_guard.py',
-    'build_weekly.py',
+    'build_weekly.py', 'validate_data.py',
   ].map(name => join('scripts', name)));
   const pilotReferences = /inactive_confirmation|pilot_config|selflearning_pilot|pilot_capture|learning_journal|export_learning|capture_outcome_evidence|run_parlay_feedback|learning_history_guard/;
   const walk = (dir) => {

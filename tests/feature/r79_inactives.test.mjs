@@ -52,6 +52,15 @@ from scripts.build_weekly import (build_weekly_document, build_factors, inactive
 from scripts.scrape.espn import parse_game_roster
 from scripts.build_predictions import games_in_inactive_window, _inactives_doc
 SCHED_BY_TEAM, ELOS, SCHED = _fixture()
+# Confirmation offer gate needs kickoff/game_id; week-3 matches INACT kickoff so
+# builds at 2026-09-17T21:30Z stay provisional (before T-90).
+for _g in SCHED:
+    if _g.get("week") == 3 and _g.get("home") == "DAL" and _g.get("away") == "SFX":
+        _g["game_id"] = "G3"
+        _g["kickoff_utc"] = "2026-09-18T00:15Z"
+    else:
+        _g.setdefault("game_id", "FX%s" % _g.get("week"))
+        _g.setdefault("kickoff_utc", "2026-09-%02dT17:00Z" % (10 + int(_g.get("week") or 1)))
 FX = lambda: build_factors(2026, None, None, None)
 PROJ = [
   {"gsis_id": "espn-1", "name": "QB One",   "team": "SFX", "position": "QB", "proj_points": 300.0},

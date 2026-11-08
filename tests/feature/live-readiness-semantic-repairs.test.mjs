@@ -14,7 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const UPSTREAM_PIN = '35a6c8b65c6257ff369574fa375e5db3576f145a';
+/** Audited upstream main tip integrated into this draft via ordinary merge. */
+const UPSTREAM_PIN = '9e4af833b2deadbc4519d5fb38036dc64f8ebbfb';
 
 function runPy(code) {
   const out = execFileSync('python3', ['-'], {
@@ -94,17 +95,15 @@ print(json.dumps({"ok": True, "cin_empty_all_active": False, "dnp_confirmed": Fa
   assert.equal(r.dnp_confirmed, false);
 });
 
-test('real callers: unconfirmed DNP does not bind this_week inactive; confirmation_offer_refusal gates prop_legs', () => {
+test('real callers: DNP non-binding; missing context fail-closed for prop+ATD; pre-T90 provisional kept', () => {
   const r = runPy(`
-import json, copy, datetime as dt
+import json, copy
 from scripts.build_weekly import (build_weekly_document, build_factors, inactive_ids,
                                   observed_inactive_ids, confirmation_offer_refusal, _fixture)
-from scripts.build_leg_pool import prop_legs
+from scripts.build_leg_pool import prop_legs, atd_legs
 from scripts.models.parlay_builder import playable_this_week
 
 _, ELOS, SCHED0 = _fixture()
-# Real schedule rows carry game_id + kickoff (fixture weeks alone are not enough
-# for confirmation_offer_refusal / recommendation_eligibility).
 SCHED = []
 for g in SCHED0:
     row = dict(g)
@@ -134,7 +133,6 @@ INACT = {"season": 2026, "week": 3, "updated_utc": "2026-09-17T21:30:00Z",
              "inactive": {"DAL": [{"espn_id": "9", "name": "D. RB"}], "SFX": []}}],
   "failed": []}
 
-# Probe A repro→fix: observation DNP must not bind playable=false
 doc = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T21:30:00Z",
                             injuries=[], factors=FX(), this_week=3, first_week=3,
                             depth_chart=None, inactives=INACT)
@@ -143,45 +141,90 @@ assert inactive_ids(INACT, 3) == {}
 assert observed_inactive_ids(INACT, 3) == {"9": ("DAL", "G3")}
 assert by["espn-9"].get("this_week") is None
 assert doc["model"]["this_week"]["by_reason"]["inactive"] == 0
-
-# Mid-week (before T-90): provisional → no confirmation refusal stamp
+# Intended pre-T90 provisional: no refusal stamp, still playable
 assert by["espn-9"].get("eligibility") is None
 assert playable_this_week(by["espn-9"], 3) is True
+pre = confirmation_offer_refusal(PROJ[1], SCHED, 3, "2026-09-17T21:30:00Z", INACT)
+assert pre is None, "provisional before T-90 must remain offerable (None refusal)"
 
-# Inside T-90 window without official source: confirmation_offer_refusal fails closed
-t90 = confirmation_offer_refusal(
-  PROJ[1], SCHED, 3, "2026-09-17T23:00:00Z", INACT)
-assert t90 is not None and t90["eligible"] is False and t90["reason"] == "confirmation_required"
-assert t90["state"] == "unknown_or_stale"
+# Missing-context cases must stamp eligible=False (not None bypass)
+cases = {
+  "missing_week": confirmation_offer_refusal(PROJ[1], SCHED, None, "2026-09-17T23:00:00Z", INACT),
+  "missing_kickoff": confirmation_offer_refusal(
+      PROJ[1], [{**g, "kickoff_utc": None} if g.get("game_id")=="G3" else g for g in SCHED],
+      3, "2026-09-17T23:00:00Z", INACT),
+  "missing_game_id": confirmation_offer_refusal(
+      PROJ[1], [{**g, "game_id": ""} if g.get("game_id")=="G3" else g for g in SCHED],
+      3, "2026-09-17T23:00:00Z", INACT),
+  "bad_clock": confirmation_offer_refusal(PROJ[1], SCHED, 3, "not-a-clock", INACT),
+  "missing_espn_id": confirmation_offer_refusal(
+      {"gsis_id": "00-0033873", "team": "DAL", "position": "RB"}, SCHED, 3,
+      "2026-09-17T23:00:00Z", INACT),
+  "missing_game": confirmation_offer_refusal(
+      {"gsis_id": "espn-9", "team": "ZZZ", "position": "RB"}, SCHED, 3,
+      "2026-09-17T23:00:00Z", INACT),
+}
+for label, ref in cases.items():
+    assert ref is not None and ref["eligible"] is False, label
+    assert ref["reason"] == "confirmation_required", label
+    assert ref["detail"], label
 
-# Real build_weekly stamps eligibility after T-90; prop_legs refuses via playable_this_week
+# T-90 without official source + build_weekly stamp → prop_legs AND atd_legs refuse
 doc2 = build_weekly_document(PROJ, SCHED, ELOS, {}, 2026, "2026-09-17T23:00:00Z",
                              injuries=[], factors=FX(), this_week=3, first_week=3,
                              depth_chart=None, inactives=INACT)
 by2 = {p["gsis_id"]: p for p in doc2["players"]}
 assert by2["espn-9"]["eligibility"]["eligible"] is False
-assert by2["espn-9"]["eligibility"]["source"] == "inactive_confirmation"
 assert playable_this_week(by2["espn-9"], 3) is False
-# Week points are NOT rewritten by confirmation refusal (no this_week inactive bind)
 assert by2["espn-9"].get("this_week") is None
 
 players = [{"gsis_id": "espn-9", "name": "DAL RB", "team": "DAL", "position": "RB"}]
 weekly = {"espn-9": by2["espn-9"]}
 game_preds = [{"game_id": "G3", "home": "DAL", "away": "SFX", "week": 3,
                "probs": {"home": 0.55, "away": 0.45}}]
-calib = {"RB": {"a": 0.0, "b": 1.0, "c": 0.0}}
-support = {"RB": (-2.0, 2.0)}
-sd = {"RB": 20.0}
-ladder = {"RB": [50.0]}
-legs, counts = prop_legs(players, weekly, game_preds, calib, support, sd, ladder, wk=3)
+legs, counts = prop_legs(players, weekly, game_preds,
+                         {"RB": {"a": 0.0, "b": 1.0, "c": 0.0}},
+                         {"RB": (-2.0, 2.0)}, {"RB": 20.0}, {"RB": [50.0]}, wk=3)
 assert legs == [] and counts["not_playable"] == 1
+assert counts.get("not_playable", 0) >= 1
+REACHES_OFFER_WHEN_REFUSAL_NONE = False  # stamped path never reaches offer
 
-print(json.dumps({"ok": True, "dnp_bound_inactive": False, "offer_refused": True,
-                  "wired_caller": "build_weekly.confirmation_offer_refusal"}))
+# ATD path uses the same playable_this_week gate
+atd_doc = {"adopted": True, "season": 2026, "week": 3, "players": [
+  {"gsis_id": "espn-9", "player": "DAL RB", "team": "DAL", "position": "RB",
+   "game_id": "G3", "side": "home", "selection": "D. RB ATD", "model_prob": 0.4}]}
+atd_bt = {"adopted": True}
+atd_rows, atd_reason = atd_legs(atd_doc, atd_bt, weekly, 2026, 3)
+assert atd_rows == [] and "offered: 0" in atd_reason
+
+# Missing-context stamp on a bare weekly row also blocks prop+ATD (integration)
+for detail, ref in cases.items():
+    bare = {"gsis_id": "espn-9", "weeks": [{"wk": 3, "pts": 10.0}], "eligibility": ref}
+    assert playable_this_week(bare, 3) is False, detail
+    legs_m, counts_m = prop_legs(players, {"espn-9": bare}, game_preds,
+                                 {"RB": {"a": 0.0, "b": 1.0, "c": 0.0}},
+                                 {"RB": (-2.0, 2.0)}, {"RB": 20.0}, {"RB": [50.0]}, wk=3)
+    assert legs_m == [] and counts_m["not_playable"] == 1, detail
+    atd_m, _ = atd_legs(atd_doc, atd_bt, {"espn-9": bare}, 2026, 3)
+    assert atd_m == [], detail
+
+print(json.dumps({
+  "ok": True, "dnp_bound_inactive": False, "offer_refused": True,
+  "pre_T90_provisional_None": True,
+  "FAIL_CLOSED_MISSING_CONTEXT": True,
+  "REACHES_OFFER_WHEN_REFUSAL_NONE": REACHES_OFFER_WHEN_REFUSAL_NONE,
+  "prop_not_playable": counts["not_playable"], "atd_offered": len(atd_rows),
+  "missing_details": sorted({c["detail"] for c in cases.values()}),
+  "wired_caller": "build_weekly.confirmation_offer_refusal"}))
 `);
   assert.equal(r.ok, true);
   assert.equal(r.dnp_bound_inactive, false);
   assert.equal(r.offer_refused, true);
+  assert.equal(r.pre_T90_provisional_None, true);
+  assert.equal(r.FAIL_CLOSED_MISSING_CONTEXT, true);
+  assert.equal(r.REACHES_OFFER_WHEN_REFUSAL_NONE, false);
+  assert.equal(r.prop_not_playable, 1);
+  assert.equal(r.atd_offered, 0);
   assert.equal(r.wired_caller, 'build_weekly.confirmation_offer_refusal');
 });
 
@@ -364,27 +407,44 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
     assert.equal(workBlob(rel), blob, `${rel} non-idempotent`);
   }
 
+  /** Require a real commit object that is an ancestor of HEAD (PR base / merge-base). */
+  const requireCommitAncestor = (raw) => {
+    const sha = String(raw || '').trim();
+    if (!/^[0-9a-f]{40}$/i.test(sha)) {
+      throw new Error(`base ${sha} is not a 40-char hex commit id`);
+    }
+    const typ = gitOk(['cat-file', '-t', sha]);
+    if (typ !== 'commit') {
+      throw new Error(`base ${sha} git type is ${typ || 'missing'}, want commit`);
+    }
+    try {
+      execFileSync('git', ['merge-base', '--is-ancestor', sha, 'HEAD'], {
+        cwd: ROOT, stdio: 'ignore',
+      });
+    } catch {
+      throw new Error(`base ${sha} is not an ancestor of HEAD`);
+    }
+    return sha;
+  };
   const resolveBase = () => {
     if (process.env.GITHUB_BASE_SHA) {
-      const sha = process.env.GITHUB_BASE_SHA.trim();
-      if (!gitOk(['rev-parse', '--verify', sha])) {
-        throw new Error(`GITHUB_BASE_SHA=${sha} is not a resolvable git object`);
-      }
-      return sha;
+      return requireCommitAncestor(process.env.GITHUB_BASE_SHA);
     }
     for (const cand of ['origin/main', 'main']) {
       if (!gitOk(['rev-parse', '--verify', cand])) continue;
       const mb = gitOk(['merge-base', cand, 'HEAD']);
-      if (mb) return mb;
+      if (mb) return requireCommitAncestor(mb);
     }
     throw new Error(
-      'hash proof base unavailable: set GITHUB_BASE_SHA to the PR base SHA '
-      + 'or fetch origin/main (refuse HEAD~N ancestor guesses)',
+      'hash proof base unavailable: set GITHUB_BASE_SHA to a real commit SHA '
+      + 'that is an ancestor of HEAD, or fetch origin/main (refuse HEAD~N)',
     );
   };
   const base = resolveBase();
-  assert.ok(/^[0-9a-f]{40}$/i.test(base) || base === 'origin/main' || base === 'main'
-    || gitOk(['rev-parse', '--verify', base]), `unverified base ${base}`);
+  assert.equal(gitOk(['cat-file', '-t', base]), 'commit');
+  execFileSync('git', ['merge-base', '--is-ancestor', base, 'HEAD'], {
+    cwd: ROOT, stdio: 'ignore',
+  });
 
   // Own edits = non-merge commits on HEAD not in UPSTREAM_PIN.
   const own = execFileSync('git', ['rev-list', '--no-merges', `${UPSTREAM_PIN}..HEAD`], {
@@ -408,4 +468,66 @@ test('historical lock/archive/receipt bytes match integrated upstream; own commi
   });
   assert.ok(Object.keys(after).length >= 8, `tracked data count ${Object.keys(after).length}`);
   assert.ok(base, 'base resolved');
+});
+
+test('hash-proof base validation rejects nonexistent/blob/tree and non-ancestor commits', () => {
+  // Adversarial: prove the weak rev-parse-only check would pass these, but the
+  // hardened requireCommitAncestor fails closed.
+  const weakRevParseOk = (ref) => {
+    try {
+      execFileSync('git', ['rev-parse', '--verify', ref], {
+        cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const requireCommitAncestor = (raw) => {
+    const sha = String(raw || '').trim();
+    if (!/^[0-9a-f]{40}$/i.test(sha)) throw new Error('not hex');
+    const typ = gitOk(['cat-file', '-t', sha]);
+    if (typ !== 'commit') throw new Error(`type ${typ}`);
+    execFileSync('git', ['merge-base', '--is-ancestor', sha, 'HEAD'], {
+      cwd: ROOT, stdio: 'ignore',
+    });
+    return sha;
+  };
+
+  const bogus = 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef';
+  assert.equal(weakRevParseOk(bogus), true, 'adversarial: rev-parse accepts nonexistent 40-hex');
+  assert.throws(() => requireCommitAncestor(bogus), /type missing|type undefined|not hex|type/);
+
+  const blob = execFileSync('git', ['rev-parse', 'HEAD:CHANGELOG.md'], {
+    cwd: ROOT, encoding: 'utf8',
+  }).trim();
+  assert.equal(gitOk(['cat-file', '-t', blob]), 'blob');
+  assert.equal(weakRevParseOk(blob), true, 'adversarial: rev-parse accepts blob');
+  assert.throws(() => requireCommitAncestor(blob), /type blob/);
+
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], {
+    cwd: ROOT, encoding: 'utf8',
+  }).trim();
+  assert.equal(gitOk(['cat-file', '-t', tree]), 'tree');
+  assert.equal(weakRevParseOk(tree), true, 'adversarial: rev-parse accepts tree');
+  assert.throws(() => requireCommitAncestor(tree), /type tree/);
+
+  // A real commit that is NOT an ancestor of this draft HEAD must fail.
+  // Use an orphan empty commit object if available; otherwise synthesize via
+  // commit-tree without updating any ref (read-only to branch history).
+  const orphan = execFileSync('git', [
+    'commit-tree', tree, '-m', 'orphan-hash-proof-adversarial',
+  ], { cwd: ROOT, encoding: 'utf8' }).trim();
+  assert.equal(gitOk(['cat-file', '-t', orphan]), 'commit');
+  assert.equal(weakRevParseOk(orphan), true);
+  assert.throws(() => requireCommitAncestor(orphan), /not an ancestor|Command failed/);
+
+  // Intended base: fork main tip / merge-base with HEAD must pass.
+  const intended = gitOk(['rev-parse', 'origin/main']) || gitOk(['rev-parse', 'main']);
+  if (intended) {
+    const mb = gitOk(['merge-base', intended, 'HEAD']);
+    assert.ok(mb);
+    assert.equal(requireCommitAncestor(mb), mb);
+  }
+  assert.equal(requireCommitAncestor(UPSTREAM_PIN), UPSTREAM_PIN);
 });

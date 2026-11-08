@@ -1952,12 +1952,23 @@ def _injury_identity_audit(records, rows):
     return codes, refusals
 
 
+def _is_confirmation_eligibility(el):
+    """Offer refusal from inactive_confirmation (independent of injury_source)."""
+    return isinstance(el, dict) and el.get("source") == "inactive_confirmation"
+
+
 def check_injury_source_eligibility(weekly, projections, injuries):
-    """Independent source/offer check; legacy documents without metadata remain readable."""
+    """Independent source/offer check; legacy documents without metadata remain readable.
+
+    Confirmation-required refusals (source=inactive_confirmation) are a separate
+    offer gate and may appear with or without injury_source metadata.
+    """
     meta = (weekly.get("model") or {}).get("injury_source")
     if meta is None:
-        if any(p.get("eligibility") for p in weekly.get("players", [])):
-            raise ValidationError("eligibility refusal has no injury_source receipt")
+        for p in weekly.get("players", []):
+            el = p.get("eligibility")
+            if el and not _is_confirmation_eligibility(el):
+                raise ValidationError("eligibility refusal has no injury_source receipt")
         return True
     doc = injuries or {}
     problems = []
@@ -2012,7 +2023,15 @@ def check_injury_source_eligibility(weekly, projections, injuries):
         expected_gate = ({"eligible": False, "reason": "source_unverified", "detail": refusal,
                           "week": week, "source": "injuries", "source_updated_utc": source}
                          if applicable and refusal else None)
-        if player.get("eligibility") != expected_gate:
+        el = player.get("eligibility")
+        if _is_confirmation_eligibility(el):
+            # Independent confirmed-required offer gate. When injury also refuses,
+            # the producer keeps the injury stamp; otherwise confirmation may stamp.
+            if expected_gate is not None:
+                problems.append("%s: injury refusal overwritten by confirmation eligibility" % pid)
+            elif el.get("eligible") is not False or el.get("reason") != "confirmation_required":
+                problems.append("%s: inactive_confirmation eligibility malformed" % pid)
+        elif el != expected_gate:
             problems.append("%s: eligibility differs from injury source evidence" % pid)
         # This assertion is independent of producer equality: refusing an offer
         # must not simultaneously assert a certain medical absence from the

@@ -15,7 +15,10 @@ from scripts.validate_data import check_weekly_availability, check_no_unplayable
 NOW='2026-10-14T15:00:00Z'
 PROJ=[{'gsis_id':'espn-1','name':'Runner One','team':'SF','position':'RB','proj_points':170.0},
       {'gsis_id':'espn-2','name':'Receiver Two','team':'SEA','position':'WR','proj_points':170.0}]
-SCHED=[{'week':w,'home':'SF','away':'SEA'} for w in range(1,19) if w!=7]
+# Kickoff + game_id required so confirmation_offer_refusal can take the intended
+# provisional path (before T-90) instead of fail-closing on missing context.
+SCHED=[{'week':w,'home':'SF','away':'SEA','game_id':'W6G%d'%w,
+        'kickoff_utc':'2026-10-19T17:00:00Z'} for w in range(1,19) if w!=7]
 def report(status='Out', timestamp='2026-10-14T14:00:00Z', week=6, quarantine=None):
     d=av.enrich_document({'updated_utc':timestamp,'source':'espn','injuries':[
       {'team':'SF','player':'Runner One','status':status,'detail':None}]})
