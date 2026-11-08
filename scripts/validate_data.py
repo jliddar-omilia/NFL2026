@@ -2109,11 +2109,18 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
     skip_teams = set((gate_meta or {}).get("skipped_final_teams") or [])
     depth_teams = (depth_chart or {}).get("teams") if isinstance(depth_chart, dict) else None
     gate_counts = {"inactive": 0, "status": 0, "depth": 0, "promoted": 0}
-    # R79 — binding confirmed inactive ids only (same rule as
-    # build_weekly.inactive_ids). Observation/unconfirmed ESPN DNP does not
-    # require a this_week.playable=false gate and must not invent all-active.
-    from scripts.build_weekly import inactive_ids as _binding_inactive_ids  # noqa: PLC0415
+    # R79 — binding confirmed inactive ids (same rule as build_weekly.inactive_ids).
+    # Observation/unconfirmed ESPN DNP never confirms and must not invent all-active.
+    # Legacy served weekly may still carry reason=inactive from the old producer that
+    # bound DNP; those claims are accepted only as fail-closed transition when the
+    # observation list still names the player (never as official confirmation).
+    from scripts.build_weekly import (  # noqa: PLC0415
+        inactive_ids as _binding_inactive_ids,
+        observed_inactive_ids as _observed_inactive_ids,
+    )
     inact_ids = _binding_inactive_ids(inactives, gate_wk) if isinstance(inactives, dict) else {}
+    observed_ids = (_observed_inactive_ids(inactives, gate_wk)
+                    if isinstance(inactives, dict) else {})
 
     for pl in weekly.get("players", []):
         pid = pl.get("gsis_id")
@@ -2166,15 +2173,31 @@ def check_weekly_availability(weekly, projections, injuries, depth_chart=None,
             if reason == "inactive":
                 eid = str(pid)[5:] if str(pid).startswith("espn-") else None
                 hit = inact_ids.get(eid) if eid else None
-                if hit is None:
+                obs = observed_ids.get(eid) if eid else None
+                if hit is not None:
+                    if tw.get("game_id") != hit[1] or (record or {}).get("team") != hit[0]:
+                        problems.append("%s: this_week.game_id %r / team %r disagree with the "
+                                        "confirmed list (%r, %r)" % (
+                                            pid, tw.get("game_id"),
+                                            (record or {}).get("team"),
+                                            hit[1], hit[0]))
+                elif obs is not None:
+                    # Legacy transition: old producer stamped reason=inactive from
+                    # observation DNP. Keep fail-closed (playable false); do not
+                    # promote observation to official confirmation.
+                    if tw.get("playable") is not False:
+                        problems.append("%s: legacy observation inactive claim must remain "
+                                        "playable:false (fail closed, not all-active)" % pid)
+                    if tw.get("game_id") != obs[1] or (record or {}).get("team") != obs[0]:
+                        problems.append("%s: this_week.game_id %r / team %r disagree with the "
+                                        "observation list (%r, %r)" % (
+                                            pid, tw.get("game_id"),
+                                            (record or {}).get("team"),
+                                            obs[1], obs[0]))
+                else:
                     problems.append("%s: this_week reason inactive but data/inactives.json "
                                     "does not name him — a game-day claim needs its list"
                                     % pid)
-                elif tw.get("game_id") != hit[1] or (record or {}).get("team") != hit[0]:
-                    problems.append("%s: this_week.game_id %r / team %r disagree with the "
-                                    "list (%r, %r)" % (pid, tw.get("game_id"),
-                                                       (record or {}).get("team"),
-                                                       hit[1], hit[0]))
                 gate_counts["inactive"] += 1
             elif reason == "status":
                 st = tw.get("status")
