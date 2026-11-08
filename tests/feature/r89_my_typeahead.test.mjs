@@ -21,7 +21,12 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
-import { emptyReason, matchSeeds } from '../../app/views/myparlays.js';
+import {
+  emptyReason, matchSeeds, DIALS, DEFAULT_DIAL, PROP_DIAL_BAND,
+  poolLegs, upcomingLegs, dialLegs, buildCards, matchesSeed, mergedCalib,
+} from '../../app/views/myparlays.js';
+import { correlationTable } from '../../app/parlay-math.js';
+import { SEED_ROWS, SEED_PLAYER, SKIP_REASON } from '../web/_myseed.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..', '..');
@@ -226,6 +231,78 @@ test('a seed that DOES have upcoming legs is told the dial, not the clock', () =
     emptyReason([SEED.p10], LEGS, GAMES, 2, NOW),
     'No card could be built around Tomás Ramírez at this dial; try another risk setting.',
   );
+});
+
+/* ==========================================================================
+   4b. COMMITTED-SLATE LIVE TYPEAHEAD SEED MUST SURVIVE THE DEFAULT DIAL
+   ==========================================================================
+ * Browser r89 asserts .mp-card after seeding LIVE_PLAYER at the default dial.
+ * Surname-unambiguous alone is not enough: Greg Dortch was first unambiguous
+ * on BUF with nearest rung 0.3401 outside EVEN's PROP_DIAL_BAND — chip painted,
+ * zero cards, e2e timeout (818f8260). This proves the fixture filter the web
+ * spec now applies, against the committed pool. */
+
+test('committed LIVE typeahead seed survives default dial and builds cards', () => {
+  if (SKIP_REASON) {
+    // Finished slate: MY offers nothing by design; browser specs skip too.
+    assert.equal(SEED_ROWS.length, 0);
+    return;
+  }
+  const pool = JSON.parse(readFileSync(join(ROOT, 'data/leg_pool.json'), 'utf8'));
+  const games = JSON.parse(readFileSync(join(ROOT, 'data/schedule_full.json'), 'utf8')).games;
+  const calib = JSON.parse(readFileSync(join(ROOT, 'data/model_tuning.json'), 'utf8'));
+  const target = DIALS[DEFAULT_DIAL];
+  const seen = new Set();
+  const unique = SEED_ROWS.filter((r) => (seen.has(r.gsis_id) ? false : (seen.add(r.gsis_id), true)));
+  const cardable = unique.filter((row) => {
+    const probs = SEED_ROWS.filter((r) => r.gsis_id === row.gsis_id)
+      .flatMap((r) => (r.rungs || []).map((x) => x.model_prob));
+    return probs.some((p) => Math.abs(Number(p) - target) - PROP_DIAL_BAND <= 1e-9);
+  });
+  assert.ok(cardable.length > 0,
+    'seed team must have at least one player whose rung survives the default dial');
+  // The bug: first unambiguous-by-surname on the seed team can sit outside the
+  // dial band. Prove that case still empties honestly when it happens.
+  const norm = (s) => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const SUFFIX = new Set(['jr', 'sr', 'ii', 'iii', 'iv', 'v']);
+  const surnameOf = (name) => {
+    const tokens = norm(name).split(' ').filter((t) => !SUFFIX.has(t));
+    return tokens[tokens.length - 1] || '';
+  };
+  const ALL_NAMES = [...new Set([...pool.players.map((r) => r.player),
+    ...pool.players.map((r) => r.team)])];
+  const reach = (q) => ALL_NAMES.filter((name) => {
+    const full = norm(name);
+    return full.split(' ').some((t) => t.startsWith(q)) || full.includes(q);
+  });
+  const firstUnambiguous = unique.find((r) => reach(surnameOf(r.player)).length === 1) || null;
+  if (firstUnambiguous && !cardable.some((r) => r.gsis_id === firstUnambiguous.gsis_id)) {
+    const legs = upcomingLegs(poolLegs(pool), games);
+    const dialled = dialLegs(legs, target);
+    const seeds = [{ id: firstUnambiguous.gsis_id, name: firstUnambiguous.player, kind: 'player' }];
+    const table = correlationTable(mergedCalib(calib, pool));
+    assert.equal(buildCards(dialled, seeds, table).length, 0,
+      `${firstUnambiguous.player} is unambiguous but outside the default dial — `
+      + 'must not silently invent cards');
+    assert.match(
+      emptyReason(seeds, legs, games, pool.week),
+      /at this dial; try another risk setting/,
+    );
+  }
+  // The LIVE_PLAYER the browser spec must use: first dial-cardable unambiguous,
+  // else first dial-cardable, else SEED_PLAYER.
+  const live = cardable.find((r) => reach(surnameOf(r.player)).length === 1)
+    || cardable[0] || SEED_PLAYER;
+  assert.ok(live, 'LIVE typeahead player must resolve');
+  const legs = upcomingLegs(poolLegs(pool), games);
+  const dialled = dialLegs(legs, target);
+  const seeds = [{ id: live.gsis_id, name: live.player, kind: 'player' }];
+  assert.ok(dialled.some((l) => matchesSeed(l, seeds)),
+    `${live.player} must keep a dialled seed leg at ${DEFAULT_DIAL}`);
+  const table = correlationTable(mergedCalib(calib, pool));
+  assert.ok(buildCards(dialled, seeds, table).length > 0,
+    `${live.player} must build ≥1 card at the default dial`);
 });
 
 test('several seeds produce several sentences, joined by one space', () => {
