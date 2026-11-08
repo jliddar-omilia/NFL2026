@@ -143,20 +143,24 @@ def fetch_schedule(season, week=None, seasontype=2):
     for ev in events:
         home, away = _competitors(ev)
         status = (((ev.get("status") or {}).get("type")) or {}).get("name")
-        venue = (ev.get("competitions") or [{}])[0].get("venue") or {}
-        out.append(
-            {
-                "game_id": str(ev.get("id")),
-                "home": _team_abbrev(home),
-                "away": _team_abbrev(away),
-                "kickoff_utc": ev.get("date"),  # e.g. "2026-09-10T00:20Z"
-                "status": status,
-                "venue": venue.get("fullName"),
-                # ESPN's `indoor` flag covers domes + closed retractables; we record
-                # the binary here and let the stadium table refine retractable/open.
-                "roof": "indoor" if venue.get("indoor") else "outdoor",
-            }
-        )
+        comp = (ev.get("competitions") or [{}])[0]
+        venue = comp.get("venue") or {}
+        row = {
+            "game_id": str(ev.get("id")),
+            "home": _team_abbrev(home),
+            "away": _team_abbrev(away),
+            "kickoff_utc": ev.get("date"),  # e.g. "2026-09-10T00:20Z"
+            "status": status,
+            "venue": venue.get("fullName"),
+            # ESPN's `indoor` flag covers domes + closed retractables; we record
+            # the binary here and let the stadium table refine retractable/open.
+            "roof": "indoor" if venue.get("indoor") else "outdoor",
+        }
+        # Carry ESPN's explicit neutralSite when present. Absent stays absent
+        # (ordinary HFA); True is never inferred from venue name/country.
+        if "neutralSite" in comp:
+            row["neutral_site"] = comp.get("neutralSite") is True
+        out.append(row)
     return out
 
 

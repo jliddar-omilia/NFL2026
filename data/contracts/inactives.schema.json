@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "inactives",
-  "description": "R79: game-day inactive lists for the current week's games inside the inactives window (kickoff minus window_hours until FINAL), read from ESPN's per-competition rosters (didNotPlay). Written by build_predictions every run; REMOVED when no game is in the window so a stale list can never gate a later game. espn_id is the ESPN athlete id the projection pool spells espn-<id>. The this-week gate's first source (build_weekly.this_week_gate reason 'inactive').",
+  "description": "R79: game-day inactive OBSERVATIONS for the current week's games inside the inactives window (kickoff minus window_hours until FINAL), read from ESPN's per-competition rosters (didNotPlay). These rows are observation-only — never official confirmation. Empty team lists do not mean all-active. Written by build_predictions every run; REMOVED when no game is in the window so a stale list can never gate a later game. espn_id is the ESPN athlete id the projection pool spells espn-<id>. The this-week gate's first source (build_weekly.this_week_gate reason 'inactive') treats DNP as an observation gate, not confirmed eligibility.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -31,6 +31,16 @@
     "source": {
       "type": "string",
       "minLength": 1
+    },
+    "evidence_profile": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Registered observation profile id (espn_core_roster_didnotplay_v1)."
+    },
+    "confirmation": {
+      "type": "string",
+      "enum": ["unconfirmed"],
+      "description": "ESPN DNP never stamps confirmed; official confirmation is a separate source."
     },
     "window_hours": {
       "type": "number",
@@ -99,6 +109,40 @@
           "fetched_utc": {
             "type": "string",
             "minLength": 1
+          },
+          "evidence_kind": {
+            "type": "string",
+            "enum": ["observation"]
+          },
+          "confirmation": {
+            "type": "string",
+            "enum": ["unconfirmed"]
+          },
+          "team_coverage": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["coverage", "complete", "dnp_rows", "source_profile"],
+              "properties": {
+                "coverage": {
+                  "type": "string",
+                  "enum": ["unknown", "stale", "failed"]
+                },
+                "complete": {
+                  "type": "boolean",
+                  "enum": [false]
+                },
+                "dnp_rows": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "source_profile": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
           },
           "inactive": {
             "type": "object",

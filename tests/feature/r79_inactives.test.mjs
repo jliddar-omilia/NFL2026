@@ -151,7 +151,11 @@ emit({"counts": doc["counts"], "games": [g["game_id"] for g in doc["games"]],
   assert.deepEqual(out.counts, { games: 1, failed: 1, players: 1 });
   assert.deepEqual(out.games, ['A']);
   assert.deepEqual(out.failed, [{ game_id: 'B', error: 'boom' }]);
-  assert.deepEqual(out.keys, ['season', 'week', 'updated_utc', 'source', 'window_hours', 'counts', 'games', 'failed']);
+  for (const k of ['season', 'week', 'updated_utc', 'source', 'window_hours', 'counts', 'games', 'failed']) {
+    assert.ok(out.keys.includes(k), k);
+  }
+  assert.ok(out.keys.includes('evidence_profile'));
+  assert.ok(out.keys.includes('confirmation'));
   assert.equal(out.week, 3);
   assert.match(out.swapped_failed[0].error, /ESPN teams SFX\/GBX != schedule DAL\/SFX/, 'a team mismatch is a failure, never a silent mis-attribution');
   assert.equal(out.none, null, 'no game in the window: nothing to state');

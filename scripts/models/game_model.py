@@ -241,9 +241,14 @@ def predict_game(game, teams=None, weights=None, model="hybrid"):
     vec, meta = blend_vectors(sources, weights=weights)
 
     # Resolve roof: explicit on the game, else look up the home team, else 'outdoor'.
+    # Neutral sites must never inherit the designated-home stadium roof table.
     roof = game.get("roof")
     if roof not in ("indoor", "outdoor", "retractable"):
-        roof = roof_for_team(game.get("home"), teams) if teams is not None else "outdoor"
+        from scripts.home_field import is_neutral_site  # noqa: PLC0415 (local)
+        if is_neutral_site(game):
+            roof = "outdoor"
+        else:
+            roof = roof_for_team(game.get("home"), teams) if teams is not None else "outdoor"
 
     return {
         "game_id": game.get("game_id", ""),

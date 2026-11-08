@@ -244,17 +244,75 @@ def withhold(pool, assessment):
 
 def espn_observations(inactives_doc):
     """Map data/inactives.json games to OBSERVATION-only evidence records (one
-    per team). Kept for the audit trail; validate_evidence always refuses them."""
+    per team). Kept for the audit trail; validate_evidence always refuses them.
+
+    Empty DNP lists stay coverage=unknown / complete=False — never all-active.
+    `active=false` on ESPN roster rows is ignored upstream and never appears here.
+    """
     out = {}
     for g in (inactives_doc or {}).get("games") or []:
         if type(g) is not dict or type(g.get("inactive")) is not dict:
             continue
         for team, rows in g["inactive"].items():
+            ids = [str(r.get("espn_id")) for r in rows or [] if type(r) is dict]
             out.setdefault(str(g.get("game_id")), []).append({
                 "source_profile": "espn_core_roster_didnotplay_v1",
+                "evidence_kind": "observation",
+                "confirmation": "unconfirmed",
+                "coverage": "unknown",
+                "complete": False,
                 "game_id": str(g.get("game_id")), "home": g.get("home"), "away": g.get("away"),
                 "kickoff_utc": g.get("kickoff_utc"), "team": team,
+                "observed_at": g.get("fetched_utc"),
                 "fetched_utc": g.get("fetched_utc"),
-                "inactive_ids": [str(r.get("espn_id")) for r in rows or [] if type(r) is dict],
+                "inactive_ids": ids,
+                "dnp_rows": len(ids),
             })
     return out
+
+
+def recommendation_eligibility(espn_id, team, game, now, evidence,
+                                registry=OFFICIAL_SOURCES, require_confirmed=True):
+    """Fail-closed offer eligibility when confirmed evidence is required.
+
+    Returns {eligible, state, reason, require_confirmed}. Does not mutate pools,
+    forecasts, locks, or receipts. When require_confirmed is True, only
+    confirmed_active (inside the T-90 window) or provisional (before T-90) may
+    offer; unknown/stale/inactive/closed refuse. Observation-only DNP evidence
+    never confirms.
+    """
+    state, reason = player_state(espn_id, team, game, now, evidence, registry)
+    if not require_confirmed:
+        return {"eligible": state in OFFERABLE, "state": state, "reason": reason,
+                "require_confirmed": False}
+    if state == "provisional":
+        return {"eligible": True, "state": state, "reason": reason,
+                "require_confirmed": True}
+    if state == "confirmed_active":
+        return {"eligible": True, "state": state, "reason": reason,
+                "require_confirmed": True}
+    return {"eligible": False, "state": state, "reason": reason,
+            "require_confirmed": True}
+
+
+def team_coverage_from_observation(game_row, team):
+    """Per-team coverage for an inactives.json game row. Pure.
+
+    ESPN DNP never yields complete=True. Missing team key -> unknown.
+    """
+    if type(game_row) is not dict:
+        return {"coverage": "unknown", "complete": False, "dnp_rows": 0,
+                "source_profile": "espn_core_roster_didnotplay_v1"}
+    stamped = (game_row.get("team_coverage") or {}).get(team)
+    if type(stamped) is dict and stamped.get("coverage"):
+        return {
+            "coverage": stamped.get("coverage") or "unknown",
+            "complete": stamped.get("complete") is True,
+            "dnp_rows": int(stamped.get("dnp_rows") or 0),
+            "source_profile": stamped.get("source_profile")
+            or "espn_core_roster_didnotplay_v1",
+        }
+    rows = (game_row.get("inactive") or {}).get(team)
+    n = len(rows) if type(rows) is list else 0
+    return {"coverage": "unknown", "complete": False, "dnp_rows": n,
+            "source_profile": "espn_core_roster_didnotplay_v1"}

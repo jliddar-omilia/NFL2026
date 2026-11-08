@@ -60,7 +60,11 @@ def weekly(home_rows, away_rows=None, *, reverse=False):
         # Exercise the actual fetch function through the default producer path.
         doc = P._inactives_doc(NOW, GAMES, 6, now_utc=dt.datetime(2026,10,18,16,tzinfo=dt.timezone.utc))
     gates, meta = W.this_week_gate(PROJECTIONS, {}, [], DEPTH, 6, W.team_schedule(GAMES), inactives=doc)
-    assert list(doc) == ['season','week','updated_utc','source','window_hours','counts','games','failed']
+    # Core contract keys first; observation-only evidence stamps may follow.
+    required = ['season','week','updated_utc','source','window_hours','counts','games','failed']
+    assert [k for k in required if k in doc] == required
+    assert doc.get('confirmation') in (None, 'unconfirmed')
+    assert doc.get('evidence_profile') in (None, 'espn_core_roster_didnotplay_v1')
     return doc, gates, meta, warning.getvalue(), requests
 
 def assert_game_refused(home_rows, away_rows=None, *, reverse=False):
@@ -197,11 +201,19 @@ for observation in (None, [], [{'playerId':101,'didNotPlay':False,'active':False
     assert doc['counts'] == {'games':2,'failed':0,'players':1} and warning == ''
     assert 'espn-101' not in gates and gates['espn-102']['reason'] == 'depth'
     assert meta['promoted'] == 0
-    # No new completeness/posted/confirmation authority is added to the feed.
-    assert set(doc['games'][0]) == {'game_id','home','away','kickoff_utc','status','fetched_utc','inactive'}
+    # Core identity keys remain; evidence annotations may stamp observation-only
+    # metadata that explicitly refuses confirmation/completeness authority.
+    required = {'game_id','home','away','kickoff_utc','status','fetched_utc','inactive'}
+    assert required <= set(doc['games'][0])
+    assert doc.get('confirmation') == 'unconfirmed'
+    assert doc['games'][0].get('confirmation') == 'unconfirmed'
+    assert doc['games'][0].get('evidence_kind') == 'observation'
+    cov = doc['games'][0].get('team_coverage') or {}
+    for team, row in cov.items():
+        assert row['complete'] is False and row['coverage'] == 'unknown', team
 print(json.dumps({'genuine_true_promotes':True, 'nonnegative_observations_do_not_promote':4,
-                  'new_confirmation_fields':False}))
+                  'confirmation_authority_claimed':False}))
 `);
   assert.deepEqual(result, {genuine_true_promotes: true, nonnegative_observations_do_not_promote: 4,
-    new_confirmation_fields: false});
+    confirmation_authority_claimed: false});
 });

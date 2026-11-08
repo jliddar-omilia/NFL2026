@@ -244,19 +244,39 @@ def main():
 
     try:
         for gm in polymarket_nfl.fetch_game_markets():
+            # Defense in depth: fetch_game_markets already drops series/futures,
+            # but a caller that bypasses it must still refuse non-game titles.
+            if not polymarket_nfl.game_market_title_ok(gm.get("title") or ""):
+                continue
             mapped = {}
             for nm, p in gm["prices"].items():
                 ab = to_abbrev(nm, names)
                 if ab:
                     mapped[ab] = p
+            # Bind only with team pair + event/date proximity (Kalshi rule).
+            # Team names alone must not attach a series market to an arbitrary
+            # fixture among multiple meetings.
+            end_raw = str(gm.get("end_date") or "")
+            end_day = end_raw[:10] if len(end_raw) >= 10 else ""
+            candidates = []
             for g in schedule:
-                if g["home"] in mapped and g["away"] in mapped:
-                    games.setdefault(g["game_id"], {})["polymarket"] = {
-                        "home_prob": mapped[g["home"]], "away_prob": mapped[g["away"]],
-                        "slug": gm["title"],
-                    }
-                    n_games += 1
-                    break
+                if g["home"] not in mapped or g["away"] not in mapped:
+                    continue
+                if end_day and not date_near(g.get("kickoff_utc"), end_day):
+                    continue
+                if not end_day:
+                    # No usable event date -> withhold rather than guess which
+                    # of several same-team fixtures the quote belongs to.
+                    continue
+                candidates.append(g)
+            if len({c["game_id"] for c in candidates}) != 1:
+                continue
+            g = candidates[0]
+            games.setdefault(g["game_id"], {})["polymarket"] = {
+                "home_prob": mapped[g["home"]], "away_prob": mapped[g["away"]],
+                "slug": gm["title"],
+            }
+            n_games += 1
         poly_ok += 1
     except Exception as exc:  # noqa: BLE001 — loud, isolated
         poly_notes.append(f"games: {exc}")
