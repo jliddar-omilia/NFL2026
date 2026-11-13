@@ -161,28 +161,54 @@ def snap_evidence(leg, week, snaps_by_week):
     already uses: ("played", snaps) when he is on his team's published sheet with
     >= 1 offensive snap, ("dnp", None) when the sheet is published and he is not on
     it, (None, None) when there is no evidence either way. The name is his full
-    name when the leg carries one, else the selection's initial + surname."""
+    name when the leg carries one, else the selection's initial + surname.
+
+    data-ci #202 — when the locked team sheet says DNP (or is absent) but a unique
+    same-week name match played elsewhere (mid-week roster move), that counts as
+    played — never void a settled field result against the old abbrev."""
     snaps = (snaps_by_week or {}).get(int(week))
     team = leg.get("team")
-    if not snaps or not team or team not in snaps["teams"]:
+    if not snaps or not team:
         return None, None
-    rows = [r for r in snaps["rows"] if r["team"] == team]
-    full = norm_name(leg.get("player")) if leg.get("player") else None
-    if full:
-        mine = [r for r in rows if r["norm"] == full]
-    else:
+
+    def _team_rows(scope):
+        full = norm_name(leg.get("player")) if leg.get("player") else None
+        if full:
+            return [r for r in scope if r["norm"] == full]
         parsed = split_abbrev(leg.get("selection"))
         if parsed is None:
-            return None, None
+            return None
         ini, last = parsed
-        mine = [r for r in rows if len(r["norm"].split(" ")) >= 2
+        mine = [r for r in scope if len(r["norm"].split(" ")) >= 2
                 and r["norm"][0] == ini and " ".join(r["norm"].split(" ")[1:]) == last]
         if len({r["norm"] for r in mine}) > 1:
-            return None, None                 # two men fit the abbreviation: no call
-    played = [r for r in mine if r["snaps"] >= 1]
-    if played:
-        return "played", played[0]["snaps"]
-    return "dnp", None
+            return None                 # two men fit the abbreviation: no call
+        return mine
+
+    def _elsewhere_full(scope):
+        # Roster-move evidence is full-name only — never initial+surname league-wide.
+        full = norm_name(leg.get("player")) if leg.get("player") else None
+        if not full:
+            return None
+        mine = [r for r in scope if r["norm"] == full]
+        return mine or None
+
+    if team in snaps["teams"]:
+        mine = _team_rows([r for r in snaps["rows"] if r["team"] == team])
+        if mine is None:
+            return None, None
+        played = [r for r in mine if r["snaps"] >= 1]
+        if played:
+            return "played", played[0]["snaps"]
+        # Locked team DNP — full-name play elsewhere beats a false void.
+        else_mine = _elsewhere_full([r for r in snaps["rows"] if r["snaps"] >= 1])
+        if else_mine:
+            return "played", else_mine[0]["snaps"]
+        return "dnp", None
+    else_mine = _elsewhere_full([r for r in snaps["rows"] if r["snaps"] >= 1])
+    if else_mine:
+        return "played", else_mine[0]["snaps"]
+    return None, None
 
 
 def grade_prop(leg, week, by_week, snaps_by_week=None):
@@ -779,6 +805,26 @@ def selftest():
     assert fully_excluded(x_rows[2][1], {"gX"}) and not fully_excluded(x_rows[0][1], {"gX"})
     assert not fully_excluded(x_rows[2][1], set()) and not fully_excluded({"legs": []}, {"gX"})
     assert document(2026, x_weeks, x_graded, "f", None, "t", excluded=2)["excluded"] == 2
+
+    # data-ci #202 — locked CLE, same-week stats on NO: grade the NO line, not void.
+    moved_week = index_stats([
+        {"season": "2026", "week": "9", "season_type": "REG", "position": "RB",
+         "team": "NO", "player_display_name": "Audric Estime",
+         "passing_yards": "0", "rushing_yards": "72", "receiving_yards": "5"},
+    ])
+    result, actual, reason = grade_prop(
+        {"position": "RB", "player": "Audric Estime",
+         "selection": "A. Estime 20+ rush yds", "team": "CLE", "line": 19.5},
+        9, moved_week, snaps_by_week=None)
+    assert (result, actual, reason) == ("hit", 72.0, None), (result, actual, reason)
+    # Snap sheet: CLE published, he is absent there, but played on NO → played not dnp.
+    snap_week = {9: {"teams": {"CLE", "NO"}, "rows": [
+        {"norm": "audric estime", "team": "NO", "snaps": 18.0},
+        {"norm": "other browns", "team": "CLE", "snaps": 40.0},
+    ]}}
+    assert snap_evidence(
+        {"player": "Audric Estime", "team": "CLE", "selection": "A. Estime 20+ rush yds"},
+        9, snap_week)[0] == "played"
 
     print("selftest OK: locked-only grading, an unresolved leg is pending and never a "
           "miss, exact push voids, winner-only finals grade a moneyline and not a "

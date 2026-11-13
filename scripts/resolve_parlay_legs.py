@@ -148,7 +148,14 @@ def split_abbrev(selection):
 
 
 def find_player(leg, week_rows):
-    """(row, None) for the unique stats row behind the leg, else (None, reason)."""
+    """(row, None) for the unique stats row behind the leg, else (None, reason).
+
+    Prefer the locked leg's team(s). When that misses, fall back to a unique
+    same-week name+position match across every team: a mid-week roster move
+    (practice-squad elevation, trade) leaves the locked card on the old abbrev
+    while nflverse writes the new one, and treating that as did_not_play voids
+    a leg the field already settled (data-ci #202: Audric Estime CLE→NO).
+    """
     pos = leg.get("position")
     teams = {leg.get("home"), leg.get("away")}
     cands = [r for r in week_rows if r["pos"] == pos and r["team"] in teams]
@@ -170,7 +177,19 @@ def find_player(leg, week_rows):
             hits.append(r)
     if len(hits) == 1:
         return hits[0], None
-    return None, "ambiguous" if hits else "no_stat_line"
+    if hits:
+        return None, "ambiguous"
+    # Same-week roster move: locked team missed; unique FULL name+pos across the
+    # week wins (Audric Estime CLE→NO). Never fall back on initial+surname alone —
+    # "T. Johnson" is Tyler (NYJ) and Tez (TB) in the same position (data-ci #202).
+    if leg.get("player") and pos:
+        full = norm_name(leg["player"])
+        cross = [r for r in week_rows if r["pos"] == pos and r["norm"] == full]
+        if len(cross) == 1:
+            return cross[0], None
+        if len(cross) > 1:
+            return None, "ambiguous"
+    return None, "no_stat_line"
 
 
 # --------------------------------------------------------------------------- #
@@ -254,6 +273,15 @@ def grade_atd(leg, week, td_by_week, snaps_by_week=None):
         ini, last = name[0], name.split(" ", 1)[1]
         hits = [r for r in rows if r["team"] == team and " " in r["norm"]
                 and r["norm"][0] == ini and r["norm"].split(" ", 1)[1] == last]
+    if not hits:
+        # Same-week roster move (data-ci #202): locked team missed; unique FULL
+        # name across the week wins. No initial+surname cross-team fallback —
+        # that collides on common surnames (Tyler vs Tez Johnson).
+        cross = [r for r in rows if r["norm"] == name]
+        if len(cross) == 1:
+            hits = cross
+        elif len(cross) > 1:
+            return "pending", None, "ambiguous"
     if len(hits) > 1:
         return "pending", None, "ambiguous"
     if hits:
@@ -261,11 +289,24 @@ def grade_atd(leg, week, td_by_week, snaps_by_week=None):
         return ("hit" if tds >= 1 else "miss"), {"tds": tds}, None
     snaps = (snaps_by_week or {}).get(int(week))
     if not snaps or team not in snaps["teams"]:
+        # Roster move: he may sit on another team's published sheet this week.
+        if snaps:
+            played = [r for r in snaps["rows"] if r["norm"] == name and r["snaps"] >= 1]
+            if len({r["norm"] for r in played}) == 1 and played:
+                return "miss", {"tds": 0, "snaps": played[0]["snaps"]}, None
+            if snaps["teams"] and not played:
+                # Every team he could belong to has a sheet and he is on none → void.
+                # Only void when his locked team published a sheet (same as before).
+                pass
         return "pending", None, "no_stat_line"
     played = [r for r in snaps["rows"] if r["norm"] == name and r["team"] == team
               and r["snaps"] >= 1]
     if played:
         return "miss", {"tds": 0, "snaps": played[0]["snaps"]}, None
+    # Locked team sheet says DNP — but he may have played elsewhere this week.
+    elsewhere = [r for r in snaps["rows"] if r["norm"] == name and r["snaps"] >= 1]
+    if elsewhere:
+        return "miss", {"tds": 0, "snaps": elsewhere[0]["snaps"]}, None
     return "void", None, "did_not_play"
 
 
@@ -746,6 +787,27 @@ def selftest():
     reasons = {u["selection"].split(" ")[1]: u["reason"] for u in unres}
     assert reasons == {"Harris": "no_stat_line", "Adams": "ambiguous",
                        "Known": "player_unidentified", "Two": "no_stat_line"}, reasons
+    # data-ci #202 — locked team CLE, same-week stats on NO: unique FULL name wins.
+    moved = index_stats([
+        {"season": "2026", "week": "9", "season_type": "REG", "position": "RB",
+         "team": "NO", "player_display_name": "Audric Estime",
+         "passing_yards": "0", "rushing_yards": "72", "receiving_yards": "5"},
+        {"season": "2026", "week": "9", "season_type": "REG", "position": "WR",
+         "team": "TB", "player_display_name": "Tez Johnson",
+         "passing_yards": "0", "rushing_yards": "0", "receiving_yards": "64"},
+    ])[9]
+    stale = {"position": "RB", "player": "Audric Estime",
+             "selection": "A. Estime 20+ rush yds", "home": "CLE", "away": "CLE"}
+    row, why = find_player(stale, moved)
+    assert why is None and row["team"] == "NO" and row["yards"]["RB"] == 72.0, (row, why)
+    # Tyler Johnson NYJ DNP must NOT steal Tez Johnson's TB line via "T. Johnson".
+    tyler = {"position": "WR", "player": "Tyler Johnson",
+             "selection": "T. Johnson 30+ rec yds", "home": "NYJ", "away": "NYJ"}
+    assert find_player(tyler, moved) == (None, "no_stat_line")
+    atd, _, _ = grade_atd(
+        {"player": "Audric Estime", "team": "CLE"}, 9,
+        {9: [{"norm": "audric estime", "pos": "RB", "tds": 0, "team": "NO"}]}, None)
+    assert atd == "miss", atd
     assert not any(r["selection"].startswith("X. Late") for r in props), \
         "an unlocked leg is never scored"
     assert not any(r["week"] == 2 for r in props), \
