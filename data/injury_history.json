@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-11-06T10:14:27Z",
+ "generated_utc": "2026-11-13T17:39:17Z",
  "seasons": {
   "2021": {
    "ARI": {
@@ -56507,6 +56507,82 @@
       "status": "Questionable"
      }
     ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Hjalte Froholdt",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jayden Williams",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Bam Knight",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Darius Robinson",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Zachary Carter",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Dante Stills",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Hunter Long",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": "00-0035289",
+      "name": "Gardner Minshew II",
+      "position": "QB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Michael Wilson",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jon Gaines II",
+      "position": "G",
+      "status": "Questionable"
+     }
+    ],
     "2": [
      {
       "id": "00-0032954",
@@ -56617,71 +56693,34 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jayden Williams",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jon Gaines II",
-      "position": "G",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Isaiah Adams",
-      "position": "G",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037157",
       "name": "Bam Knight",
       "position": "RB",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038571",
+      "name": "Jon Gaines II",
+      "position": "G",
+      "status": "Out"
+     },
+     {
+      "id": "00-0039808",
+      "name": "Isaiah Adams",
+      "position": "G",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Michael Wilson",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "James Conner",
-      "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jeremiyah Love",
-      "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Kendrick Bourne",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Walter Nolen III",
+      "id": "00-0040706",
+      "name": "Walter Nolen",
       "position": "DT",
       "status": "Questionable"
+     },
+     {
+      "id": "00-0041113",
+      "name": "Jayden Williams",
+      "position": "T",
+      "status": "Out"
      }
     ]
    },
@@ -56709,6 +56748,45 @@
       "id": "00-0040687",
       "name": "Cameron Williams",
       "position": "T",
+      "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Cameron Thomas",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Zachariah Branch",
+      "position": "WR",
+      "status": "Doubtful"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Gervon Dexter Sr.",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Brian Robinson Jr.",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Samson Ebukam",
+      "position": "DE",
       "status": "Out"
      }
     ],
@@ -56866,48 +56944,39 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Beaux Collins",
-      "position": "WR",
+      "id": "00-0037746",
+      "name": "Brian Robinson",
+      "position": "RB",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Brian Robinson Jr.",
-      "position": "RB",
+      "id": "00-0038580",
+      "name": "Yasir Abdullah",
+      "position": "DE",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Samson Ebukam",
+      "id": "00-0040432",
+      "name": "Beaux Collins",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0040578",
+      "name": "James Pearce Jr.",
       "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0040687",
+      "name": "Cameron Williams",
+      "position": "T",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0041044",
       "name": "Zachariah Branch",
       "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Cameron Williams",
-      "position": "OL",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Anterio Thompson",
-      "position": "DT",
       "status": "Out"
      }
     ]
@@ -56925,6 +56994,30 @@
       "name": "Devontez Walker",
       "position": "WR",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Rashod Bateman",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Olaivavega Ioane",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": "00-0034796",
+      "name": "Lamar Jackson",
+      "position": "QB",
+      "status": "Out"
      }
     ],
     "2": [
@@ -57099,56 +57192,22 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": "00-0039577",
-      "name": "Kedon Slovis",
-      "position": "QB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Elijah Sarratt",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Emery Jones Jr.",
-      "position": "OT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Aeneas Peebles",
-      "position": "DT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": "00-0035993",
-      "name": "Tyler Huntley",
-      "position": "QB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
       "id": "00-0034796",
       "name": "Lamar Jackson",
       "position": "QB",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0035993",
+      "name": "Tyler Huntley",
+      "position": "QB",
+      "status": "Out"
+     },
+     {
+      "id": "00-0040888",
       "name": "Adam Randall",
       "position": "RB",
-      "status": "Out"
+      "status": "Questionable"
      }
     ]
    },
@@ -57165,6 +57224,50 @@
       "name": "T.J. Sanders",
       "position": "DE",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Dalton Kincaid",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Dion Dawkins",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Spencer Brown",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Connor McGovern",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Alec Anderson",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tyrell Shavers",
+      "position": "WR",
+      "status": "Out"
      }
     ],
     "2": [
@@ -57313,71 +57416,56 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Ty Johnson",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Keon Coleman",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0033904",
       "name": "Dion Dawkins",
-      "position": "OT",
+      "position": "T",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Alec Anderson",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Joshua Palmer",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Dalton Kincaid",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "DJ Moore",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0035667",
       "name": "Greg Gaines",
       "position": "DT",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Spencer Brown",
-      "position": "OT",
+      "id": "00-0036988",
+      "name": "Josh Palmer",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0037428",
+      "name": "Alec Anderson",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0038679",
+      "name": "Tyrell Shavers",
+      "position": "WR",
       "status": "Questionable"
      }
     ]
    },
    "CAR": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Xavier Legette",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Jonathon Brooks",
+      "position": "RB",
+      "status": "Out"
+     }
+    ],
     "2": [
      {
       "id": "00-0036903",
@@ -57506,35 +57594,28 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Brady Christensen",
+      "id": "00-0036417",
+      "name": "Damien Lewis",
       "position": "G",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Damien Lewis",
+      "id": "00-0036968",
+      "name": "Brady Christensen",
       "position": "G",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jonathon Brooks",
-      "position": "RB",
-      "status": "Out"
+      "id": "00-0039242",
+      "name": "Corey Bullock",
+      "position": "G",
+      "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Xavier Legette",
-      "position": "WR",
-      "status": "Out"
+      "id": "00-0040541",
+      "name": "Torricelli Simpkins III",
+      "position": "G",
+      "status": "Questionable"
      }
     ]
    },
@@ -57557,6 +57638,46 @@
       "name": "Ozzy Trapilo",
       "position": "T",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Luther Burden III",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Kyle Monangai",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Zavier Scott",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Kentavius Street",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Braxton Jones",
+      "position": "OT",
+      "status": "Out"
      }
     ],
     "3": [
@@ -57657,48 +57778,9 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Zavier Scott",
-      "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0040236",
       "name": "Kyle Monangai",
       "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Kentavius Street",
-      "position": "DT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Braxton Jones",
-      "position": "OT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Theo Benedet",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Grady Jarrett",
-      "position": "DE",
       "status": "Questionable"
      }
     ]
@@ -57710,6 +57792,32 @@
       "name": "Shemar Stewart",
       "position": "DE",
       "status": "Doubtful"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Brian Parker II",
+      "position": "OT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Andrei Iosivas",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Cashius Howell",
+      "position": "DE",
+      "status": "Out"
      }
     ],
     "2": [
@@ -57782,35 +57890,10 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Cashius Howell",
-      "position": "DE",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0039752",
       "name": "Cedric Johnson",
       "position": "DE",
       "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Andrei Iosivas",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Erick All Jr.",
-      "position": "TE",
-      "status": "Out"
      }
     ]
    },
@@ -57826,6 +57909,50 @@
       "id": "00-0041073",
       "name": "Parker Brailsford",
       "position": "C",
+      "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Harold Fannin Jr.",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Denzel Boston",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tytus Howard",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Elgton Jenkins",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Austin Barber",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Maliek Collins",
+      "position": "DT",
       "status": "Questionable"
      }
     ],
@@ -57995,38 +58122,15 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Denzel Boston",
-      "position": "WR",
-      "status": "Questionable"
+      "id": "00-0033131",
+      "name": "Maliek Collins",
+      "position": "DT",
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Harold Fannin Jr.",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
       "id": "00-0033537",
       "name": "Deshaun Watson",
       "position": "QB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Austin Barber",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Maliek Collins",
-      "position": "DT",
       "status": "Questionable"
      }
     ]
@@ -58037,6 +58141,51 @@
       "id": "00-0037563",
       "name": "Malik Davis",
       "position": "RB",
+      "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jonathan Mingo",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "KaVontae Turpin",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "George Pickens",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tyler Goodson",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jake Ferguson",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Jonathan Bullard",
+      "position": "DT",
       "status": "Out"
      }
     ],
@@ -58122,51 +58271,55 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Tyler Smith",
-      "position": "G",
+      "id": "00-0033093",
+      "name": "Jonathan Bullard",
+      "position": "DE",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jake Ferguson",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037247",
       "name": "George Pickens",
       "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037801",
       "name": "KaVontae Turpin",
       "position": "WR",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Luke Schoonmaker",
+      "id": "00-0038041",
+      "name": "Jake Ferguson",
       "position": "TE",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jonathan Bullard",
-      "position": "DT",
-      "status": "Out"
+      "id": "00-0038547",
+      "name": "Luke Schoonmaker",
+      "position": "TE",
+      "status": "Questionable"
      }
     ]
    },
    "DEN": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jaylen Waddle",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Eyioma Uwazurike",
+      "position": "DE",
+      "status": "Out"
+     }
+    ],
     "2": [
      {
       "id": "00-0038976",
@@ -58237,31 +58390,51 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Pat Bryant",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0038106",
       "name": "Eyioma Uwazurike",
       "position": "DE",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "RJ Harvey",
-      "position": "RB",
-      "status": "Out"
+      "id": "00-0040134",
+      "name": "Pat Bryant",
+      "position": "WR",
+      "status": "Questionable"
      }
     ]
    },
    "DET": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Cade Mays",
+      "position": "C",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Sione Vaki",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Amon-Ra St. Brown",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Isiah Pacheco",
+      "position": "RB",
+      "status": "Out"
+     }
+    ],
     "2": [
      {
       "id": "00-0039408",
@@ -58322,33 +58495,34 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0036335",
+      "name": "DJ Wonnum",
+      "position": "DE",
+      "status": "Out"
+     },
+     {
+      "id": "00-0036963",
       "name": "Amon-Ra St. Brown",
       "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037297",
+      "name": "Cade Mays",
+      "position": "C",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038896",
       "name": "Jacob Saylors",
       "position": "RB",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Cade Mays",
-      "position": "C",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Isiah Pacheco",
+      "id": "00-0039364",
+      "name": "Sione Vaki",
       "position": "RB",
-      "status": "Out"
+      "status": "Questionable"
      }
     ]
    },
@@ -58371,6 +58545,95 @@
       "name": "Warren Brinson",
       "position": "DT",
       "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Kevin Zeitler",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Travis Glover",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Aaron Banks",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Sean Rhyan",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Warren Brinson",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Skyy Moore",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Chris Brooks",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Savion Williams",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Micah Parsons",
+      "position": "DE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Josh Whyle",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Josh Jacobs",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Lukas Van Ness",
+      "position": "DE",
+      "status": "Questionable"
      }
     ],
     "2": [
@@ -58617,65 +58880,89 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Travis Glover",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037076",
       "name": "Sean Rhyan",
-      "position": "G",
+      "position": "C",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038589",
+      "name": "Josh Whyle",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038685",
+      "name": "Chris Brooks",
+      "position": "RB",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Aaron Banks",
-      "position": "G",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0039811",
       "name": "MarShawn Lloyd",
       "position": "RB",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Christian Watson",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Chris Brooks",
-      "position": "RB",
+      "id": "00-0039819",
+      "name": "Travis Glover",
+      "position": "G",
       "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Micah Parsons",
-      "position": "DE",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Josh Whyle",
-      "position": "TE",
-      "status": "Questionable"
      }
     ]
    },
    "HOU": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Danielle Hunter",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Will Anderson Jr.",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Marvin Harrison Jr.",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Woody Marks",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "David Montgomery",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Brevin Jordan",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Keylan Rutledge",
+      "position": "G",
+      "status": "Questionable"
+     }
+    ],
     "2": [
      {
       "id": "00-0031364",
@@ -58816,23 +59103,53 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0035685",
       "name": "David Montgomery",
       "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jaylin Noel",
-      "position": "WR",
       "status": "Out"
      }
     ]
    },
    "IND": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jerry Tillery",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Mo Alie-Cox",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Arden Key",
+      "position": "DE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Alec Pierce",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jalen Travis",
+      "position": "OT",
+      "status": "Doubtful"
+     }
+    ],
     "2": [
      {
       "id": "00-0035021",
@@ -58951,25 +59268,9 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Drew Ogletree",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Alec Pierce",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Anthony Gould",
-      "position": "WR",
+      "id": "00-0040163",
+      "name": "Jalen Travis",
+      "position": "T",
       "status": "Questionable"
      }
     ]
@@ -58980,6 +59281,58 @@
       "id": "00-0040238",
       "name": "LeQuint Allen Jr.",
       "position": "RB",
+      "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Travon Walker",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jakobi Meyers",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Chris Rodriguez Jr.",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Bhayshul Tuten",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "B.J. Green II",
+      "position": "DE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Robert Hainsey",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Ezra Cleveland",
+      "position": "G",
       "status": "Questionable"
      }
     ],
@@ -59009,26 +59362,16 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Wesley Williams",
+      "id": "00-0037235",
+      "name": "Travon Walker",
       "position": "DE",
-      "status": "Out"
+      "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "CJ Williams",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "DaVon Hamilton",
-      "position": "DT",
-      "status": "Out"
+      "id": "00-0040719",
+      "name": "Bhayshul Tuten",
+      "position": "RB",
+      "status": "Questionable"
      }
     ]
    },
@@ -59039,6 +59382,29 @@
       "name": "Josh Simmons",
       "position": "T",
       "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jaydn Ott",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Peter Woods",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jaylon Moore",
+      "position": "OT",
+      "status": "Questionable"
      }
     ],
     "2": [
@@ -59121,16 +59487,20 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Peter Woods",
-      "position": "DT",
+      "id": "00-0038519",
+      "name": "Nikko Remigio",
+      "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0040748",
       "name": "Omarr Norman-Lott",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "id": "00-0041545",
+      "name": "Peter Woods",
       "position": "DT",
       "status": "Out"
      }
@@ -59142,6 +59512,65 @@
       "id": "00-0039111",
       "name": "Tuli Tuipulotu",
       "position": "DE",
+      "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Brenen Thompson",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "David Njoku",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tre' Harris",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Keaton Mitchell",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Branson Taylor",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Alex Harkey",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Ladd McConkey",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Kayode Awosika",
+      "position": "G",
       "status": "Questionable"
      }
     ],
@@ -59357,26 +59786,22 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0033885",
       "name": "David Njoku",
       "position": "TE",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Brenen Thompson",
-      "position": "WR",
       "status": "Doubtful"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0036736",
       "name": "Kayode Awosika",
       "position": "G",
-      "status": "Questionable"
+      "status": "Doubtful"
+     },
+     {
+      "id": "00-0041550",
+      "name": "Brenen Thompson",
+      "position": "WR",
+      "status": "Doubtful"
      }
     ]
    },
@@ -59387,6 +59812,75 @@
       "name": "Aaron Donald",
       "position": "DE",
       "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Davis Allen",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Puka Nacua",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Colby Parkinson",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tyler Higbee",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Myles Garrett",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Davante Adams",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Jordan Whittington",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Terrance Ferguson",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Steve Avila",
+      "position": "G",
+      "status": "Questionable"
      }
     ],
     "2": [
@@ -59467,49 +59961,21 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Myles Garrett",
-      "position": "DE",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0036244",
       "name": "Colby Parkinson",
       "position": "TE",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Terrance Ferguson",
-      "position": "TE",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0039751",
       "name": "Jordan Whittington",
       "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Ronnie Rivers",
-      "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Dean Connors",
-      "position": "RB",
+      "id": "00-0040737",
+      "name": "Terrance Ferguson",
+      "position": "TE",
       "status": "Out"
      }
     ]
@@ -59521,6 +59987,22 @@
       "name": "Brock Bowers",
       "position": "TE",
       "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Trey Zuhn III",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Thomas Booker IV",
+      "position": "DT",
+      "status": "Questionable"
      }
     ],
     "2": [
@@ -59671,22 +60153,67 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Dont'e Thornton Jr.",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Thomas Booker IV",
+      "id": "00-0037262",
+      "name": "Thomas Booker",
       "position": "DT",
-      "status": "Questionable"
+      "status": "Out"
      }
     ]
    },
    "MIA": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jared Wayne",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Chris Bell",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Will Kacmarek",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Malik Herring",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Aaron Brewer",
+      "position": "C",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": "00-0038128",
+      "name": "Malik Willis",
+      "position": "QB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Zach Sieler",
+      "position": "DT",
+      "status": "Out"
+     }
+    ],
     "3": [
      {
       "id": "00-0038603",
@@ -59771,50 +60298,71 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jaylen Wright",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Kadyn Proctor",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0036682",
       "name": "Malik Herring",
       "position": "DE",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Kaytron Allen",
+      "id": "00-0039874",
+      "name": "Jaylen Wright",
       "position": "RB",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Will Kacmarek",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Zach Sieler",
-      "position": "DT",
+      "id": "00-0041096",
+      "name": "Kaytron Allen",
+      "position": "RB",
       "status": "Questionable"
      }
     ]
    },
    "MIN": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Jauan Jennings",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": "00-0032950",
+      "name": "Carson Wentz",
+      "position": "QB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "T.J. Hockenson",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": "00-0035228",
+      "name": "Kyler Murray",
+      "position": "QB",
+      "status": "Doubtful"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tyrion Ingram-Dawkins",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Demond Claiborne",
+      "position": "RB",
+      "status": "Out"
+     }
+    ],
     "2": [
      {
       "id": "00-0034158",
@@ -59899,32 +60447,22 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jauan Jennings",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Demond Claiborne",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
       "id": "00-0035228",
       "name": "Kyler Murray",
       "position": "QB",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Christian Darrisaw",
-      "position": "OT",
-      "status": "Questionable"
+      "id": "00-0036259",
+      "name": "Jauan Jennings",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0041104",
+      "name": "Demond Claiborne",
+      "position": "RB",
+      "status": "Out"
      }
     ]
    },
@@ -59938,6 +60476,64 @@
      },
      {
       "id": "00-0040734",
+      "name": "TreVeyon Henderson",
+      "position": "RB",
+      "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Hunter Henry",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Rhamondre Stevenson",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "A.J. Brown",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Ben Brown",
+      "position": "C",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Morgan Moses",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Walter Rouse",
+      "position": "OL",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Cameron Latu",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
       "name": "TreVeyon Henderson",
       "position": "RB",
       "status": "Out"
@@ -60073,54 +60669,39 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "TreVeyon Henderson",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "A.J. Brown",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Hunter Henry",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0029685",
       "name": "Greg Van Roten",
       "position": "G",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Dre'Mont Jones",
-      "position": "DE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0031330",
       "name": "Morgan Moses",
-      "position": "OT",
+      "position": "T",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0033090",
+      "name": "Hunter Henry",
+      "position": "TE",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0033555",
       "name": "Mack Hollins",
       "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0035676",
+      "name": "A.J. Brown",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0040734",
+      "name": "TreVeyon Henderson",
+      "position": "RB",
       "status": "Out"
      }
     ]
@@ -60135,7 +60716,7 @@
      },
      {
       "id": "00-0039373",
-      "name": "Audric Estim\u00e9",
+      "name": "Audric Estime",
       "position": "RB",
       "status": "Out"
      },
@@ -60144,6 +60725,58 @@
       "name": "Oscar Delp",
       "position": "TE",
       "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Taliese Fuaga",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "David Edwards",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Kelvin Banks Jr.",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "CJ Donaldson",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Travis Etienne Jr.",
+      "position": "RB",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Christen Miller",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Erik McCoy",
+      "position": "C",
+      "status": "Doubtful"
      }
     ],
     "2": [
@@ -60244,47 +60877,26 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Kelvin Banks Jr.",
-      "position": "OT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "CJ Donaldson",
-      "position": "RB",
+      "id": "00-0038601",
+      "name": "Asim Richards",
+      "position": "T",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0040125",
+      "name": "Kelvin Banks Jr.",
+      "position": "T",
+      "status": "Questionable"
+     },
+     {
+      "id": "00-0041029",
       "name": "Jordyn Tyson",
       "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Alvin Kamara",
-      "position": "RB",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Asim Richards",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Travis Etienne Jr.",
+      "id": "00-0041326",
+      "name": "CJ Donaldson",
       "position": "RB",
       "status": "Out"
      }
@@ -60297,6 +60909,36 @@
       "name": "Malik Nabers",
       "position": "WR",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Josh Sills",
+      "position": "G",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "CJ Okoye",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "J.C. Davis",
+      "position": "OT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Thomas Fidone II",
+      "position": "TE",
+      "status": "Out"
      }
     ],
     "5": [
@@ -60349,54 +60991,16 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Jermaine Eluemunor",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Andrew Thomas",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Darius Alexander",
-      "position": "DT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Cam Skattebo",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Malik Nabers",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0038576",
       "name": "Charlie Jones",
       "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Tyrone Tracy Jr.",
+      "id": "00-0040715",
+      "name": "Cam Skattebo",
       "position": "RB",
-      "status": "Out"
+      "status": "Doubtful"
      }
     ]
    },
@@ -60418,6 +61022,44 @@
       "id": "00-0036902",
       "name": "Joseph Ossai",
       "position": "DE",
+      "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Garrett Wilson",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Omar Cooper Jr.",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Harrison Phillips",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Joseph Ossai",
+      "position": "DE",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Max Mitchell",
+      "position": "OT",
       "status": "Out"
      }
     ],
@@ -60659,40 +61301,21 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Garrett Wilson",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Joseph Ossai",
-      "position": "DE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0034782",
       "name": "Harrison Phillips",
       "position": "DT",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Max Mitchell",
-      "position": "OT",
+      "id": "00-0036902",
+      "name": "Joseph Ossai",
+      "position": "DE",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "T'Vondre Sweat",
-      "position": "DT",
+      "id": "00-0037740",
+      "name": "Garrett Wilson",
+      "position": "WR",
       "status": "Out"
      }
     ]
@@ -60703,6 +61326,29 @@
       "id": "00-0041483",
       "name": "Eli Stowers",
       "position": "TE",
+      "status": "Out"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Dontayvion Wicks",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "DeVonta Smith",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Britain Covey",
+      "position": "WR",
       "status": "Out"
      }
     ],
@@ -60882,43 +61528,50 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
+      "id": "00-0036912",
+      "name": "DeVonta Smith",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0037132",
+      "name": "Britain Covey",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038393",
+      "name": "Dontayvion Wicks",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
       "id": "00-0038400",
       "name": "Tanner McKee",
       "position": "QB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Dontayvion Wicks",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "DeVonta Smith",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Saquon Barkley",
-      "position": "RB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Britain Covey",
-      "position": "WR",
       "status": "Questionable"
      }
     ]
    },
    "PIT": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Michael Pittman Jr.",
+      "position": "WR",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Derrick Harmon",
+      "position": "DT",
+      "status": "Out"
+     }
+    ],
     "2": [
      {
       "id": "00-0036252",
@@ -61040,31 +61693,6 @@
       "position": "WR",
       "status": "Questionable"
      }
-    ],
-    "9": [
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Ben Skowronek",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Michael Pittman Jr.",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Sebastian Joseph-Day",
-      "position": "DT",
-      "status": "Out"
-     }
     ]
    },
    "SEA": {
@@ -61074,6 +61702,57 @@
       "name": "Tory Horton",
       "position": "WR",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Charles Cross",
+      "position": "OT",
+      "status": "Doubtful"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": "00-0035704",
+      "name": "Drew Lock",
+      "position": "QB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Leonard Williams",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Anthony Bradford",
+      "position": "G",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Brandon Pili",
+      "position": "DT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Quenton Nelson",
+      "position": "G",
+      "status": "Doubtful"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": "00-0034869",
+      "name": "Sam Darnold",
+      "position": "QB",
+      "status": "Out"
      }
     ],
     "2": [
@@ -61194,60 +61873,40 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Quenton Nelson",
-      "position": "G",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Charles Cross",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0031933",
       "name": "Leonard Williams",
       "position": "DT",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Rashid Shaheed",
-      "position": "WR",
-      "status": "Questionable"
+      "id": "00-0034342",
+      "name": "Quenton Nelson",
+      "position": "G",
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": "00-0035704",
-      "name": "Drew Lock",
-      "position": "QB",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
       "id": "00-0034869",
       "name": "Sam Darnold",
       "position": "QB",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Velus Jones Jr.",
-      "position": "RB",
-      "status": "Questionable"
+      "id": "00-0037545",
+      "name": "Rashid Shaheed",
+      "position": "WR",
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037821",
+      "name": "Charles Cross",
+      "position": "T",
+      "status": "Out"
+     },
+     {
+      "id": "00-0038694",
       "name": "Brandon Pili",
       "position": "DT",
-      "status": "Questionable"
+      "status": "Out"
      }
     ]
    },
@@ -61264,6 +61923,52 @@
       "name": "James Thompson Jr.",
       "position": "DT",
       "status": "Questionable"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Trent Williams",
+      "position": "OT",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Mike Evans",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Deebo Samuel Sr.",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "C.J. West",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Gracen Halton",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Brandon Aiyuk",
+      "position": "WR",
+      "status": "Out"
      }
     ],
     "2": [
@@ -61430,60 +62135,26 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Brandon Aiyuk",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Demarcus Robinson",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Christian Kirk",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Deebo Samuel Sr.",
-      "position": "WR",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0031408",
       "name": "Mike Evans",
       "position": "WR",
+      "status": "Out"
+     },
+     {
+      "id": "00-0032775",
+      "name": "Demarcus Robinson",
+      "position": "WR",
       "status": "Questionable"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Christian McCaffrey",
-      "position": "RB",
-      "status": "Questionable"
+      "id": "00-0034775",
+      "name": "Christian Kirk",
+      "position": "WR",
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Nick Bosa",
-      "position": "DE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "De'Zhaun Stribling",
+      "id": "00-0035719",
+      "name": "Deebo Samuel Sr.",
       "position": "WR",
       "status": "Out"
      }
@@ -61508,6 +62179,16 @@
       "name": "Jalen McMillan",
       "position": "WR",
       "status": "Doubtful"
+     }
+    ],
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Jalen McMillan",
+      "position": "WR",
+      "status": "Out"
      }
     ],
     "2": [
@@ -61608,23 +62289,44 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Tristan Wirfs",
-      "position": "OT",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jalen McMillan",
+      "id": "00-0040129",
+      "name": "Emeka Egbuka",
       "position": "WR",
-      "status": "Out"
+      "status": "Questionable"
      }
     ]
    },
    "TEN": {
+    "10": [
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tyjae Spears",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Tony Pollard",
+      "position": "RB",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Carnell Tate",
+      "position": "WR",
+      "status": "Questionable"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Peter Skoronski",
+      "position": "G",
+      "status": "Questionable"
+     }
+    ],
     "3": [
      {
       "id": "00-0039032",
@@ -61708,39 +62410,62 @@
       "position": "WR",
       "status": "Out"
      }
-    ],
-    "9": [
+    ]
+   },
+   "WAS": {
+    "10": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Tyjae Spears",
-      "position": "RB",
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": "00-0041117",
+      "name": "Athan Kaliakmanis",
+      "position": "QB",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
+      "as_of_utc": "2026-11-13T10:19:32Z",
       "id": null,
-      "name": "Carnell Tate",
+      "name": "Tanoa Togiai",
+      "position": "G",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Ricky Barber",
+      "position": "DT",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Lucas Patrick",
+      "position": "G",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "id": null,
+      "name": "Colson Yankoff",
+      "position": "TE",
+      "status": "Out"
+     },
+     {
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
+      "id": null,
+      "name": "Dyami Brown",
       "position": "WR",
       "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
+      "as_of_utc": "2026-11-13T10:19:32Z",
+      "designation": "Injured Reserve",
       "id": null,
-      "name": "Peter Skoronski",
-      "position": "G",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "JC Latham",
-      "position": "OT",
-      "status": "Questionable"
+      "name": "Daron Payne",
+      "position": "DT",
+      "status": "Out"
      }
-    ]
-   },
-   "WAS": {
+    ],
     "2": [
      {
       "id": "00-0036260",
@@ -61917,87 +62642,22 @@
     ],
     "9": [
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0036626",
       "name": "Dyami Brown",
       "position": "WR",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
+      "id": "00-0037742",
       "name": "Treylon Burks",
       "position": "WR",
-      "status": "Questionable"
+      "status": "Out"
      },
      {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
+      "id": "00-0039906",
       "name": "Jer'Zhan Newton",
       "position": "DT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Shy Tuttle",
-      "position": "DT",
       "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "John Bates",
-      "position": "TE",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "id": null,
-      "name": "Sam Cosmi",
-      "position": "G",
-      "status": "Questionable"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Daron Payne",
-      "position": "DT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Jeremy McNichols",
-      "position": "RB",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Javon Kinlaw",
-      "position": "DT",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Terry McLaurin",
-      "position": "WR",
-      "status": "Out"
-     },
-     {
-      "as_of_utc": "2026-11-06T03:56:14Z",
-      "designation": "Injured Reserve",
-      "id": null,
-      "name": "Laremy Tunsil",
-      "position": "OT",
-      "status": "Out"
      }
     ]
    }

@@ -17,199 +17,241 @@
     "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.38702401999999997,
     "estimate": false,
     "event_id": "401873038",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T14:30Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.5796399397663503,
     "model": "elo_prior",
     "probs": [
       0.4399,
       0.5601
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.5360265800000001,
     "estimate": false,
     "event_id": "401873040",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.7291889519072109,
     "model": "elo_prior",
     "probs": [
       0.5177,
       0.4823
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 0,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.10839168,
     "estimate": false,
     "event_id": "401873045",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.2650077554129086,
     "model": "elo_prior",
     "probs": [
       0.7672,
       0.2328
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.21242161999999998,
     "estimate": false,
     "event_id": "401873042",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.3943768111227438,
     "model": "elo_prior",
     "probs": [
       0.3259,
       0.6741
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 0,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.48668977999999996,
     "estimate": false,
     "event_id": "401873039",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.6798361665002729,
     "model": "elo_prior",
     "probs": [
       0.5067,
       0.4933
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.39676232000000006,
     "estimate": false,
     "event_id": "401873044",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.5895081458004594,
     "model": "elo_prior",
     "probs": [
       0.4454,
       0.5546
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.27011250000000003,
     "estimate": false,
     "event_id": "401873043",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.4580750583804618,
     "model": "elo_prior",
     "probs": [
       0.3675,
       0.6325
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.23052050000000004,
     "estimate": false,
     "event_id": "401873041",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T18:00Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.4147581550197571,
     "model": "elo_prior",
     "probs": [
       0.3395,
       0.6605
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.33162368000000003,
     "estimate": false,
     "event_id": "401873046",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T21:05Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.52289820500026,
     "model": "elo_prior",
     "probs": [
       0.4072,
       0.5928
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.8640865799999999,
     "estimate": false,
     "event_id": "401873049",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T21:25Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 1.0708998501015738,
     "model": "elo_prior",
     "probs": [
       0.6573,
       0.3427
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 0,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.09210632,
     "estimate": false,
     "event_id": "401873047",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T21:25Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.24156213683822783,
     "model": "elo_prior",
     "probs": [
       0.7854,
       0.2146
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 0,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.09116450000000001,
     "estimate": false,
     "event_id": "401873048",
     "event_type": "game",
     "kickoff_utc": "2026-11-08T21:25Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.24016255648380458,
     "model": "elo_prior",
     "probs": [
       0.7865,
       0.2135
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 0,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.16279218,
     "estimate": false,
     "event_id": "401873050",
     "event_type": "game",
     "kickoff_utc": "2026-11-09T01:20Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.33589240475620386,
     "model": "elo_prior",
     "probs": [
       0.7147,
       0.2853
     ],
-    "resolved": false
+    "resolved": true
   },
   {
+    "actual": 1,
     "as_of_utc": "2026-11-03T05:42:45Z",
+    "brier": 0.5273645,
     "estimate": false,
     "event_id": "401873051",
     "event_type": "game",
     "kickoff_utc": "2026-11-10T01:15Z",
     "locked_utc": "2026-11-03T05:42:45Z",
+    "log_loss": 0.7205183773560774,
     "model": "elo_prior",
     "probs": [
       0.5135,
       0.4865
     ],
-    "resolved": false
+    "resolved": true
   }
 ]
